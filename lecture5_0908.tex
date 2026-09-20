@@ -1,0 +1,314 @@
+\documentclass[11pt]{article}
+\usepackage[rm2]{lecturenote}
+\HandoutTitle{5}{The Discrete-Time Fourier Transform (DTFT)}{September 8, 2026}
+
+\begin{document}
+\maketitle
+
+\HandoutMarkSection{1}{The Discrete-Time Fourier Transform (DTFT)}
+
+\begin{defbox}[title={Def}]
+The DTFT $X(e^{j\omega})$ of a sequence $x[n]$ is given by
+\begin{equation}
+X(e^{j\omega}) = \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega n}.
+\end{equation}
+$\Rightarrow$ a complex-valued function of a real-valued variable $\omega$.
+\begin{equation}
+X(e^{j\omega}) = X_{\mathrm{re}}(e^{j\omega}) + j X_{\mathrm{im}}(e^{j\omega}).
+\end{equation}
+Both $X_{\mathrm{re}}(e^{j\omega})$ and $X_{\mathrm{im}}(e^{j\omega})$ are real-valued functions of $\omega$.
+\end{defbox}
+
+\begin{equation}
+X(e^{j\omega}) = \underbrace{|X(e^{j\omega})|}_{\HandoutUnderbraceLabel{\text{magnitude}}}\,e^{j\HandoutHighlightYellow{$\theta(\omega)$}}, \qquad \theta(\omega) = \angle X(e^{j\omega})\ \text{(\textbf{phase})}.
+\end{equation}
+
+\begin{notebox}
+Phase is not unique:
+\begin{equation*}
+  e^{j\theta(\omega)} = e^{j(\theta(\omega)+2\pi k)}, \quad k \in \Z.
+\end{equation*}
+\noindent Sometimes we force the \textbf{principal value},
+$-\pi \le \theta(\omega) < +\pi$.
+\end{notebox}
+
+\begin{examplebox}[title={DTFT Examples}, handout mark=2]
+\begin{itemize}
+  \item $x[n] = \delta[n]$:
+  \begin{align*}
+    X(e^{j\omega}) &= \sum_{n=-\infty}^{\infty} \delta[n]\,e^{-j\omega n} = \delta[0]\,e^{-j\omega \cdot 0} = 1.
+  \end{align*}
+  \item $x[n] = \alpha^n u[n]$, $|\alpha|<1$:
+  \begin{align*}
+    X(e^{j\omega}) &= \sum_{n=-\infty}^{\infty} \alpha^n u[n]\,e^{-j\omega n}
+      = \sum_{n=0}^{\infty} \alpha^n e^{-j\omega n} = \sum_{n=0}^{\infty} \left(\alpha e^{-j\omega}\right)^n \\
+    &= \frac{1}{1-\alpha e^{-j\omega}} \quad \text{if } |\alpha e^{-j\omega}| < 1 \quad \left(|\alpha e^{-j\omega}| = |\alpha|\,\underbrace{|e^{-j\omega}|}_{\HandoutUnderbraceLabel{1}}\right).
+  \end{align*}
+\end{itemize}
+\end{examplebox}
+
+\begin{examplebox}[title={Example (Rectangular Window Sequence)}]
+\begin{align*}
+  x[n] &= \begin{cases} 1, & 0\le n \le N-1 \\ 0, & \text{else} \end{cases} \\
+  &= u[n] - u[n-N].
+\end{align*}%
+\HandoutMarkBeforeAlign{3}%
+\begin{align*}
+  X(e^{j\omega}) &= \sum_{n=0}^{N-1} e^{-j\omega n} \\
+  &= \frac{1-\left(e^{-j\omega}\right)^N}{1-e^{-j\omega}} \\
+  &= \frac{e^{-j\omega\frac{N}{2}}\left(e^{+j\omega\frac{N}{2}}-e^{-j\omega\frac{N}{2}}\right)}{e^{-j\frac{\omega}{2}}\left(e^{+j\frac{\omega}{2}}-e^{-j\frac{\omega}{2}}\right)} \\
+  &= \HandoutHighlightYellow{$\frac{\sin\!\left(\omega\frac{N}{2}\right)}{\sin\!\left(\frac{\omega}{2}\right)}$}\,e^{-j\omega\frac{N-1}{2}}.
+\end{align*}
+\end{examplebox}
+
+\section{Dirichlet Kernel}
+
+\begin{wrapfigure}[3]{r}{0.22\linewidth}
+\vspace{-0.35\baselineskip}
+\centering
+\includegraphics[width=\linewidth,height=2.6cm,keepaspectratio]{Peter_Gustav_Lejeune_Dirichlet.jpg}\\[-0.1em]
+{\scriptsize\itshape P.~G.~Lejeune Dirichlet}
+\vspace{-0.35\baselineskip}
+\end{wrapfigure}
+In signal processing, the Dirichlet kernel is often called the periodic sinc function:
+\[
+\frac{\sin\!\left(\omega\frac{N}{2}\right)}{\sin\!\left(\frac{\omega}{2}\right)}.
+\]
+For small $\omega$, $\sin\!\left(\frac{\omega}{2}\right)\approx \frac{\omega}{2}$, so
+\begin{equation}
+\frac{\sin\!\left(\omega\frac{N}{2}\right)}{\sin\!\left(\frac{\omega}{2}\right)}
+  \approx \frac{\sin\!\left(\omega\frac{N}{2}\right)}{\frac{\omega}{2}}
+  = N\,\mathrm{sinc}\!\left(\omega\frac{N}{2}\right),
+  \qquad \mathrm{sinc}(x) \triangleq \frac{\sin x}{x}.
+\end{equation}
+Zeros occur when $\omega\dfrac{N}{2} = k\pi$, $k\ne 0$, i.e., $\omega = \dfrac{2\pi k}{N}$.
+
+\begin{center}
+\adjustbox{max width=\linewidth,max height=0.24\textheight,center}{%
+  \includegraphics{dirichlet_zeros.pdf}%
+}\\[-0.35em]
+{\scriptsize ``more zeros'' for larger $N$, faster oscillations.}
+\end{center}
+
+\noindent\HandoutMarkLeft{4}\textbf{But:} also periodic (``periodic sinc''):
+\begin{align*}
+\left|\frac{\sin\!\left(\omega\frac{N}{2}\right)}{\sin\!\left(\frac{\omega}{2}\right)}\right| \ \overset{?}{=}\ \left|\frac{\sin\!\left((\omega+2\pi)\frac{N}{2}\right)}{\sin\!\left(\frac{\omega+2\pi}{2}\right)}\right|
+= \left|\frac{\sin\left(\omega\frac{N}{2}+\pi N\right)}{\sin\left(\frac{\omega}{2}+\pi\right)}\right|.
+\end{align*}
+
+\begin{center}
+\adjustbox{max width=\linewidth,max height=0.22\textheight,center}{%
+  \includegraphics{dirichlet_periodic.pdf}%
+}\\[-0.35em]
+{\scriptsize $|D(\omega)| = |D(\omega + 2\pi)|$}
+\end{center}
+
+\textbf{Dealing with $0/0$ when $\omega=0$:}
+\begin{equation}
+X(e^{j\omega})\Big|_{\omega=0} = \sum_{n=0}^{N-1} e^{-j\omega n}\Big|_{\omega=0} = N.
+\end{equation}
+Limits: $\displaystyle\lim_{\omega\to 0} \frac{f(\omega)}{g(\omega)}$. For small $\omega$, $\dfrac{\omega\frac{N}{2}}{\frac{\omega}{2}} = N$.
+
+\HandoutMarkSection{5}{DTFT Properties}
+
+\textbf{Periodicity:} The DTFT is $2\pi$-periodic.
+
+\paragraph{Proof.}
+\begin{align*}
+X\!\left(e^{j(\omega_0+2\pi k)}\right) &= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j(\omega_0+2\pi k)n} \\
+&= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega_0 n}\,\underbrace{e^{-j2\pi k n}}_{\HandoutUnderbraceLabel{\left(e^{-j2\pi}\right)^{kn}=1}} \\
+&= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega_0 n} = X(e^{j\omega_0}). \quad \blacksquare
+\end{align*}
+
+More properties: see \hyperref[tab:dtft-real-symmetry]{Table~3.1}, \hyperref[tab:dtft-complex-symmetry]{Table~3.2}, and \hyperref[tab:dtft-theorems]{Table~3.4} of Mitra.
+
+\paragraph{Inverse.}
+\begin{equation}
+x[n] = \frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\,e^{+j\omega n}\,d\omega.
+\end{equation}
+\textbf{Proof.}
+\begin{align*}
+x[n] &= \frac{1}{2\pi}\int_{-\pi}^{\pi}\left(\sum_{\ell=-\infty}^{\infty} x[\ell]\,e^{-j\omega \ell}\right)e^{j\omega n}\,d\omega \\
+&= \sum_{\ell=-\infty}^{\infty} x[\ell]\int_{-\pi}^{\pi}\frac{1}{2\pi}\,e^{j\omega(n-\ell)}\,d\omega \\
+&= \sum_{\ell=-\infty}^{\infty} x[\ell]\,\frac{\sin\big(\pi(n-\ell)\big)}{\pi(n-\ell)}
+= \sum_{\ell=-\infty}^{\infty} x[\ell]\,\delta[n-\ell] \\
+&= x[n]. \quad \blacksquare
+\end{align*}
+
+\HandoutMarkSubsection{6}{Convergence}
+
+\textbf{Note:} Exchanging the order of integration and summation (above) assumed convergence.
+
+\begin{defbox}[title={Convergence}]
+An infinite series of the form $X(e^{j\omega}) = \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega n}$ may or may not converge. Let
+\begin{equation}
+X_K(e^{j\omega}) = \sum_{n=-K}^{K} x[n]\,e^{-j\omega n}, \qquad X(e^{j\omega}) = \lim_{K\to\infty} X_K(e^{j\omega}).
+\end{equation}
+\end{defbox}
+
+\begin{defbox}[title={Def}]
+We say that $X_K(e^{j\omega})$ converges \textbf{uniformly} to $X(e^{j\omega})$ if for every $\varepsilon>0$, there exists an integer $K$ such that for all integers $L\ge K$,
+\begin{equation}
+\big|X(e^{j\omega}) - X_L(e^{j\omega})\big| < \varepsilon \quad \text{for all } \omega.
+\end{equation}
+\end{defbox}
+
+\begin{factbox}[title={Property}]
+The DTFT will converge uniformly if $x[n]$ is an \textbf{absolutely summable} sequence,
+\begin{equation}
+\sum_{n=-\infty}^{\infty} |x[n]| < \infty.
+\end{equation}
+\end{factbox}
+
+\HandoutMarkLeft{7}
+
+\begin{defbox}[title={Def}]
+We say that $X_K(e^{j\omega})$ converges in the \textbf{mean-square} to $X(e^{j\omega})$ if
+\begin{equation}
+\lim_{K\to\infty} \int_{-\pi}^{\pi} \big|X(e^{j\omega}) - X_K(e^{j\omega})\big|^2\,d\omega = 0.
+\end{equation}
+\end{defbox}
+
+\begin{factbox}[title={Property}]
+The DTFT will converge in the mean-square if the sequence $x[n]$ is \textbf{square-summable}:
+\begin{equation}
+\sum_{n=-\infty}^{\infty} |x[n]|^2 < \infty.
+\end{equation}
+\end{factbox}
+
+\begin{factbox}[title={Property (Nesting of the $\ell_p(\mathbb{Z})$ spaces)}]
+\begin{itemize}
+  \item Every absolutely summable sequence is also square summable.
+  \item Every square-summable sequence is bounded.
+\end{itemize}
+\begin{equation}
+\ell_1(\mathbb{Z}) \subset \ell_2(\mathbb{Z}) \subset \ell_\infty(\mathbb{Z}).
+\end{equation}
+\begin{handouttikz}
+  \definecolor{swissred}{RGB}{227,6,19}
+  \tikzset{
+    lp/lbl/.style={
+      align=left,
+      text=ee483ink,
+      execute at begin node={\footnotesize\sffamily}
+    },
+    lp/ann/.style={
+      align=left,
+      text=ee483ink,
+      execute at begin node={\large\sffamily}
+    },
+    lp/lead/.style={
+      draw=ee483ink,
+      line width=0.65pt,
+      line cap=rect,
+      -{Stealth[length=2.8mm, width=2.1mm, inset=0pt]}
+    },
+    lp/leadaccent/.style={
+      draw=swissred,
+      line width=0.75pt,
+      line cap=rect,
+      -{Stealth[length=2.8mm, width=2.1mm, inset=0pt]}
+    }
+  }
+
+  \draw[ee483ink, line width=0.35pt] (-6.2,3.85) -- (6.2,3.85);
+
+  \draw[ee483ink, line width=0.5pt, fill=white]
+    (-6,-3.5) rectangle (6,3.5);
+
+  \draw[ee483ink, line width=0.75pt]
+    (0,-0.1) ellipse (5cm and 2.7cm);
+
+  \filldraw[
+    fill=ee483ink!4,
+    draw=ee483ink,
+    line width=0.9pt
+  ]
+  (-0.8,0) ellipse (3.3cm and 1.8cm);
+
+  \filldraw[
+    fill=swissred!10,
+    draw=swissred,
+    line width=1.1pt
+  ]
+  (-0.8,0) ellipse (1.25cm and 0.8cm);
+
+  \node[lp/lbl, anchor=north east] at (5.85, 3.25)
+    {Space of all sequences};
+
+  \node[lp/ann, anchor=west] (lblinf) at (6.35, -2.05)
+    {Bounded sequences\\[1pt]$\ell_\infty(\mathbb{Z})$};
+  \draw[lp/lead] (lblinf.west) ++(-0.05, 0.32) -- (3.85, -0.92);
+
+  \node[lp/ann, anchor=east] (lbltwo) at (-6.35, 1.55)
+    {Square-summable\\[1pt]$\ell_2(\mathbb{Z})$};
+  \draw[lp/lead] (lbltwo.east) ++(0.05, -0.18) -- (-3.15, 0.82);
+
+  \node[
+    lp/ann,
+    align=center,
+    text=swissred
+  ] (lblone) at (-0.8,-2.35)
+    {Absolutely summable\\[1pt]$\ell_1(\mathbb{Z})$};
+  \draw[lp/leadaccent] (lblone.north) ++(0, 0.08) -- (-0.8,-1.05);
+\end{handouttikz}
+\end{factbox}
+
+\HandoutMarkSubsection{8}{An Example, and Generalized DTFTs}
+
+\begin{examplebox}[title={Example}]
+The sequence
+\begin{equation}
+x[n] = \begin{cases} 1/n, & n \ge 1 \\ 0, & n \le 0 \end{cases}
+\end{equation}
+is \textbf{not} absolutely summable, but \textbf{is} square summable (famous result by Euler):
+\begin{equation}
+\sum_{n=1}^{\infty} \left(\frac{1}{n}\right)^2 = \frac{\pi^2}{6}.
+\end{equation}
+\end{examplebox}
+
+We can sometimes define DTFTs in cases where the DTFT does not actually converge (but still exists in a generalized sense).
+
+\begin{examplebox}[title={Example}]
+$x[n] = e^{j\omega_0 n}$:
+\begin{equation}
+X(e^{j\omega}) = \sum_{n=-\infty}^{\infty} e^{j(\omega_0-\omega)n} \qquad \text{does not converge.}
+\end{equation}
+But $x[n]$ still has a useful (generalized) DTFT:
+\begin{equation}
+X(e^{j\omega}) = \sum_{k=-\infty}^{\infty} 2\pi\,\delta(\omega - \omega_0 + 2\pi k).
+\end{equation}
+\end{examplebox}
+
+\HandoutMarkLeft{9}
+
+\begin{equation}
+X(e^{j\omega}) = 2\pi\,
+\underbrace{\delta(\omega-\omega_0)}_{\HandoutUnderbraceLabel{\text{Dirac delta function}}},
+\quad -\pi\le\omega\le\pi,\ -\pi\le\omega_0\le\pi
+\end{equation}
+\begin{align*}
+x[n] &= \frac{1}{2\pi}\int_{-\pi}^{\pi} 2\pi\,\delta(\omega-\omega_0)\,e^{j\omega n}\,d\omega = e^{j\omega_0 n}.
+\end{align*}
+
+\section*{Readings}
+\begin{itemize}
+  \item Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Ch.\ 4.8
+  \item Monson H. Hayes, \textit{Schaum's Outline of Digital Signal Processing}, 2nd ed., Ch.\ 2.7
+\end{itemize}
+
+\HandoutAppendixListStart
+  \HandoutAppendixListItem{app:mitra-tables}{A.\ Mitra Tables 3.1, 3.2, and 3.4}
+  \HandoutAppendixListItem{app:scan5}{B.\ Handwritten Lecture Note Scan (September 8, 2026)}
+\HandoutAppendixListEnd
+
+\HandoutAppendixSection{app:mitra-tables}{Mitra Tables 3.1, 3.2, and 3.4}
+\ifhandoutclean\else
+\input{appendix/mitra_tables_3_1_3_2_3_4.tex}
+\clearpage
+\fi
+
+\HandoutAppendixSection{app:scan5}{Handwritten Lecture Note Scan}
+\HandoutIncludeHandoutScan{lecture5_0908.pdf}
+
+\end{document}

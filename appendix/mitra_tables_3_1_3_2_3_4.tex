@@ -1,0 +1,186 @@
+% Mitra 4th ed.: Tables 3.1, 3.2, and 3.4 (DTFT properties appendix).
+
+\begin{table}[H]
+\centering
+\caption{Symmetry relations of the discrete-time Fourier transform of a real sequence (Mitra Table~3.1).}
+\label{tab:dtft-real-symmetry}
+
+\begin{tabular}{cc}
+\toprule
+\textbf{Sequence}
+&
+\textbf{Discrete-Time Fourier Transform}
+\\
+\midrule
+
+$x[n]$
+&
+$X(e^{j\omega})
+ = X_{\mathrm{re}}(e^{j\omega})
+ + jX_{\mathrm{im}}(e^{j\omega})$
+\\
+\midrule
+
+$x_{\mathrm{ev}}[n]$
+&
+$X_{\mathrm{re}}(e^{j\omega})$
+\\
+
+$x_{\mathrm{od}}[n]$
+&
+$jX_{\mathrm{im}}(e^{j\omega})$
+\\
+\midrule
+
+\multirow{5}{*}{Symmetry relations}
+&
+$X(e^{j\omega})=X^{*}(e^{-j\omega})$
+\\[1.2em]
+
+&
+$X_{\mathrm{re}}(e^{j\omega})
+ =X_{\mathrm{re}}(e^{-j\omega})$
+\\[1.2em]
+
+&
+$X_{\mathrm{im}}(e^{j\omega})
+ =-X_{\mathrm{im}}(e^{-j\omega})$
+\\[1.2em]
+
+&
+$\lvert X(e^{j\omega})\rvert
+ =\lvert X(e^{-j\omega})\rvert$
+\\[1.2em]
+
+&
+$\arg\!\left\{X(e^{j\omega})\right\}
+ =-\arg\!\left\{X(e^{-j\omega})\right\}$
+\\
+
+\bottomrule
+\end{tabular}
+
+\medskip
+
+\parbox{0.9\textwidth}{
+\textit{Note:}
+$x_{\mathrm{ev}}[n]$ and $x_{\mathrm{od}}[n]$ denote the even and
+odd parts of $x[n]$, respectively.
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Symmetry relations of the discrete-time Fourier transform of a complex sequence (Mitra Table~3.2).}
+\label{tab:dtft-complex-symmetry}
+
+\begin{tabular}{cc}
+\toprule
+\textbf{Sequence}
+&
+\textbf{Discrete-Time Fourier Transform}
+\\
+\midrule
+
+$x[n]$
+&
+$X(e^{j\omega})$
+\\
+\midrule
+
+$x[-n]$
+&
+$X(e^{-j\omega})$
+\\[0.8em]
+
+$x^{*}[-n]$
+&
+$X^{*}(e^{j\omega})$
+\\[0.8em]
+
+$x_{\mathrm{re}}[n]$
+&
+$X_{\mathrm{cs}}(e^{j\omega})
+ =\dfrac{1}{2}
+ \left\{
+ X(e^{j\omega})+X^{*}(e^{-j\omega})
+ \right\}$
+\\[0.8em]
+
+$jx_{\mathrm{im}}[n]$
+&
+$X_{\mathrm{ca}}(e^{j\omega})
+ =\dfrac{1}{2}
+ \left\{
+ X(e^{j\omega})-X^{*}(e^{-j\omega})
+ \right\}$
+\\[0.8em]
+
+$x_{\mathrm{cs}}[n]$
+&
+$X_{\mathrm{re}}(e^{j\omega})$
+\\[0.8em]
+
+$x_{\mathrm{ca}}[n]$
+&
+$jX_{\mathrm{im}}(e^{j\omega})$
+\\
+
+\bottomrule
+\end{tabular}
+
+\medskip
+
+\parbox{0.9\textwidth}{
+\textit{Note:}
+$X_{\mathrm{cs}}(e^{j\omega})$ and
+$X_{\mathrm{ca}}(e^{j\omega})$ are the conjugate-symmetric and
+conjugate-antisymmetric parts of $X(e^{j\omega})$, respectively.
+Likewise, $x_{\mathrm{cs}}[n]$ and $x_{\mathrm{ca}}[n]$ are the
+conjugate-symmetric and conjugate-antisymmetric parts of $x[n]$,
+respectively.
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Discrete-time Fourier transform theorems (Mitra Table~3.4).}
+\label{tab:dtft-theorems}
+
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}@{}>{\raggedright\arraybackslash}p{0.28\linewidth}@{}>{\raggedright\arraybackslash}p{0.47\linewidth}@{}}
+\toprule
+\textbf{Theorem} & \textbf{Sequence} & \textbf{Discrete-Time Fourier Transform} \\
+\midrule
+& $g[n]$ & $G(e^{j\omega})$ \\
+& $h[n]$ & $H(e^{j\omega})$ \\
+\midrule
+Linearity &
+$\alpha g[n]+\beta h[n]$ &
+$\alpha G(e^{j\omega})+\beta H(e^{j\omega})$ \\[0.6em]
+Time-reversal &
+$g[-n]$ &
+$G(e^{-j\omega})$ \\[0.6em]
+Time-shifting &
+$g[n-n_0]$ &
+$e^{-j\omega n_0}G(e^{j\omega})$ \\[0.6em]
+Frequency-shifting &
+$e^{j\omega_0 n}g[n]$ &
+$G\!\left(e^{j(\omega-\omega_0)}\right)$ \\[0.6em]
+Differentiation-in-frequency &
+$ng[n]$ &
+$j\dfrac{dG(e^{j\omega})}{d\omega}$ \\[0.8em]
+Convolution &
+$g[n]\circledast h[n]$ &
+$G(e^{j\omega})H(e^{j\omega})$ \\[0.6em]
+Modulation &
+$g[n]h[n]$ &
+$\dfrac{1}{2\pi}\displaystyle\int_{-\pi}^{\pi}G(e^{j\theta})H(e^{j(\omega-\theta)})\,d\theta$ \\[0.8em]
+Parseval's Theorem &
+\multicolumn{2}{@{}l@{}}{%
+$\displaystyle\sum_{n=-\infty}^{\infty}g[n]h^*[n]
+=\dfrac{1}{2\pi}\displaystyle\int_{-\pi}^{\pi}G(e^{j\omega})H^*(e^{j\omega})\,d\omega$}%
+\\
+\bottomrule
+\end{tabular}
+\end{table}

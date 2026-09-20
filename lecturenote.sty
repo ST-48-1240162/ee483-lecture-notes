@@ -49,9 +49,13 @@
 
 % --- Math: Latin Modern Math ---
 \RequirePackage{amsmath,amssymb,amsthm}
+\RequirePackage{mathtools}
 \RequirePackage{unicode-math}
 \setmathfont{latinmodern-math.otf}
-\RequirePackage{mathtools}
+\RequirePackage{array}
+\RequirePackage{booktabs}
+\RequirePackage{multirow}
+\RequirePackage{float}
 \RequirePackage{enumitem}
 \RequirePackage{etoolbox}
 \RequirePackage{needspace}
@@ -60,6 +64,11 @@
 \fi
 
 % --- Figures ---
+\RequirePackage{graphicx}
+\graphicspath{{figures/}}
+\RequirePackage{wrapfig}
+\setlength{\intextsep}{0.35em plus 0.1em minus 0.1em}
+\setlength{\columnsep}{0.55em}
 \RequirePackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
 
@@ -69,21 +78,6 @@
 \RequirePackage{fancyhdr}
 \RequirePackage{titlesec}
 \RequirePackage{xcolor}
-\RequirePackage{pdfpages}
-\RequirePackage{hyperref}
-\ifhandoutrmtwo
-  \hypersetup{
-    colorlinks=false,
-    pdfborder={0 0 0}
-  }
-\else
-  \hypersetup{
-    colorlinks=true,
-    linkcolor=black,
-    citecolor=black,
-    urlcolor=black!70!white
-  }
-\fi
 
 % Muted, print-friendly palette
 \definecolor{ee483ink}{RGB}{25,25,25}
@@ -98,7 +92,17 @@
 \definecolor{ee483footnote}{RGB}{95, 55, 140}
 \definecolor{ee483link}{RGB}{40, 90, 145}
 \colorlet{ee483blue}{ee483ink}  % backward compatibility for figures
-\newcommand{\HandoutSecLink}[2]{\hyperref[#1]{\textcolor{ee483link}{#2}}}
+
+\RequirePackage{pdfpages}
+\RequirePackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=ee483link,
+  citecolor=ee483link,
+  urlcolor=ee483link,
+  pdfborder={0 0 0}
+}
+\newcommand{\HandoutSecLink}[2]{\hyperref[#1]{#2}}
 
 % Footnote markers in purple to distinguish from body text.
 \makeatletter
@@ -117,6 +121,9 @@
   boxrule=0pt, arc=0pt, left=4pt, right=4pt, top=3pt, bottom=3pt, boxsep=0pt}
 \newtcbox{\HandoutHighlightYellow}{on line, colback=ee483highlightyellow, colframe=ee483highlightyellow,
   boxrule=0pt, arc=0pt, left=3pt, right=3pt, top=2pt, bottom=2pt, boxsep=0pt}
+
+% Underbrace label: \mathclap prevents long labels from widening the brace.
+\newcommand{\HandoutUnderbraceLabel}[1]{\mathclap{\scriptsize #1}}
 
 % Side-by-side block diagram (left) and equation derivation (right).
 \newcommand{\HandoutDiagramEqLayoutStart}{%
@@ -339,6 +346,13 @@
   \llap{\HandoutMark{#1}\hspace{\dimexpr\HandoutMarkInset+\HandoutMarkBoxOffset\relax}}%
 }
 \newcommand{\HandoutMarkLeft}[1]{\HandoutMarkMargin{#1}}
+% Mark at the left margin before a display-math block inside a tcolorbox.
+% After \end{align*} etc., the horizontal anchor sits at the frame edge, not
+% the text inset, so do not add \HandoutMarkBoxOffset here.
+\newcommand{\HandoutMarkBeforeAlign}[1]{%
+  \par\noindent\llap{\HandoutMark{#1}\hspace{\HandoutMarkInset}}%
+  \vspace{-\baselineskip}%
+}
 % Mark in the left margin, vertically aligned with the top of a tcolorbox frame.
 \newcommand{\HandoutBeginMarkedExamplebox}[2][Example]{%
   \begin{examplebox}[title={#1}, handout mark=#2]%
@@ -375,6 +389,28 @@
 \newcommand{\MitraEqDoubt}[1]{\HandoutMitraInlineText{#1}\textcolor{red}{?}}
 \newcommand{\MitraEqDoubtTag}[1]{\tag{\HandoutMitraTagText{#1}\textcolor{red}{?}}}
 \newcommand{\HandoutMitraSecRef}[1]{\textnormal{(cf.\ Mitra~Sec.~#1)}}
+
+% Suppress automatic (1), (2), ... equation numbers; keep \tag / \MitraTag.
+\makeatletter
+\newif\ifHandout@eqtag
+\Handout@eqtagfalse
+\AtBeginEnvironment{equation}{\Handout@eqtagfalse}
+\AtBeginEnvironment{align}{\Handout@eqtagfalse}
+\AtBeginEnvironment{gather}{\Handout@eqtagfalse}
+\AtBeginEnvironment{multline}{\Handout@eqtagfalse}
+\AtBeginDocument{%
+  \let\Handout@orig@tag\tag
+  \renewcommand{\tag}[1]{%
+    \Handout@eqtagtrue
+    \Handout@orig@tag{#1}%
+  }%
+  \renewcommand{\tagform@}[1]{%
+    \ifHandout@eqtag
+      \maketag@@{#1}%
+    \fi
+  }%
+}
+\makeatother
 
 % Gain block: vertical left edge, apex pointing right.
 \tikzset{
