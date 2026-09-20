@@ -34,7 +34,3 @@ make notes      # clean PDFs only (same as CI)
 make all        # full + clean PDFs for every lecture
 make lecture1   # single lecture
 ```
-
-Full handouts (`lectureN_*.pdf`, with Mitra excerpts and handwritten lecture note scans) are gitignored. Files in `pdf/` match the `*_clean.pdf` output.
-
-GitHub Actions builds `make notes` on each push and PR. The PDFs show up as the `clean-pdfs` artifact on the run.
