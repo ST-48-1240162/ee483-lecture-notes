@@ -7,6 +7,7 @@ function plot_dirichlet_zeros()
 
   Ns = [8, 16];
   colors = [0.15, 0.15, 0.15; 0.45, 0.45, 0.45];
+  accent_color = [40, 90, 145] / 255;  % ee483link (handout hyperlink accent)
 
   figure('visible', 'off', 'color', 'w', 'units', 'inches', 'position', [0, 0, 5.8, 1.85]);
   % Must be the full Fontconfig name; 'Latin Modern Roman' falls back to Noto Sans.
@@ -42,23 +43,23 @@ function plot_dirichlet_zeros()
     tick_w = 2 * pi * (0:N) / N;
     tick_labels = cell(1, N + 1);
     tick_labels{1} = '0';
-    tick_labels{2} = '2π/N';
     tick_labels{end} = '2π';
-    for k = 3:N
+    for k = 2:N
       tick_labels{k} = '';
     end
     xticks(tick_w);
     xticklabels(tick_labels);
+
+    loose = get(gca, 'LooseInset');
+    set(gca, 'LooseInset', [loose(1), max(loose(2), 0.15), loose(3), loose(4)]);
+
+    draw_underbrace(zero_w(1), zero_w(2), 0, '2π/N', 0.032 * N, accent_color);
+
     xlabel('ω');
     ylabel('|D(ω)|');
     title(sprintf('N = %d', N));
     grid on;
     set(gca, 'GridAlpha', 0.18, 'FontSize', 9, 'LineWidth', 0.6);
-
-    text(2 * pi, N * 1.05, 'Δω = 2π/N', ...
-      'HorizontalAlignment', 'right', 'VerticalAlignment', 'top', ...
-      'FontSize', 9, 'Color', 'k', 'BackgroundColor', 'w', ...
-      'EdgeColor', 'none', 'Margin', 2, 'Clipping', 'off');
   end
 
   set(gcf, 'PaperUnits', 'inches', 'PaperSize', [5.8, 1.85], ...
@@ -66,6 +67,27 @@ function plot_dirichlet_zeros()
 
   print(out_pdf, '-dpdf', '-painters');
   fprintf('Wrote %s\n', out_pdf);
+end
+
+function draw_underbrace(x1, x2, y, label, depth, color)
+  xm = (x1 + x2) / 2;
+  half_w = (x2 - x1) / 2;
+  tip_y = y - depth;
+
+  t = linspace(-1, 1, 48);
+  bx = xm + half_w * t;
+  by = y - depth * (1 - t.^2);
+
+  h_curve = plot(bx, by, 'Color', color, 'LineWidth', 0.75);
+  h_left = plot([x1, x1], [y, y - 0.12 * depth], 'Color', color, 'LineWidth', 0.75);
+  h_right = plot([x2, x2], [y, y - 0.12 * depth], 'Color', color, 'LineWidth', 0.75);
+  h_tip = plot([xm - 0.06 * half_w, xm, xm + 0.06 * half_w], ...
+    [tip_y, y - 1.18 * depth, tip_y], 'Color', color, 'LineWidth', 0.75);
+  set([h_curve, h_left, h_right, h_tip], 'Clipping', 'off');
+
+  text(xm, y - 1.32 * depth, label, ...
+    'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', ...
+    'FontSize', 9, 'Color', color, 'Clipping', 'off');
 end
 
 function y = dirichlet_mag(w, N)

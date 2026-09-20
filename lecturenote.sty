@@ -381,35 +381,21 @@
 }
 
 % Mitra textbook equation reference (4th ed.).
-% \tag{} adds parentheses automatically; do not wrap tag text in ().
-\newcommand{\HandoutMitraTagText}[1]{\text{\scriptsize\textit{Mitra~#1}}}
+\makeatletter
+\newcommand{\HandoutMitraTagText}[1]{\text{\scriptsize\textit{(Mitra~#1)}}}
 \newcommand{\HandoutMitraInlineText}[1]{\;\text{\scriptsize\textit{(Mitra~#1)}}}
 \newcommand{\MitraEq}[1]{\HandoutMitraInlineText{#1}}  % inline, after prose or $...$
-\newcommand{\MitraTag}[1]{\tag{\HandoutMitraTagText{#1}}}  % right-aligned in display math
+\newcommand{\HandoutEqRef}[1]{\hyperref[eq:mitra-#1]{(#1)}}  % clickable (3.10)-style eq.\ ref
+\newcommand{\MitraTag}[1]{\tag*{\HandoutMitraTagText{#1}}}  % right-aligned in display math
+\newcommand{\MitraTagRef}[1]{\MitraTag{#1}\label{eq:mitra-#1}}  % tag + label for \HandoutEqRef
 \newcommand{\MitraEqDoubt}[1]{\HandoutMitraInlineText{#1}\textcolor{red}{?}}
-\newcommand{\MitraEqDoubtTag}[1]{\tag{\HandoutMitraTagText{#1}\textcolor{red}{?}}}
+\newcommand{\MitraEqDoubtTag}[1]{\tag*{\HandoutMitraTagText{#1}\textcolor{red}{?}}}
 \newcommand{\HandoutMitraSecRef}[1]{\textnormal{(cf.\ Mitra~Sec.~#1)}}
+% Footnote mark flush right on a section/box title line (use with \footnotetext after).
+\newcommand{\HandoutTitleFnmark}{\hfill\protect\footnotemark}
 
-% Suppress automatic (1), (2), ... equation numbers; keep \tag / \MitraTag.
-\makeatletter
-\newif\ifHandout@eqtag
-\Handout@eqtagfalse
-\AtBeginEnvironment{equation}{\Handout@eqtagfalse}
-\AtBeginEnvironment{align}{\Handout@eqtagfalse}
-\AtBeginEnvironment{gather}{\Handout@eqtagfalse}
-\AtBeginEnvironment{multline}{\Handout@eqtagfalse}
-\AtBeginDocument{%
-  \let\Handout@orig@tag\tag
-  \renewcommand{\tag}[1]{%
-    \Handout@eqtagtrue
-    \Handout@orig@tag{#1}%
-  }%
-  \renewcommand{\tagform@}[1]{%
-    \ifHandout@eqtag
-      \maketag@@{#1}%
-    \fi
-  }%
-}
+% Suppress automatic (1), (2), ... equation numbers; \MitraTag uses \tag* (not \tag).
+\AtBeginDocument{\renewcommand{\tagform@}[1]{}}
 \makeatother
 
 % Gain block: vertical left edge, apex pointing right.

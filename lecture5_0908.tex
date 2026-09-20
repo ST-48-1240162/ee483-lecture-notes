@@ -10,7 +10,7 @@
 \begin{defbox}[title={Def}]
 The DTFT $X(e^{j\omega})$ of a sequence $x[n]$ is given by
 \begin{equation}
-X(e^{j\omega}) = \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega n}.
+X(e^{j\omega}) = \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega n}.\footnotemark{}\MitraTagRef{3.10}
 \end{equation}
 $\Rightarrow$ a complex-valued function of a real-valued variable $\omega$.
 \begin{equation}
@@ -18,6 +18,7 @@ X(e^{j\omega}) = X_{\mathrm{re}}(e^{j\omega}) + j X_{\mathrm{im}}(e^{j\omega}).
 \end{equation}
 Both $X_{\mathrm{re}}(e^{j\omega})$ and $X_{\mathrm{im}}(e^{j\omega})$ are real-valued functions of $\omega$.
 \end{defbox}
+\footnotetext{Mitra: Equation~(3.10) usually is referred to as the \textbf{analysis equation}, because it analyzes how much of each complex exponential signal is present in the original signal.}
 
 \begin{equation}
 X(e^{j\omega}) = \underbrace{|X(e^{j\omega})|}_{\HandoutUnderbraceLabel{\text{magnitude}}}\,e^{j\HandoutHighlightYellow{$\theta(\omega)$}}, \qquad \theta(\omega) = \angle X(e^{j\omega})\ \text{(\textbf{phase})}.
@@ -61,7 +62,8 @@ $-\pi \le \theta(\omega) < +\pi$.
 \end{align*}
 \end{examplebox}
 
-\section{Dirichlet Kernel}
+\clearpage
+\HandoutMarkSection{2}{Dirichlet Kernel}
 
 \begin{wrapfigure}[3]{r}{0.22\linewidth}
 \vspace{-0.35\baselineskip}
@@ -109,24 +111,58 @@ X(e^{j\omega})\Big|_{\omega=0} = \sum_{n=0}^{N-1} e^{-j\omega n}\Big|_{\omega=0}
 \end{equation}
 Limits: $\displaystyle\lim_{\omega\to 0} \frac{f(\omega)}{g(\omega)}$. For small $\omega$, $\dfrac{\omega\frac{N}{2}}{\frac{\omega}{2}} = N$.
 
-\HandoutMarkSection{5}{DTFT Properties}
+\HandoutMarkSection{5}{DTFT Properties\HandoutTitleFnmark}
+\footnotetext{cf. Mitra Sec.~3.2.2, Basic Properties.}
 
-\textbf{Periodicity:} The DTFT is $2\pi$-periodic.
+\subsection{Periodicity}
+
+Unlike the continuous-time Fourier transform, the DTFT is a periodic function of $\omega$ with period $2\pi$.\footnotemark{}
+\footnotetext{cf. Mitra Sec.~3.2.1.}
+
+\begin{factbox}[title={Property}]
+The DTFT is $2\pi$-periodic: $X(e^{j(\omega+2\pi k)}) = X(e^{j\omega})$ for all $k\in\Z$.
+\end{factbox}
 
 \paragraph{Proof.}
 \begin{align*}
 X\!\left(e^{j(\omega_0+2\pi k)}\right) &= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j(\omega_0+2\pi k)n} \\
-&= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega_0 n}\,\underbrace{e^{-j2\pi k n}}_{\HandoutUnderbraceLabel{\left(e^{-j2\pi}\right)^{kn}=1}} \\
-&= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega_0 n} = X(e^{j\omega_0}). \quad \blacksquare
+&= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega_0 n}\,\underbrace{e^{-j2\pi k n}}_{\HandoutUnderbraceLabel{e^{-j2\pi kn}=1}} \\
+&= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega_0 n} = X(e^{j\omega_0}), \quad \text{for all values of $k$.} \quad \blacksquare
 \end{align*}
 
-More properties: see \hyperref[tab:dtft-real-symmetry]{Table~3.1}, \hyperref[tab:dtft-complex-symmetry]{Table~3.2}, and \hyperref[tab:dtft-theorems]{Table~3.4} of Mitra.
+\begin{notebox}[title={Remark\hfill\textnormal{\small\textit{(addendum to orig lecture note)}}}]
+Why is $e^{-j2\pi kn}=1$? Both $k$ and $n$ are integers, so $kn\in\Z$ and the angle $-2\pi kn$ is an integer multiple of $2\pi$.
+Each full turn on the unit circle returns to~$1$:
+\begin{equation*}
+  e^{-j2\pi kn}=\cos(2\pi kn)-j\sin(2\pi kn)=1.
+\end{equation*}
+\end{notebox}
 
-\paragraph{Inverse.}
+\subsection{Inverse transform}
+
+\begin{defbox}[title={Inverse DTFT}]
 \begin{equation}
-x[n] = \frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\,e^{+j\omega n}\,d\omega.
+x[n] = \frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\,e^{+j\omega n}\,d\omega.\footnotemark{}\MitraTag{3.14}
 \end{equation}
-\textbf{Proof.}
+\end{defbox}
+\footnotetext{Mitra:
+\begin{itemize}[nosep, leftmargin=1.2em]
+  \item It should be noted that even though the integration in Eq.~(3.14) can be carried out over any interval of duration~$2\pi$, it is a common practice to choose the interval $[-\pi,\pi]$.
+  \item The inverse discrete-time Fourier transform given by Eq.~(3.14) can be interpreted as a linear combination of infinitesimally small complex exponential signals of the form $\frac{1}{2\pi}\,e^{j\omega n}\,d\omega$, weighted by the complex constant $X(e^{j\omega})$ over the normalized angular frequency range from $-\pi$ to $\pi$.
+  \item Eq.~(3.14) is referred to as the \textbf{synthesis equation}, because it synthesizes an arbitrary signal from its complex exponential components.
+\end{itemize}}
+
+\noindent Equations~(3.10) and~(3.14) form a DTFT pair. Write
+\begin{equation*}
+\HandoutHighlightMath{$\mathcal{F}\{x[n]\}$}=X(e^{j\omega}), \qquad
+\HandoutHighlightMath{$\mathcal{F}^{-1}\{X(e^{j\omega})\}$}=x[n],
+\end{equation*}
+and denote the DTFT pair by
+\begin{equation}
+x[n] \mathrel{\mathop{\longleftrightarrow}^{\mathcal{F}}} X(e^{j\omega}).\MitraTag{3.15}
+\end{equation}
+
+\paragraph{Proof.}
 \begin{align*}
 x[n] &= \frac{1}{2\pi}\int_{-\pi}^{\pi}\left(\sum_{\ell=-\infty}^{\infty} x[\ell]\,e^{-j\omega \ell}\right)e^{j\omega n}\,d\omega \\
 &= \sum_{\ell=-\infty}^{\infty} x[\ell]\int_{-\pi}^{\pi}\frac{1}{2\pi}\,e^{j\omega(n-\ell)}\,d\omega \\
@@ -136,28 +172,61 @@ x[n] &= \frac{1}{2\pi}\int_{-\pi}^{\pi}\left(\sum_{\ell=-\infty}^{\infty} x[\ell
 \end{align*}
 
 \HandoutMarkSubsection{6}{Convergence}
+\label{sec:dtft-convergence}
 
 \textbf{Note:} Exchanging the order of integration and summation (above) assumed convergence.
 
 \begin{defbox}[title={Convergence}]
-An infinite series of the form $X(e^{j\omega}) = \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega n}$ may or may not converge. Let
+An infinite series of the form $X(e^{j\omega}) = \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega n}$\,\HandoutEqRef{3.10} may or may not converge. Let
 \begin{equation}
-X_K(e^{j\omega}) = \sum_{n=-K}^{K} x[n]\,e^{-j\omega n}, \qquad X(e^{j\omega}) = \lim_{K\to\infty} X_K(e^{j\omega}).
+X_K(e^{j\omega}) = \sum_{n=-K}^{K} x[n]\,e^{-j\omega n}.\MitraTagRef{3.24}
 \end{equation}
+denote the partial sum of the weighted complex exponentials in Eq.~\HandoutEqRef{3.10}, and define
+\begin{equation}
+X(e^{j\omega}) = \lim_{K\to\infty} X_K(e^{j\omega})
+\end{equation}
+when this limit exists (in the sense made precise below).
 \end{defbox}
 
 \begin{defbox}[title={Def}]
-We say that $X_K(e^{j\omega})$ converges \textbf{uniformly} to $X(e^{j\omega})$ if for every $\varepsilon>0$, there exists an integer $K$ such that for all integers $L\ge K$,
+We say that $X_K(e^{j\omega})$ converges \textbf{uniformly} to $X(e^{j\omega})$---stronger than pointwise convergence---if for every $\varepsilon>0$, there exists an integer $K$ such that for all integers $L\ge K$, the partial sum $X_L(e^{j\omega})$ of Eq.~\HandoutEqRef{3.24} satisfies
 \begin{equation}
 \big|X(e^{j\omega}) - X_L(e^{j\omega})\big| < \varepsilon \quad \text{for all } \omega.
 \end{equation}
 \end{defbox}
 
 \begin{factbox}[title={Property}]
-The DTFT will converge uniformly if $x[n]$ is an \textbf{absolutely summable} sequence,
+If $x[n]$ is an \textbf{absolutely summable} sequence---that is, if Eq.~\HandoutEqRef{3.25} holds with
 \begin{equation}
-\sum_{n=-\infty}^{\infty} |x[n]| < \infty.
+\sum_{n=-\infty}^{\infty} |x[n]| < \infty.\MitraTagRef{3.25}
 \end{equation}
+then, by the triangle inequality and $|e^{-j\omega n}|=1$,
+\begin{equation*}
+\big|X(e^{j\omega})\big| = \left|\sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega n}\right|
+\le \sum_{n=-\infty}^{\infty} |x[n]|\,\big|e^{-j\omega n}\big|
+= \sum_{n=-\infty}^{\infty} |x[n]| < \infty
+\end{equation*}
+for all $\omega$, so the DTFT $X(e^{j\omega})$ of $x[n]$ exists for every $\omega$.
+
+\medskip
+\noindent Eq.~\HandoutEqRef{3.25} is thus a \textbf{sufficient condition} for existence of the DTFT $X(e^{j\omega})$:
+\begin{center}
+\begin{tikzpicture}[
+  >=Latex,
+  pqbox/.style={draw=ee483ink!75, line width=0.45pt, fill=white,
+    align=center, inner xsep=6pt, inner ysep=5pt, font=\small},
+  pqarr/.style={-{Stealth[length=2.4mm,width=1.7mm]}, line width=0.55pt, draw=ee483ink},
+]
+  \node[pqbox] (p) {$p$:\\[2pt]$\displaystyle\sum_{n=-\infty}^{\infty}|x[n]|<\infty$\\[2pt]\footnotesize\protect\HandoutEqRef{3.25}};
+  \node[pqbox, right=3.1cm of p] (q) {$q$:\\[2pt]DTFT $X(e^{j\omega})$ exists\\[2pt]\footnotesize uniform conv.\ of \protect\HandoutEqRef{3.10}};
+  \draw[pqarr] (p.east) -- (q.west)
+    node[midway, above=3pt, font=\footnotesize] {$p\Rightarrow q$}
+    node[midway, below=3pt, font=\footnotesize\itshape] {(sufficient)};
+  \node[font=\footnotesize, align=center, below=1.05cm of $(p)!0.5!(q)$]
+    {$q\not\Rightarrow p$ in general \;(\textit{not necessary}; cf.\ Example~\ref{ex:one-over-n})};
+\end{tikzpicture}
+\end{center}
+\noindent Moreover, since $|x[n]e^{-j\omega n}|=|x[n]|$ is independent of $\omega$, the Weierstrass $M$-test shows that the series of Eq.~\HandoutEqRef{3.10} converges \textbf{uniformly} for all $\omega$.
 \end{factbox}
 
 \HandoutMarkLeft{7}
@@ -257,6 +326,7 @@ The DTFT will converge in the mean-square if the sequence $x[n]$ is \textbf{squa
 \HandoutMarkSubsection{8}{An Example, and Generalized DTFTs}
 
 \begin{examplebox}[title={Example}]
+\label{ex:one-over-n}
 The sequence
 \begin{equation}
 x[n] = \begin{cases} 1/n, & n \ge 1 \\ 0, & n \le 0 \end{cases}
@@ -265,6 +335,7 @@ is \textbf{not} absolutely summable, but \textbf{is} square summable (famous res
 \begin{equation}
 \sum_{n=1}^{\infty} \left(\frac{1}{n}\right)^2 = \frac{\pi^2}{6}.
 \end{equation}
+So $x[n]\in\ell_2(\mathbb{Z})\setminus\ell_1(\mathbb{Z})$: absolute summability is \textbf{not necessary} for a sequence to admit a useful DTFT analysis in the mean-square sense (cf.\ the diagram in \S\ref{sec:dtft-convergence}).
 \end{examplebox}
 
 We can sometimes define DTFTs in cases where the DTFT does not actually converge (but still exists in a generalized sense).

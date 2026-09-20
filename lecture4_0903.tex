@@ -238,13 +238,14 @@ $x[m]$ with $m \le n$.\MitraEq{4.14}
 
 \HandoutMarkSubsection{6}{$h[n]$ and Stability}
 
-\begin{defbox}[title={BIBO Stability \HandoutMitraSecRef{4.4.3}}]
+\begin{defbox}[title={BIBO Stability\HandoutTitleFnmark}]
 An LTI discrete-time system is \textbf{BIBO stable} if and only if its
 impulse response $\{h[n]\}$ is \textbf{absolutely summable}, i.e.,
 \begin{equation}
 S = \sum_{n=-\infty}^{\infty} |h[n]| < \infty.\MitraTag{4.20,\ 2.42}
 \end{equation}
 \end{defbox}
+\footnotetext{cf. Mitra Sec.~4.4.3.}
 
 \paragraph{Proof (sufficiency).} Assume $\{x[n]\}$ is bounded, $|x[n]| \le B_x < \infty$
 for all $n$, where $B_x$ is a finite bound on the input magnitude; then the
