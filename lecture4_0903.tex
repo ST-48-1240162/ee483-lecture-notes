@@ -1,0 +1,458 @@
+\documentclass[11pt]{article}
+\usepackage[rm2]{lecturenote}
+\HandoutTitle{4}{Convolution, System Properties, and Difference Equations}{September 3, 2026}
+
+\begin{document}
+\maketitle
+
+\HandoutMarkSection{1}{Impulse Response and the Convolution Sum}
+
+\begin{equation}
+h[n] = H\{\delta[n]\}.\MitraTag{\S4.3}
+\end{equation}
+
+\begin{factbox}
+LTI systems with zero initial conditions (ICs) are \textbf{completely
+characterized} by $h[n]$.
+\end{factbox}
+
+\paragraph{Proof of fact.} Write
+\begin{equation}
+x[n] = \sum_k x[k]\,\delta[n-k]\footnotemark{}\MitraTag{4.15}
+\end{equation}
+\qquad $y[n] = H\{x[n]\}.$
+If $H\{\cdot\}$ is LTI, then
+\begin{align*}
+  y[n] &= H\left\{\sum_k x[k]\,\delta[n-k]\right\} \\
+  &= \sum_k x[k]\,H\{\delta[n-k]\} && \text{(linearity)} \\
+  &= \sum_k x[k]\,h[n-k]. && \text{(time-invariance)} \MitraTag{2.20a,\ 4.16a}
+\end{align*}
+
+\noindent The summation
+\begin{equation}
+y[n] = \sum_{k=-\infty}^{\infty} x[k]\,h[n-k]\MitraTag{2.20a,\ 4.16a}
+\end{equation}
+is called the \textbf{convolution sum} of the sequences $x[n]$ and $h[n]$:
+\begin{equation}
+y[n] = x[n] \circledast h[n].\MitraTag{2.21}
+\end{equation}
+\footnotetext{Following Mitra (\S4.3): in $\sum_k x[k]\,\delta[n-k]$, the index $k$
+labels the $k$th sample $x[k]$ of $\{x[n]\}$. In Eqs.~(4.16a)--(4.16b), $k$ is the
+convolution summation index; Eq.~(4.16b) forms $y[n]$ as a sum of input samples
+$x[n-k]$ weighted by $h[k]$ (see Mitra, Fig.~4.7).}
+
+\begin{examplebox}[title={Example (Computing the Convolution Sum)}, handout mark=2]
+We compute $y[n]=x[n]\circledast h[n]$ numerically for a
+short input and a short impulse response. Here $x[n]$ is the input and
+$h[n]=H\{\delta[n]\}$ is the impulse response of an LTI system with zero ICs.
+By definition,
+\begin{equation}
+y[n]=\sum_{m=-\infty}^{\infty} x[m]\,h[n-m].\MitraTag{2.20a,\ 4.16a}
+\end{equation}
+Equivalently, flip $h[n]$ to form $g[m]\triangleq h[-m]$, then slide $g[m]$
+relative to $x[m]$: at each $n$, multiply the overlapping samples and add.
+
+Let $h[n] = \{1,1,1\}$ and $x[n] = \{1,2,3\}$, with $n=0$ at the first listed
+sample of each sequence.
+
+\begin{handouttikz}[x=1.15cm, y=0.72cm]
+  \tikzset{
+    cell/.style={draw, minimum width=0.78cm, minimum height=0.52cm, font=\small},
+    lbl/.style={font=\small, anchor=east}
+  }
+
+  \node[font=\small, align=left, anchor=west] at (-0.2,2.15)
+    {Flip $h[n]$ to get $g[m]=h[-m]$, then align $x[m]$ and $g[m]$.\\At $n=0$:};
+
+  % column headers
+  \node[lbl] at (-0.15,1.1) {$m$};
+  \node[font=\small] at (1,1.1) {$-1$};
+  \node[font=\small] at (2,1.1) {$0$};
+  \node[font=\small] at (3,1.1) {$1$};
+
+  % x[m]
+  \node[lbl] at (-0.15,0.2) {$x[m]$};
+  \node[cell] at (1,0.2) {$1$};
+  \node[cell] at (2,0.2) {$2$};
+  \node[cell] at (3,0.2) {$3$};
+
+  % g[m]
+  \node[lbl] at (-0.15,-0.7) {$g[m]$};
+  \node[cell] at (1,-0.7) {$1$};
+  \node[cell] at (2,-0.7) {$1$};
+  \node[cell] at (3,-0.7) {$0$};
+
+  % products
+  \node[lbl] at (-0.15,-1.6) {$x[m]g[m]$};
+  \node[cell, fill=green!15] at (1,-1.6) {$1$};
+  \node[cell, fill=green!15] at (2,-1.6) {$2$};
+  \node[cell] at (3,-1.6) {$0$};
+
+  % result
+  \node[font=\small, anchor=west] at (3.55,-1.6) {$\Rightarrow y[0]=3$};
+\end{handouttikz}
+
+\noindent Shift $g[m]$ one sample to the right to compute $y[1]=6$, and continue for each $n$.
+Then
+$$y[0] = \sum_{m=-\infty}^{\infty} x[m]\,h[0-m] = \sum_{m=-\infty}^{\infty} x[m]\,g[m],
+  \qquad g[m] \triangleq h[-m].$$
+With
+$$g[m] = \{\ldots,0,1,1,1,0,0,\ldots\}, \qquad
+  x[m] = \{\ldots,0,1,2,3,0,\ldots\},$$
+with $m=0$ at the samples $1$ and $2$, respectively.
+$$y[0] = 0 + 1 + 2 + 0 + 0 = 3, \qquad
+  y[1] = \sum_{m=-\infty}^{\infty} x[m]\,g[m-1] = 6.$$
+Continuing in this way,
+$$y[n] = \{\ldots,0,1,3,6,5,3,0,\ldots\}, \qquad n=0 \text{ at the sample } 3.$$
+\end{examplebox}
+
+\HandoutMarkSubsection{3}{Convolution Properties}
+
+\begin{align*}
+  \textbf{Commutative:} & \quad x[n]\circledast h[n] = h[n]\circledast x[n]. \MitraTag{4.17} \\
+  \textbf{Associative:} & \quad (x[n]\circledast h[n])\circledast y[n]
+    = x[n]\circledast (h[n]\circledast y[n]). \MitraTag{4.18} \\
+  \textbf{Distributive:} & \quad x[n]\circledast (h[n]+y[n])
+    = x[n]\circledast h[n] + x[n]\circledast y[n]. \MitraTag{4.19}
+\end{align*}
+
+\subsection{Cascade System}
+
+\HandoutDiagramEqLayoutStart
+\begin{handoutdiagram}[>=stealth, thick]
+    % Title
+    \node[font=\large] at (2.5,2) {Cascade System};
+
+    % System boundary
+    \draw (0.5,0) rectangle (5.8,1.5);
+    \node at (5.5,1.75) {$g[n]$};
+
+    % Subsystems
+    \node[draw, minimum width=1.4cm, minimum height=0.8cm]
+        (h1) at (2,0.75) {$h_1[n]$};
+
+    \node[draw, minimum width=1.4cm, minimum height=0.8cm]
+        (h2) at (4.5,0.75) {$h_2[n]$};
+
+    % Signal flow
+    \draw[->] (-1.4,0.75) -- (h1.west);
+    \node[above] at (-1.1,0.75) {$x[n]$};
+    \draw[->] (h1.east) -- (h2.west)
+        node[midway, below] {$f[n]$};
+    \draw[->] (h2.east) -- (7.8,0.75);
+    \node[above] at (7.5,0.75) {$y[n]$};
+\end{handoutdiagram}
+\HandoutDiagramEqLayoutMid
+\begin{align*}
+  f[n] &= x[n]\circledast h_1[n], \\
+  y[n] &= f[n]\circledast h_2[n] \\
+       &= (x[n]\circledast h_1[n])\circledast h_2[n]
+\end{align*}
+\begin{equation}
+\HandoutHighlightMath{$\displaystyle y[n] = x[n]\circledast g[n], \quad g[n] = h_1[n]\circledast h_2[n].$}
+\MitraTag{4.28}
+\end{equation}
+\HandoutDiagramEqLayoutEnd
+
+\HandoutMarkSubsection{4}{Parallel System}
+
+\HandoutDiagramEqLayoutStart
+\begin{handoutdiagram}[>=stealth, thick]
+    % Title
+    \node[font=\large] at (2.5,2.4) {Parallel System};
+
+    % System boundary
+    \draw (0.2,-0.75) rectangle (6.0,2.2);
+    \node at (5.7,2.45) {$g[n]$};
+
+    % Input and branching point
+    \fill (0.9,0.8) circle (2pt);
+    \draw[->] (-1.4,0.8) -- (0.9,0.8);
+    \node[above] at (-1.1,0.8) {$x[n]$};
+
+    % Upper subsystem
+    \node[draw, minimum width=1.4cm, minimum height=0.8cm]
+        (h1) at (2.5,0.8) {$h_1[n]$};
+    \draw[->] (0.9,0.8) -- (h1.west);
+
+    % Lower subsystem
+    \node[draw, minimum width=1.4cm, minimum height=0.8cm]
+        (h2) at (2.5,-0.1) {$h_2[n]$};
+
+    % Branch to lower subsystem
+    \draw[->] (0.9,0.8) |- (h2.west);
+
+    % Summation node
+    \node[draw, circle, inner sep=1pt, minimum size=0.55cm]
+        (sum) at (5,0.8) {$+$};
+
+    % Branch outputs
+    \draw[->] (h1.east) -- (sum.west)
+        node[midway, above] {$f_1[n]$};
+
+    \draw[->] (h2.east) -| (sum.south)
+        node[pos=0.35, below] {$f_2[n]$};
+
+    % Output
+    \draw[->] (sum.east) -- (8.2,0.8);
+    \node at (8.6,0.8) {$y[n]$};
+\end{handoutdiagram}
+\HandoutDiagramEqLayoutMid
+\begin{align*}
+  y[n] &= f_1[n] + f_2[n], \\
+  f_1[n] &= x[n]\circledast h_1[n], \\
+  f_2[n] &= x[n]\circledast h_2[n], \\
+  y[n] &= x[n]\circledast h_1[n] + x[n]\circledast h_2[n]
+\end{align*}
+\begin{equation}
+\HandoutHighlightMath{$\displaystyle y[n] = x[n]\circledast g[n], \quad g[n] = h_1[n]+h_2[n].$}
+\MitraTag{4.31}
+\end{equation}
+\HandoutDiagramEqLayoutEnd
+
+\HandoutMarkSubsection{5}{$h[n]$ and Causality}
+
+\begin{align*}
+  y[n] &= \sum_{k=-\infty}^{\infty} x[k]\,h[n-k]\MitraTag{2.20a,\ 4.16a} \\
+       &= \sum_{k=-\infty}^{\infty} x[n-k]\,h[k].\MitraTag{2.20b,\ 4.16b}
+\end{align*}
+
+\begin{defbox}[title={Causality}]
+$y[n]$ is independent of $x[m]$ for all $m > n$ $\iff$ $h[n] = 0$ for all
+$n < 0$.\footnotemark{} An LTI discrete-time system is \textbf{causal} if and only if its
+impulse response $h[n]$ is a ``causal'' sequence, i.e., $h[n]=0$ for all
+$n<0$ \MitraEq{4.27}.
+\end{defbox}
+\footnotetext{The handout uses $\Rightarrow$; here we use $\Leftrightarrow$ since both directions hold for LTI systems.}
+
+\begin{examplebox}[title={Example}]
+The FIR system below uses only present and past inputs ($k \ge 0$):
+\begin{align*}
+  y[n] &= \sum_{k=0}^{M} \alpha_k\,x[n-k] \\
+  \Longrightarrow\quad h[n] &= \sum_{k=0}^{M}\alpha_k\,\delta[n-k] \\
+  &= \begin{cases}\alpha_n, & 0\le n\le M \\ 0, & \text{else}\end{cases}
+\end{align*}
+\noindent Since $h[n]=0$ for all $n<0$, the system is causal: $y[n]$ depends only on
+$x[m]$ with $m \le n$.\MitraEq{4.14}
+\end{examplebox}
+
+\HandoutMarkSubsection{6}{$h[n]$ and Stability}
+
+\begin{defbox}[title={BIBO Stability \HandoutMitraSecRef{4.4.3}}]
+An LTI discrete-time system is \textbf{BIBO stable} if and only if its
+impulse response $\{h[n]\}$ is \textbf{absolutely summable}, i.e.,
+\begin{equation}
+S = \sum_{n=-\infty}^{\infty} |h[n]| < \infty.\MitraTag{4.20,\ 2.42}
+\end{equation}
+\end{defbox}
+
+\paragraph{Proof (sufficiency).} Assume $\{x[n]\}$ is bounded, $|x[n]| \le B_x < \infty$
+for all $n$, where $B_x$ is a finite bound on the input magnitude; then the
+output amplitude at time instant $n$, from Eq.~(4.16b), is
+\begin{align*}
+  |y[n]| &= \left|\sum_{k=-\infty}^{\infty} h[k]\,x[n-k]\right| \\
+  &\le \sum_{k=-\infty}^{\infty} |h[k]|\,|x[n-k]|\footnotemark{} \\
+  &\le B_x \sum_{k=-\infty}^{\infty} |h[k]| \\
+  &= B_x S < \infty.\MitraTag{2.20b,\ 4.16b,\ 4.21}
+\end{align*}
+\footnotetext{The summation $\sum_k$ adds all terms $h[k]x[n-k]$. By the triangle
+inequality, the absolute value of a sum is at most the sum of absolute values, so
+$\left|\sum_k h[k]x[n-k]\right|\le\sum_k|h[k]x[n-k]|$.}
+So if
+\begin{equation}
+S = \sum_{k=-\infty}^{\infty}|h[k]| < \infty,\MitraTag{4.20,\ 2.42}
+\end{equation}
+then $|y[n]| \le \HandoutHighlightMath{$B_y = B_x S$} < \infty$ for all $n$; hence absolute summability is a
+\textbf{sufficient} condition for BIBO stability.
+
+\HandoutMarkParagraph{7}{Necessity.} Let
+$\HandoutHighlightYellow{$x[n] = \mathrm{sgn}(h[-n])$},\MitraEq{4.22}$ where for real-valued $\alpha$,
+$$\mathrm{sgn}(\alpha) = \begin{cases}+1, & \alpha>0 \\ -1, & \alpha<0 \\ 0, & \alpha=0.\end{cases}$$
+Then
+$$y[n] = \sum_{k=-\infty}^{\infty} h[k]\,\HandoutHighlightYellow{$x[n-k]$}
+  = \sum_{k=-\infty}^{\infty} h[k]\,\mathrm{sgn}(h[k-n]).$$
+At $n=0$,
+\begin{equation}
+y[0] = \sum_{k=-\infty}^{\infty} h[k]\,\HandoutHighlightYellow{$\mathrm{sgn}(h[k])$}
+  = \sum_{k=-\infty}^{\infty} |h[k]| = S.\MitraTag{4.23}
+\end{equation}
+So for $y[0]$ to be finite (which is necessary for $y[n]$ to be bounded), it
+is \textbf{necessary} that $\displaystyle\sum_{k=-\infty}^{\infty}|h[k]| < \infty$.
+
+\HandoutBeginMarkedExamplebox[Example\MitraEq{Ex.\ 4.16}]{8}
+Consider a causal LTI discrete-time system with an impulse response given by
+$h[n] = \alpha^n u[n]$. For this system,\footnotemark[4]%
+\begin{align*}
+S &= \sum_{n=-\infty}^{\infty} |h[n]| \\
+  &= \sum_{n=-\infty}^{\infty} |\alpha^n u[n]| \\
+  &= \sum_{n=-\infty}^{\infty} |\alpha^n|\,u[n] \\
+  &= \sum_{n=0}^{\infty} |\alpha|^n \\
+  &= \frac{1}{1-|\alpha|} \quad \text{for } |\alpha|<1.\footnotemark[5]%
+\end{align*}
+Therefore, $S < \infty$ if $|\alpha| < 1$, for which the above system is BIBO stable.
+On the other hand, if $|\alpha| \ge 1$, the infinite series $\sum_{n=0}^{\infty}|\alpha|^n$ does not
+converge, and the above causal system is not BIBO stable.
+\HandoutEndMarkedExamplebox
+\footnotetext[4]{Since $|ab|=|a||b|$ and $u[n]\in\{0,1\}$, we have $|u[n]|=u[n]$ and thus
+$|\alpha^n u[n]|=|\alpha^n|\,u[n]$.}
+\footnotetext[5]{The last step applies the geometric series formula, which gives a finite sum when the common ratio has magnitude less than one.}
+\setcounter{footnote}{5}
+
+\begin{factbox}[title={Important Facts}]
+\begin{align}
+\sum_{n=0}^{\infty} a^n &= \frac{1}{1-a}, \quad |a|<1 \MitraTag{Ex.\ 4.6} \\
+\sum_{n=0}^{N-1} a^n &= \begin{cases}\dfrac{1-a^N}{1-a}, & a\ne 1 \\[2mm] N, & a=1.\end{cases}
+\end{align}
+\end{factbox}
+
+\HandoutMarkSection{9}{Linear Difference Equations}
+
+\begin{equation}
+\sum_{k=0}^{N} d_k\,y[n-k] = \sum_{q=0}^{M} p_q\,x[n-q],\MitraTag{4.32}
+\end{equation}
+\qquad finite order $\triangleq \max(N,M)$.
+
+If we assume causality, then $y[n]$ can be computed for all $n\ge n_0$ from
+$x[n]$ for $n\ge n_0$ and the ICs
+\begin{equation}
+y[n_0-1],\,y[n_0-2],\,\ldots,\,y[n_0-N], \qquad
+  x[n_0-1],\,x[n_0-2],\,\ldots,\,x[n_0-M].\MitraTag{4.33}
+\end{equation}
+
+\begin{equation}
+y[n] = -\sum_{k=1}^{N}\frac{d_k}{d_0}\,y[n-k] + \sum_{q=0}^{M}\frac{p_q}{d_0}\,x[n-q].\MitraTag{4.33}
+\end{equation}
+
+\begin{itemize}
+  \item \textbf{FIR} (finite impulse response): $N=0$, $M\ge 0$.
+  \item \textbf{IIR} (infinite impulse response): $N>0$, $M\ge 0$.
+\end{itemize}
+
+\HandoutMarkSubsection{10}{FIR Systems}
+
+\begin{equation}
+y[n] = \sum_{q=0}^{M} \tilde{p}_q\,x[n-q] \ \Longrightarrow\
+  h[n] = \begin{cases}\tilde{p}_n, & n=0,\ldots,M \\ 0, & \text{else.}\end{cases}\MitraTag{4.14}
+\end{equation}
+
+Generically called ``moving average'' filters:
+\begin{itemize}
+  \item Moving average: $\displaystyle y[n] = \frac{x[n]+x[n-1]}{2}$.\MitraEq{4.4}
+  \item Finite difference: $y[n] = x[n] - x[n-1]$.
+  \item Simple echo: $y[n] = x[n] + \alpha\,x[n-M]$.
+\end{itemize}
+
+\subsection{IIR Systems}
+\begin{equation}
+y[n] = \sum_{k=1}^{N} \tilde{d}_k\,y[n-k] + \sum_{q=0}^{M} \tilde{p}_q\,x[n-q].\MitraEqDoubtTag{4.33}
+\end{equation}
+\begin{itemize}
+  \item $M=0$: \textbf{autoregressive (AR)}.
+  \item $M>0$: \textbf{autoregressive moving average (ARMA)}.
+  \item Recursive (feedback loop); harder to characterize:
+  \begin{itemize}
+    \item Requires an IC (infinitely many solutions for $y[n]$ given only
+    $x[n]$ with unspecified ICs).
+    \item Harder in general to compute the impulse response.
+  \end{itemize}
+\end{itemize}
+
+\HandoutMarkSubsection{11}{Example: $y[n] = a\,y[n-1] + x[n]$}
+
+What is the impulse response?
+
+\paragraph{1. Zero ICs ($y[n]=0$ for all $n<0$).}
+\begin{align*}
+  y[0] &= a\,y[-1] + \delta[0] = 1, \\
+  y[1] &= a\,y[0] + \delta[1] = a, \\
+  y[2] &= a\,y[1] + \delta[2] = a^2, \\
+  &\ \,\vdots \\
+  y[n] &= a^n, \quad n\ge 0 \ \Longrightarrow\ h[n] = a^n u[n]. \MitraTag{Ex.\ 4.16}
+\end{align*}
+
+\paragraph{2. $y[n]=0$ for all $n\ge 0$.} Note $y[n]=a\,y[n-1]+x[n]
+\Rightarrow y[n-1] = a^{-1}(y[n]-x[n])$, so
+\begin{align*}
+  y[-1] &= a^{-1}(y[0]-\delta[0]) = -a^{-1}, \\
+  y[-2] &= a^{-1}(y[-1]-\delta[-1]) = -a^{-2}, \\
+  &\ \,\vdots \\
+  y[n] &= -a^{n}, \quad n\le -1 \ \Longrightarrow\ h[n] = -a^n\,u[-1-n].
+\end{align*}
+
+\HandoutMarkSubsection{12}{Why?}
+
+If we have a particular solution $y_p[n]$ that satisfies a given LDE, then
+any solution $y_h[n]$ to the ``homogeneous LDE'' ($x[n]=0$) gives another
+valid solution of the form
+\begin{align}
+y[n] &= y_p[n] + y_h[n], \MitraTag{4.39} \\
+\text{Homogeneous LDE:}\quad \sum_{k=0}^{N} d_k\,y[n-k] &= 0.\MitraTag{4.40}
+\end{align}
+
+\begin{examplebox}[title={Homogeneous LDE}]
+$y[n] = a\,y[n-1] \Rightarrow$ no unique solution! $y[n] = A\,a^n$ is a
+solution for any $A$. Particular solutions:
+\begin{align*}
+  \text{(1)}\quad h[n] &= a^n\,u[n], \\
+  \text{(2)}\quad h[n] &= -a^n\,u[-1-n].
+\end{align*}
+General solution: $h[n] = a^n u[n] + A\,a^n$.
+\end{examplebox}
+
+\HandoutMarkLeft{13}Using $u[-1-n] = 1-u[n]$,
+$$-a^n(1-u[n]) = a^n u[n] - a^n.$$
+
+Consider candidate solutions to a generic homogeneous equation
+$\sum_{k=0}^{N} a_k\,y[n-k]=0$ of the form $y[n] = A_\ell\,\lambda_\ell^n$.
+For what choices of $A_\ell$ and $\lambda_\ell$ is this a valid solution?
+\begin{align*}
+  \sum_{k=0}^{N} a_k\,A_\ell\,\lambda_\ell^{(n-k)} &= 0 \\
+  A_\ell\,\lambda_\ell^n \sum_{k=0}^{N} a_k\,\lambda_\ell^{-k} &= 0
+\end{align*}
+Note: $\sum_{k=0}^{N} a_k\,z^{-k}$ is a polynomial in $z^{-1}$. In the case
+of simple roots, the homogeneous equation has solutions
+\begin{equation}
+y[n] = \sum_{\ell=1}^{N} A_\ell\,\lambda_\ell^n,\MitraTag{4.43}
+\end{equation}
+where $\lambda_\ell$ are the roots of the characteristic polynomial \MitraEq{\S4.6.1} and $A_\ell$ are
+arbitrary for $\ell=1,\ldots,N$ $\Rightarrow$ infinitely many solutions.
+
+\HandoutMarkSubsection{14}{Inverse Filter}
+
+$$x[n] \to \boxed{h_1[n]} \to y[n] \to \boxed{h_2[n]} \to x[n]$$
+
+\noindent Examples: $h_1[n]$ channel, $h_2[n]$ equalizer; $h_1[n]$ is blur,
+$h_2[n]$ is deblurring. In either case,
+\begin{equation}
+h_1[n]\circledast h_2[n] = \delta[n].\MitraTag{4.29}
+\end{equation}
+
+\begin{examplebox}[title={Example}]
+$y[n] = a\,y[n-1] + x[n]$ (IIR), with $h_1[n] = a^n u[n]$. Then
+\HandoutFitDisplay{
+  x[n] = y[n] - a\,y[n-1] \ \Longrightarrow\ \text{FIR},\quad
+  h_2[n] = \delta[n] - a\,\delta[n-1] \quad \text{(inverse filter)}.
+}
+\end{examplebox}
+
+\noindent\textbf{Caution:} ICs should be treated carefully --- the inverse
+filter may not be causal or stable.
+
+\section*{Readings}
+\begin{itemize}
+  \item Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Ch.\ 3.2, 3.3
+  \item Monson H. Hayes, \textit{Schaum's Outline of Digital Signal Processing}, 2nd ed., Ch.\ 2.5, 2.6
+\end{itemize}
+
+\HandoutAppendixListStart
+  \HandoutAppendixListItem{app:mitra}{A.\ Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Ch.\ 3.2, 3.3}
+  \HandoutAppendixListItem{app:scan}{B.\ Handwritten Lecture Note Scan (September 3, 2026)}
+\HandoutAppendixListEnd
+
+\HandoutAppendixSection{app:mitra}{Mitra, Ch.\ 3.2, 3.3}
+\HandoutIncludeTextbookExcerpt{Mitra-3.2-3.3.pdf}
+
+\HandoutAppendixSection{app:scan}{Handwritten Lecture Note Scan}
+\HandoutIncludeHandoutScan{lecture4_0903.pdf}
+
+\end{document}

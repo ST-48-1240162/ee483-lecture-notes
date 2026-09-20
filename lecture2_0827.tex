@@ -1,0 +1,321 @@
+\documentclass[11pt]{article}
+\usepackage[rm2]{lecturenote}
+\HandoutTitle{2}{Systems: From Continuous-Time to Discrete-Time}{August 27, 2026}
+
+\begin{document}
+\maketitle
+
+\section*{\HandoutMarkLeft{1}Last Time / Today}
+\textbf{Last time:} Defined digital and discrete-time signals.\\
+\textbf{Today:} Systems! Review continuous-time systems, introduce
+discrete-time systems, and introduce notation and building blocks.
+
+\HandoutMarkSection{2}{Review: Continuous-Time Systems}
+
+Recall a continuous-time signal (1D) is a real- or complex-valued function
+defined on the real line.
+
+\begin{center}
+\begin{tikzpicture}[scale=1]
+\node[left] at (-0.3,0.35) {$x(t)$};
+\draw[-Latex] (-0.3,0) -- (6.6,0) node[right]{$t$};
+\foreach \x in {0,1,...,6} {\HandoutAxTick{\x}{0};}
+\draw[thick, ee483blue, domain=0:6.3, samples=150]
+  plot (\x, {0.9*sin(deg(\x*3.4))*exp(-0.12*\x) + 0.05*\x - 0.05});
+\end{tikzpicture}
+\end{center}
+
+\noindent A \textbf{continuous-time system} is a mapping
+from an input signal $x(t)$ to an output $y(t)$:
+$$x(t) \to \boxed{\begin{array}{c}\text{System}\\ H\end{array}} \to y(t),
+  \qquad y(t) = H\{x(t)\}.$$
+
+\begin{examplebox}[title={Example (Continuous-Time Systems)}]
+\begin{align*}
+  y(t) &= x(t), \\
+  y(t) &= x(t-\tau), \\
+  y(t) &= \int_0^1 x(t-\tau)\,d\tau, \\
+  y(t) &= |x(t)|.
+\end{align*}
+\end{examplebox}
+
+\HandoutMarkSubsection{3}{Linear Systems}
+
+\begin{defbox}[title={Definition (Homogeneity)}]
+If $H\{x(t)\} = y(t)$, then $H\{\alpha x(t)\} = \alpha y(t)$ for all
+$\alpha \in \C$ and all $x(t)$.
+\end{defbox}
+
+\begin{defbox}[title={Definition (Additivity)}]
+If $H\{x_1(t)\} = y_1(t)$ and $H\{x_2(t)\} = y_2(t)$, then
+$H\{x_1(t) + x_2(t)\} = y_1(t) + y_2(t)$ for all $x_1(t)$ and $x_2(t)$.
+\end{defbox}
+
+\subsection{Time-Invariant Systems}
+
+\begin{defbox}[title={Definition (Time-Invariance)}]
+If $H\{x(t)\} = y(t)$, then $H\{x(t-t_0)\} = y(t-t_0)$ for all $t_0 \in \R$
+and all $x(t)$.
+\end{defbox}
+
+\HandoutMarkSubsection{4}{Linear Time-Invariant Systems (LTI)}
+
+LTI systems are characterized by their \textbf{impulse response}:
+\begin{align*}
+  h(t) &\triangleq H\{\delta(t)\}, \\
+  H\{\delta(t-t_0)\} &= h(t-t_0).
+\end{align*}
+
+Notice that $x(t)$ can be decomposed using the sifting property of the delta
+function:
+$$x(t) = \int_{-\infty}^{\infty} x(\tau)\,\delta(t-\tau)\,d\tau.$$
+Applying $H\{\cdot\}$ to both sides and using linearity + time-invariance:
+$$y(t) = \int_{-\infty}^{\infty} x(\tau)\,h(t-\tau)\,d\tau \quad
+  \text{(\textbf{convolution})}.$$
+
+\HandoutMarkSubsection{5}{Frequency Response}
+
+LTI systems are also characterized by their \textbf{frequency response}
+$H(j\Omega)$, the Fourier transform of $h(t)$:
+\begin{align*}
+  X(j\Omega) &= \int_{-\infty}^{\infty} x(t)\,e^{-j\Omega t}\,dt,
+    \quad \Omega\in\R, \\
+  x(t) &= \frac{1}{2\pi}\int_{-\infty}^{\infty} X(j\Omega)\,e^{j\Omega t}\,d\Omega,
+    \quad t\in\R.
+\end{align*}
+
+\paragraph{Eigenfunctions of LTI systems.} Let $x(t) = e^{j\Omega_0 t}$ with
+$\Omega_0$ real. Then
+\begin{align*}
+  y(t) &= \int h(\tau)\,x(t-\tau)\,d\tau \\
+  &= \int h(\tau)\,e^{j\Omega_0(t-\tau)}\,d\tau \\
+  &= e^{j\Omega_0 t}\int h(\tau)\,e^{-j\Omega_0 \tau}\,d\tau \\
+  &= x(t)\,H(j\Omega_0).
+\end{align*}
+\noindent\HandoutMarkLeft{6}So $x(t) = e^{j\Omega_0 t}$ is an \textbf{eigenfunction} of the LTI system,
+with eigenvalue $H(j\Omega_0)$. More generally,
+$$Y(j\Omega) = H(j\Omega)\,X(j\Omega).$$
+
+\subsection{Transfer Function}
+
+LTI systems are also characterized by the \textbf{transfer function} $H(s)$,
+the Laplace transform of $h(t)$:
+$$X(s) = \int_{-\infty}^{\infty} e^{-st}\,x(t)\,dt, \quad s\in\C, \qquad
+  Y(s) = H(s)X(s).$$
+
+\begin{itemize}
+  \item Setting $s = j\Omega$ recovers the Fourier transform.
+  \item Handles more general signals; \textbf{regions of convergence (ROC)}
+  tell us about stability and causality.
+  \item Useful for filter design and for solving differential equations.
+\end{itemize}
+
+\begin{examplebox}[title={Example (Solving a Differential Equation with the Laplace Transform)}]
+Consider $\dfrac{dx}{dt} = -x(t)$. Taking the Laplace transform,
+$$sX(s) - x(0) = -X(s) \ \Longrightarrow\ X(s) = \frac{x(0)}{1+s}
+  \ \Longrightarrow\ x(t) = x(0)\,e^{-t}\,u(t).$$
+\end{examplebox}
+
+\HandoutMarkSection{7}{LTI Discrete-Time Systems (Preview)}
+
+Discrete-time LTI systems are characterized analogously:
+\begin{itemize}
+  \item Impulse response $h[n]$
+  \item Frequency response $H(e^{j\omega})$: the DTFT
+  \item Transfer function $H(z)$: the $z$-transform
+  \item Linear (constant-coefficient) difference equations
+\end{itemize}
+
+\section{Discrete-Time Signals}
+
+\begin{itemize}
+  \item Represented as a sequence of numbers (``samples'').
+  \item Denoted $x[n]$, where $n$ is an integer, $-\infty < n < \infty$.
+  \item $x[n]$ is \textbf{not defined} for non-integer $n$.
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[scale=1]
+\draw[-Latex] (-2.5,-0.2) -- (2.5,-0.2) node[right]{$n$};
+\node at (-2.85, 0.15) {$\cdots$};
+\node at (1.85, 0.15) {$\cdots$};
+\foreach \n/\val in {-2/1.0,-1/-1.1,0/0.9,1/0.6}
+  {\draw[thick] (\n,-0.2) -- (\n,\val); \fill (\n,\val) circle (2.2pt);}
+\foreach \n/\val in {-2/1.0,0/0.9,1/0.6}
+  {\node[above=2pt] at (\n,\val) {\scriptsize $x[\n]$};}
+\node[below=2pt] at (-1,-1.1) {\scriptsize $x[-1]$};
+\foreach \n in {-2,-1,0,1} {
+  \HandoutAxTick{\n}{-0.2};
+  \node[below] at (\n,-0.35) {\n};
+}
+\end{tikzpicture}
+\end{center}
+
+Notation: $\{\ldots, x[-2], x[-1], x[0], x[1], \ldots\}$, with $n=0$ at $x[0]$.
+
+\HandoutMarkSubsection{8}{Sampling of Continuous-Time Signals}
+
+\begin{center}
+\begin{tikzpicture}[
+    x=1cm,
+    y=1cm,
+    >=Latex,
+    line cap=round,
+    line join=round
+]
+\draw[->, thick] (0,0) -- (11.2,0) node[right] {$t$};
+\foreach \x in {0,0.5,...,10.5} {\HandoutAxTick[0.12]{\x}{0};}
+\draw[very thick, ee483blue, domain=0:10.8, samples=200, smooth]
+  plot (\x, {0.85*sin(deg(\x*2.2))});
+\foreach \x in {0,0.5,...,10.5} {
+  \pgfmathsetmacro{\y}{0.85*sin(deg(2.2*\x))}
+  \draw[thick] (\x,0) -- (\x,\y);
+  \fill (\x,\y) circle (2pt);
+}
+\draw[<->] (0.5,0.95) -- (1.0,0.95) node[midway, above] {$T$};
+\node[left] at (0,0.85) {$x_a(t)$};
+\node[below left] at (0,0) {$t=0$};
+\end{tikzpicture}
+\end{center}
+
+$$x[n] = x_a(t)\big|_{t=nT} = x_a(nT).$$
+$T$: \textbf{sampling interval / sampling period}.\\
+$f_T = \dfrac{1}{T}$: \textbf{sampling rate / sampling frequency}.
+
+\subsection{Basic Sequences}
+
+\textbf{Unit impulse sequence}
+$$\delta[n] = \begin{cases}1, & n=0\\ 0, & n\ne 0\end{cases}$$
+
+\begin{center}
+\begin{tikzpicture}[scale=1]
+\draw[-Latex] (-2.5,-0.2) -- (2.5,-0.2) node[right]{$n$};
+\node at (-2.85, 0.15) {$\cdots$};
+\node at (1.85, 0.15) {$\cdots$};
+\foreach \n in {-2,-1,0,1} {
+  \HandoutAxTick{\n}{-0.2};
+  \node[below] at (\n,-0.35) {\n};
+}
+\draw[thick] (0,-0.2) -- (0,1.0);
+\fill (0,1.0) circle (2.2pt);
+\node[above=2pt] at (0,1.0) {\scriptsize $1$};
+\end{tikzpicture}
+\end{center}
+
+\textbf{Unit step sequence}
+$$u[n] = \begin{cases}1, & n\ge 0\\ 0, & n<0\end{cases}$$
+
+\begin{center}
+\begin{tikzpicture}[scale=1]
+\draw[-Latex] (-2.5,-0.2) -- (2.5,-0.2) node[right]{$n$};
+\node at (-2.85, 0.15) {$\cdots$};
+\node at (2.35, 0.15) {$\cdots$};
+\foreach \n in {-2,-1,0,1,2} {
+  \HandoutAxTick{\n}{-0.2};
+  \node[below] at (\n,-0.35) {\n};
+}
+\foreach \n in {0,1,2}
+  {\draw[thick] (\n,-0.2) -- (\n,0.85); \fill (\n,0.85) circle (2.2pt);}
+\end{tikzpicture}
+\end{center}
+
+\HandoutMarkSubsection{9}{Real Sinusoidal Sequences}
+
+$$x[n] = A\cos(\omega_0 n + \phi),$$
+\noindent where $A$ is the amplitude,\\
+$\omega_0$ is the frequency, and $\phi$ is the phase.
+
+\subsection{Complex (Damped) Sinusoids}
+
+$$x[n] = A\alpha^n, \quad -\infty < n < \infty.$$
+\noindent $A$ and $\alpha$ can be real or complex.
+
+\noindent Write $\alpha = e^{\sigma_0}e^{j\omega_0}$ ($\sigma_0,\omega_0$ real) and $A = |A|e^{j\phi}$. Then
+$$x[n] = |A|\,e^{j\phi}\,e^{(\sigma_0+j\omega_0)n} = x_{re}[n] + j\,x_{im}[n],$$
+$$x_{re}[n] = |A|e^{\sigma_0 n}\cos(\omega_0 n + \phi),$$
+$$x_{im}[n] = |A|e^{\sigma_0 n}\sin(\omega_0 n + \phi).$$
+\begin{itemize}
+  \item $\sigma_0 = 0 \Rightarrow$ constant amplitude
+  \item $\sigma_0 < 0 \Rightarrow$ exponential decay
+  \item $\sigma_0 > 0 \Rightarrow$ exponential growth
+\end{itemize}
+
+\HandoutMarkSubsection{10}{Arbitrary Sequences can be represented as a weighted sum of time-shifted versions of basic sequences}
+
+\begin{examplebox}[title={Example}]
+$x[n] = \{0.5, 1, -1, 0.5\}$ with $n=0$ at the sample $1$ can be written as
+$$x[n] = 0.5\,\delta[n+1] + \delta[n] - \delta[n-1] + 0.5\,\delta[n-2],$$
+or, in terms of shifted unit steps,
+$$x[n] = 0.5\,u[n+1] + 0.5\,u[n] - 2\,u[n-1] + 1.5\,u[n-2] - 0.5\,u[n-3].$$
+\end{examplebox}
+
+\begin{factbox}
+$$x[n] = \sum_{m=-\infty}^{\infty} x[m]\,\delta[n-m], \qquad
+  \text{e.g.}\quad u[n] = \sum_{m=0}^{\infty}\delta[n-m].$$
+\end{factbox}
+
+\section{Discrete-Time Systems}
+
+\begin{center}
+\begin{tikzpicture}[node distance=10mm, >=Latex]
+\node (x) {$x[n]$};
+\node[below=1mm of x, font=\small] {input};
+\node[draw, minimum height=8mm, minimum width=3.0cm, right=of x]
+  (sys) {discrete-time system};
+\node[right=of sys] (y) {$y[n]$};
+\node[below=1mm of y, font=\small] {output};
+\draw[->] (x.east) -- (sys.west);
+\draw[->] (sys.east) -- (y.west);
+\end{tikzpicture}
+\end{center}
+
+\HandoutMarkSubsection{11}{Basic Operations}
+
+\begin{itemize}
+  \item \textbf{Multiplication (scalar):} \HandoutScalarMultDiagram, \quad
+  $y[n] = A\,x[n]$.
+  \item \textbf{Delay:} $x[n] \to \boxed{z^{-1}} \to y[n]$, \quad
+  $y[n] = x[n-1]$.
+  \item \textbf{Time reversal:} $x[n] \to \boxed{\text{time reversal}} \to y[n]$, \quad
+  $y[n] = x[-n]$.
+  \item \textbf{Advance:} $x[n] \to \boxed{z} \to y[n]$, \quad $y[n] = x[n+1]$.
+  \item \textbf{Branching:} \HandoutBranchingDiagram\quad
+  $x[n]$ splits into two identical copies.
+  \item \textbf{Addition:} \HandoutAdditionDiagram
+  \item \textbf{Product (modulation):} \HandoutModulationDiagram
+\end{itemize}
+
+\begin{examplebox}[title={Example}]
+A two-tap system:
+\begin{center}
+\HandoutTwoTapFIRDiagram
+\end{center}
+$$y[n] = a_0\,x[n] + a_1\,x[n-1].$$
+Its impulse response is
+$$h[n] = H\{\delta[n]\} = a_0\,\delta[n] + a_1\,\delta[n-1] = \{a_0, a_1\},
+  \qquad n=0 \text{ at } a_0.$$
+This is an \textbf{FIR filter} (Finite Impulse Response).
+\end{examplebox}
+
+\begin{examplebox}[title={Example (Moving-Average System)}]
+$$y[n] = \frac{1}{M}\sum_{k=0}^{M-1} x[n-k].$$
+\end{examplebox}
+
+\section*{Readings}
+\begin{itemize}
+  \item Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Ch.\ 4.1--4.4
+  \item Monson H. Hayes, \textit{Schaum's Outline of Digital Signal Processing}, 2nd ed., Ch.\ 1.4
+\end{itemize}
+
+\HandoutAppendixListStart
+  \HandoutAppendixListItem{app:mitra}{A.\ Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Ch.\ 4.1--4.4}
+  \HandoutAppendixListItem{app:scan}{B.\ Handwritten Lecture Note Scan (August 27, 2026)}
+\HandoutAppendixListEnd
+
+\HandoutAppendixSection{app:mitra}{Mitra, Ch.\ 4.1--4.4}
+\HandoutIncludeTextbookExcerpt{Mitra-4.1-4.4.pdf}
+
+\HandoutAppendixSection{app:scan}{Handwritten Lecture Note Scan}
+\HandoutIncludeHandoutScan{lecture2_0827.pdf}
+
+\end{document}

@@ -1,0 +1,20 @@
+name: notes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: texlive/texlive:latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: build clean pdfs
+        run: make notes
+      - uses: actions/upload-artifact@v6
+        with:
+          name: clean-pdfs
+          path: '*_clean.pdf'
+          if-no-files-found: error

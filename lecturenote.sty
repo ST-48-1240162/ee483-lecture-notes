@@ -1,0 +1,642 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lecturenote}[2026/09/02 Lecture notes style]
+
+\newif\ifhandoutrmtwo
+\newif\ifhandoutclean
+\DeclareOption{rm2}{\handoutrmtwotrue}
+\DeclareOption{clean}{\handoutcleantrue}
+\ProcessOptions\relax
+\ifdefined\HandoutCleanBuild
+  \handoutcleantrue
+\fi
+
+% --- Page layout & typography ---
+\ifhandoutrmtwo
+  \RequirePackage[
+    paperwidth=157.8mm,
+    paperheight=210.3mm,
+    top=14mm,
+    bottom=14mm,
+    left=11mm,
+    right=11mm,
+    headheight=14pt,
+    footskip=8mm
+  ]{geometry}
+\else
+  \RequirePackage[
+    letterpaper,
+    top=0.85in,
+    bottom=0.85in,
+    left=0.75in,
+    right=0.75in,
+    headheight=14pt
+  ]{geometry}
+\fi
+\RequirePackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{texgyrepagella-regular.otf}[
+  BoldFont = texgyrepagella-bold.otf,
+  ItalicFont = texgyrepagella-italic.otf,
+  BoldItalicFont = texgyrepagella-bolditalic.otf
+]
+\RequirePackage{microtype}
+\RequirePackage{setspace}
+\ifhandoutrmtwo
+  \setstretch{1.12}
+\else
+  \setstretch{1.05}
+\fi
+
+% --- Math: Latin Modern Math ---
+\RequirePackage{amsmath,amssymb,amsthm}
+\RequirePackage{unicode-math}
+\setmathfont{latinmodern-math.otf}
+\RequirePackage{mathtools}
+\RequirePackage{enumitem}
+\RequirePackage{etoolbox}
+\RequirePackage{needspace}
+\ifhandoutrmtwo
+  \RequirePackage{adjustbox}
+\fi
+
+% --- Figures ---
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
+
+% --- Boxes, headers, links ---
+\RequirePackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\RequirePackage{fancyhdr}
+\RequirePackage{titlesec}
+\RequirePackage{xcolor}
+\RequirePackage{pdfpages}
+\RequirePackage{hyperref}
+\ifhandoutrmtwo
+  \hypersetup{
+    colorlinks=false,
+    pdfborder={0 0 0}
+  }
+\else
+  \hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=black!70!white
+  }
+\fi
+
+% Muted, print-friendly palette
+\definecolor{ee483ink}{RGB}{25,25,25}
+\definecolor{ee483rule}{RGB}{120,120,120}
+\definecolor{defbg}{RGB}{250,250,250}
+\definecolor{exbg}{RGB}{252,252,252}
+\definecolor{exframe}{RGB}{55,130,55}
+\definecolor{factbg}{RGB}{248,250,248}
+\definecolor{notebg}{RGB}{252,252,252}
+\definecolor{ee483highlight}{RGB}{210,242,210}
+\definecolor{ee483highlightyellow}{RGB}{255, 249, 196}
+\definecolor{ee483footnote}{RGB}{95, 55, 140}
+\definecolor{ee483link}{RGB}{40, 90, 145}
+\colorlet{ee483blue}{ee483ink}  % backward compatibility for figures
+\newcommand{\HandoutSecLink}[2]{\hyperref[#1]{\textcolor{ee483link}{#2}}}
+
+% Footnote markers in purple to distinguish from body text.
+\makeatletter
+\renewcommand\@makefnmark{%
+  \hbox{\@textsuperscript{\normalfont\color{ee483footnote}\@thefnmark}}%
+}
+\def\@makefntext#1{%
+  \parindent 1em\relax
+  \noindent
+  \hb@xt@1.8em{\hss\@textsuperscript{\normalfont\color{ee483footnote}\@thefnmark}}#1%
+}
+\makeatother
+
+% Highlight a display-math fragment (e.g.\ key result in align*).
+\newtcbox{\HandoutHighlightMath}{on line, colback=ee483highlight, colframe=ee483highlight,
+  boxrule=0pt, arc=0pt, left=4pt, right=4pt, top=3pt, bottom=3pt, boxsep=0pt}
+\newtcbox{\HandoutHighlightYellow}{on line, colback=ee483highlightyellow, colframe=ee483highlightyellow,
+  boxrule=0pt, arc=0pt, left=3pt, right=3pt, top=2pt, bottom=2pt, boxsep=0pt}
+
+% Side-by-side block diagram (left) and equation derivation (right).
+\newcommand{\HandoutDiagramEqLayoutStart}{%
+  \par\noindent
+  \begin{minipage}[t]{0.52\linewidth}\raggedright\vspace{0pt}%
+}
+\newcommand{\HandoutDiagramEqLayoutMid}{%
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.46\linewidth}\raggedright\vspace{0pt}\small
+  \setlength{\abovedisplayskip}{0pt}%
+  \setlength{\abovedisplayshortskip}{0pt}%
+}
+\newcommand{\HandoutDiagramEqLayoutEnd}{%
+  \end{minipage}\par\normalsize\vspace{0.35em}%
+}
+
+% Section styling (numbered, understated)
+\let\HandoutPendingMark\empty
+\newcommand{\HandoutSectionLabelFormat}{%
+  \ifx\HandoutPendingMark\empty\else\HandoutMarkMargin{\HandoutPendingMark}\fi
+  \thesection
+}
+\newcommand{\HandoutSubsectionLabelFormat}{%
+  \ifx\HandoutPendingMark\empty\else\HandoutMarkMargin{\HandoutPendingMark}\fi
+  \thesubsection
+}
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{ee483ink}}
+  {\HandoutSectionLabelFormat}{0.75em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{ee483ink}}
+  {\HandoutSubsectionLabelFormat}{0.75em}{}
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\itshape\color{ee483ink}}
+  {\thesubsubsection}{0.75em}{}
+\titlespacing*{\section}{0pt}{14pt plus 4pt minus 2pt}{8pt plus 2pt minus 2pt}
+\titlespacing*{\subsection}{0pt}{10pt plus 2pt minus 2pt}{6pt plus 2pt minus 2pt}
+
+% Header / footer
+\pagestyle{fancy}
+\fancyhf{}
+\ifhandoutrmtwo
+  \fancyhead[L]{\small\textsc{EE 483 Notes}}
+\else
+  \fancyhead[L]{\small\textsc{EE 483: Lecture Notes}}
+\fi
+\fancyhead[R]{\small\textsc{\LectureDateText}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\newcommand{\LectureDateText}{}
+\newcommand{\SetLectureDate}[1]{\renewcommand{\LectureDateText}{#1}}
+\newcommand{\HandoutLecturer}{Prof.\ Justin Haldar}
+\newcommand{\HandoutCollectedBy}{Gewenxin Yu}
+
+\makeatletter
+\newcommand{\HandoutLectureNum}{}
+\newcommand{\HandoutLectureSubtitle}{}
+
+% Academic title block for handouts
+% Usage: \HandoutTitle{3}{Properties of Discrete-Time Systems}{September 1, 2026}
+\newcommand{\HandoutTitle}[3]{%
+  \renewcommand{\HandoutLectureNum}{#1}%
+  \renewcommand{\HandoutLectureSubtitle}{#2}%
+  \date{#3}%
+  \SetLectureDate{#3}%
+  \title{EE 483: Lecture #1: #2}%
+  \author{Collected by \HandoutCollectedBy}%
+}
+
+\renewcommand{\maketitle}{%
+  \begingroup
+  \parindent\z@
+  \thispagestyle{fancy}%
+  \vspace*{-0.25em}%
+  {\small\textsc{University of Southern California}\par}%
+  \vspace{1em}%
+  {\LARGE\bfseries EE 483: Digital Signal Processing\par}%
+  \vspace{0.5em}%
+  {\large Lecture \HandoutLectureNum: \HandoutLectureSubtitle\par}%
+  \vspace{1.25em}%
+  {\small
+    \renewcommand{\arraystretch}{1.2}%
+    \begin{tabular}{@{}l@{\quad}l@{}}%
+      \textit{Lecturer}      & \HandoutLecturer \\%
+      \textit{Collected by} & \HandoutCollectedBy \\%
+      \textit{Date}          & \@date \\%
+    \end{tabular}\par
+  }%
+  \vspace{1.25em}%
+  \noindent{\color{ee483rule}\rule{\textwidth}{0.4pt}}%
+  \vspace{0.75em}%
+  \endgroup
+}
+\makeatother
+
+% Shared academic box style
+\tcbset{
+  academic/.style={
+    enhanced,
+    breakable=false,
+    boxrule=0.4pt,
+    arc=0pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    before skip=12pt,
+    after skip=12pt,
+    colframe=ee483rule,
+    fonttitle=\bfseries,
+    coltitle=ee483ink,
+    titlerule=0pt,
+    attach title to upper,
+    after title={.\par\vspace{0.65em}\nointerlineskip}
+  }
+}
+
+% Boxed environments: Definition, Example, Fact/Property, Note
+\newtcolorbox{defbox}[1][]{%
+  academic,
+  colback=defbg,
+  title={Definition},
+  #1
+}
+\newtcolorbox{examplebox}[1][]{%
+  academic,
+  colback=exbg,
+  colframe=exframe,
+  boxrule=0.7pt,
+  fonttitle=\bfseries\itshape,
+  title={Example},
+  #1
+}
+\newtcolorbox{factbox}[1][]{%
+  academic,
+  colback=factbg,
+  title={Fact},
+  #1
+}
+\newtcolorbox{notebox}[1][]{%
+  academic,
+  colback=notebg,
+  boxrule=0.3pt,
+  colframe=ee483rule!60,
+  fonttitle=\bfseries\itshape,
+  title={Remark},
+  #1
+}
+
+% Keep each styled block on one page; only guard against orphaned titles.
+% (Do not use a large \Needspace here — that leaves huge bottom whitespace.)
+\newcommand{\HandoutProtectBlock}[1]{%
+  \BeforeBeginEnvironment{#1}{\Needspace{6\baselineskip}}%
+}
+\HandoutProtectBlock{defbox}
+\HandoutProtectBlock{examplebox}
+\HandoutProtectBlock{factbox}
+\HandoutProtectBlock{notebox}
+
+% Common math macros used throughout the notes
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\hxfer}{H}
+\newcommand{\dtft}{\mathrm{DTFT}}
+\DeclareMathOperator{\median}{median}
+
+\setlist{itemsep=2pt,topsep=4pt,parsep=0pt}
+
+% Small downward tick on a horizontal axis at $(x,y)$.
+\newcommand{\HandoutAxTick}[3][0.13]{%
+  \draw (#2,#3) -- (#2,{#3-#1});%
+}
+
+% Manual handout sequence markers (boxed numbers in the left margin).
+% Right edge of every mark sits \HandoutMarkInset left of the text-block
+% (or tcolorbox frame, which is flush with the text block).
+\newcommand{\HandoutMark}[1]{%
+  \begingroup
+  \setlength{\fboxsep}{2.5pt}%
+  \raisebox{-0.15ex}{%
+    \fboxrule=0.5pt\fbox{\normalfont\bfseries #1}%
+  }%
+  \endgroup
+}
+\newlength{\HandoutMarkInset}
+\newlength{\HandoutMarkBoxOffset}
+\setlength{\HandoutMarkBoxOffset}{0pt}
+\ifhandoutrmtwo
+  \setlength{\HandoutMarkInset}{0.22in}
+\else
+  \setlength{\HandoutMarkInset}{0.42in}
+\fi
+\makeatletter
+\newcommand{\Handout@SyncMarkBoxOffset}{%
+  \setlength{\HandoutMarkBoxOffset}{%
+    \dimexpr\kvtcb@left@rule+\kvtcb@boxsep+\kvtcb@leftupper\relax
+  }%
+}
+\newcommand{\Handout@ClearMarkBoxOffset}{\setlength{\HandoutMarkBoxOffset}{0pt}}
+\tcbset{
+  handout mark/.style={
+    overlay={%
+      \node[anchor=north east, inner sep=0pt]%
+        at ([xshift=-\HandoutMarkInset]frame.north west)%
+        {\HandoutMark{#1}};%
+    }
+  }
+}
+\newcommand{\Handout@HookMarkBox}[1]{%
+  \AtBeginEnvironment{#1}{\Handout@SyncMarkBoxOffset}%
+  \AfterEndEnvironment{#1}{\Handout@ClearMarkBoxOffset}%
+}
+\Handout@HookMarkBox{defbox}
+\Handout@HookMarkBox{examplebox}
+\Handout@HookMarkBox{factbox}
+\Handout@HookMarkBox{notebox}
+\makeatother
+\newcommand{\HandoutMarkMargin}[1]{%
+  \llap{\HandoutMark{#1}\hspace{\dimexpr\HandoutMarkInset+\HandoutMarkBoxOffset\relax}}%
+}
+\newcommand{\HandoutMarkLeft}[1]{\HandoutMarkMargin{#1}}
+% Mark in the left margin, vertically aligned with the top of a tcolorbox frame.
+\newcommand{\HandoutBeginMarkedExamplebox}[2][Example]{%
+  \begin{examplebox}[title={#1}, handout mark=#2]%
+}
+\newcommand{\HandoutEndMarkedExamplebox}{\end{examplebox}}
+\newcommand{\HandoutBeginMarkedFactbox}[2][Fact]{%
+  \begin{factbox}[title={#1}, handout mark=#2]%
+}
+\newcommand{\HandoutEndMarkedFactbox}{\end{factbox}}
+\newcommand{\HandoutMarkSection}[2]{%
+  \Needspace{3\baselineskip}%
+  \def\HandoutPendingMark{#1}%
+  \section{#2}%
+  \let\HandoutPendingMark\empty
+}
+\newcommand{\HandoutMarkSubsection}[2]{%
+  \Needspace{3\baselineskip}%
+  \def\HandoutPendingMark{#1}%
+  \subsection{#2}%
+  \let\HandoutPendingMark\empty
+}
+% Marked run-in heading: embed margin number in the paragraph title itself.
+\newcommand{\HandoutMarkParagraph}[2]{%
+  \Needspace{2\baselineskip}%
+  \paragraph{\HandoutMarkMargin{#1}#2}%
+}
+
+% Mitra textbook equation reference (4th ed.).
+% \tag{} adds parentheses automatically; do not wrap tag text in ().
+\newcommand{\HandoutMitraTagText}[1]{\text{\scriptsize\textit{Mitra~#1}}}
+\newcommand{\HandoutMitraInlineText}[1]{\;\text{\scriptsize\textit{(Mitra~#1)}}}
+\newcommand{\MitraEq}[1]{\HandoutMitraInlineText{#1}}  % inline, after prose or $...$
+\newcommand{\MitraTag}[1]{\tag{\HandoutMitraTagText{#1}}}  % right-aligned in display math
+\newcommand{\MitraEqDoubt}[1]{\HandoutMitraInlineText{#1}\textcolor{red}{?}}
+\newcommand{\MitraEqDoubtTag}[1]{\tag{\HandoutMitraTagText{#1}\textcolor{red}{?}}}
+\newcommand{\HandoutMitraSecRef}[1]{\textnormal{(cf.\ Mitra~Sec.~#1)}}
+
+% Gain block: vertical left edge, apex pointing right.
+\tikzset{
+  handout gain block/.style={
+    inner sep=1pt,
+    minimum height=0.75cm,
+    minimum width=0.72cm,
+    path picture={
+      \draw
+        (path picture bounding box.west |- path picture bounding box.south)
+        -- (path picture bounding box.west |- path picture bounding box.north)
+        -- (path picture bounding box.east)
+        -- cycle;
+    },
+  }
+}
+
+% Scalar multiplication block diagram: x[n] -> A -> y[n].
+\newcommand{\HandoutScalarMultDiagram}{%
+  \tikz[baseline=-0.6ex, >=Latex]{%
+    \node (x) at (0,0) {$x[n]$};
+    \node[handout gain block] (A) at (1.5,0) {$A$};
+    \node (y) at (3,0) {$y[n]$};
+    \draw[->, thick] (x.east) -- (A.west);
+    \draw[->, thick] (A.east) -- (y.west);
+  }%
+}
+
+% Branching: one input splits into two identical outputs.
+\newcommand{\HandoutBranchingDiagram}{%
+  \tikz[baseline=-0.6ex, >=Latex]{%
+    \node (input) at (0,0) {$x[n]$};
+    \coordinate (junction) at (1.5,0);
+    \node (right-output) at (3.2,0) {$x[n]$};
+    \node (bottom-output) at (1.5,-1.2) {$x[n]$};
+    \draw[thick] (input.east) -- (junction);
+    \fill (junction) circle (2.5pt);
+    \draw[->, thick] (junction) -- (right-output.west);
+    \draw[->, thick] (junction) -- (bottom-output.north);
+  }%
+}
+
+% Addition: sum of x[n] and w[n].
+\newcommand{\HandoutAdditionDiagram}{%
+  \tikz[baseline=-0.6ex, >=Latex]{%
+    \node (x) at (0,0) {$x[n]$};
+    \node[draw, circle, inner sep=2pt] (sum) at (2,0) {$+$};
+    \node (y) at (5,0) {$y[n]=x[n]+w[n]$};
+    \node (w) at (2,-1.2) {$w[n]$};
+    \draw[->, thick] (x.east) -- (sum.west);
+    \draw[->, thick] (w.north) -- (sum.south);
+    \draw[->, thick] (sum.east) -- (y.west);
+  }%
+}
+
+% Product (modulation): multiply x[n] and w[n].
+\newcommand{\HandoutModulationDiagram}{%
+  \tikz[baseline=-0.6ex, >=Latex]{%
+    \node (x) at (0,0) {$x[n]$};
+    \node[draw, circle, inner sep=2pt] (mult) at (2,0) {$\times$};
+    \node (y) at (5,0) {$y[n]=x[n]w[n]$};
+    \node (w) at (2,-1.2) {$w[n]$};
+    \draw[->, thick] (x.east) -- (mult.west);
+    \draw[->, thick] (w.north) -- (mult.south);
+    \draw[->, thick] (mult.east) -- (y.west);
+  }%
+}
+
+% Two-tap FIR filter block diagram (Example).
+\newcommand{\HandoutTwoTapFIRDiagram}{%
+  \begin{tikzpicture}[>=Latex, node distance=1cm]
+    \node (x) at (0,0) {$x[n]$};
+    \coordinate (branch) at (1.3,0);
+    \node[handout gain block] (a0) at (2.6,0) {$a_0$};
+    \node[draw, rectangle, minimum width=0.8cm,
+      minimum height=0.6cm] (delay) at (2,-1.2) {$z^{-1}$};
+    \node[handout gain block] (a1) at (3.4,-1.2) {$a_1$};
+    \node[draw, circle, inner sep=2pt] (sum) at (4.7,0) {$+$};
+    \node (y) at (6.3,0) {$y[n]$};
+    \draw[thick] (x.east) -- (branch);
+    \fill (branch) circle (2.5pt);
+    \draw[->, thick] (branch) -- (a0.west);
+    \draw[->, thick] (a0.east) -- (sum.west);
+    \draw[->, thick] (branch) |- (delay.west);
+    \draw[->, thick] (delay.east) -- (a1.west);
+    \draw[->, thick] (a1.east) -| (sum.south);
+    \draw[->, thick] (sum.east) -- (y.west);
+    \draw[thick]
+      (0.8,0.75) rectangle (5.5,-1.8);
+    \node[anchor=south west, inner sep=2pt] at (5.5,0.75) {$H$};
+  \end{tikzpicture}%
+}
+
+% Textbook excerpt appendix (PDFs live in ../../textbooks/ relative to each handout).
+\newcommand{\HandoutTextbookRoot}{../../textbooks}
+\newcommand{\HandoutIncludeTextbookExcerpt}[2][]{%
+  \ifhandoutclean\else
+    \ifhandoutrmtwo
+      \includepdf[
+        pages=-,
+        pagecommand={\thispagestyle{empty}},
+        width=\paperwidth,
+        keepaspectratio,
+        #1
+      ]{\HandoutTextbookRoot/#2}%
+    \else
+      \includepdf[
+        pages=-,
+        pagecommand={\thispagestyle{empty}},
+        #1
+      ]{\HandoutTextbookRoot/#2}%
+    \fi
+  \fi
+}
+
+% Handwritten lecture note scans (PDFs live in scans/ relative to each handout).
+\newcommand{\HandoutScanRoot}{scans}
+\newcommand{\HandoutIncludeHandoutScan}[2][]{%
+  \ifhandoutclean\else
+    \ifhandoutrmtwo
+      \includepdf[
+        pages=-,
+        pagecommand={\thispagestyle{empty}},
+        width=\paperwidth,
+        keepaspectratio,
+        #1
+      ]{\HandoutScanRoot/#2}%
+    \else
+      \includepdf[
+        pages=-,
+        pagecommand={\thispagestyle{empty}},
+        #1
+      ]{\HandoutScanRoot/#2}%
+    \fi
+  \fi
+}
+
+% Appendix front matter and section helpers (skipped in clean builds).
+\newcommand{\HandoutAppendixListStart}{%
+  \ifhandoutclean\else
+    \appendix
+    \section*{Appendix}%
+    \begin{itemize}[leftmargin=1.5em, itemsep=3pt]%
+  \fi
+}
+\newcommand{\HandoutAppendixListEnd}{%
+  \ifhandoutclean\else
+    \end{itemize}%
+    \vspace{0.75em}%
+  \fi
+}
+\newcommand{\HandoutAppendixListItem}[2]{%
+  \ifhandoutclean\else
+    \item \hyperref[#1]{#2}%
+  \fi
+}
+\newcommand{\HandoutAppendixSection}[2]{%
+  \ifhandoutclean\else
+    \section{#2}%
+    \label{#1}%
+  \fi
+}
+
+% --- reMarkable 2 layout adjustments (content unchanged) ---
+\ifhandoutrmtwo
+  \BeforeBeginEnvironment{handouttikz}{%
+    \Needspace{6\baselineskip}%
+    \begin{samepage}%
+    \begin{center}%
+    \begin{adjustbox}{max width=\linewidth,center}%
+  }
+  \AfterEndEnvironment{handouttikz}{%
+    \end{adjustbox}%
+    \end{center}%
+    \end{samepage}%
+  }
+  \NewDocumentEnvironment{handouttikz}{O{}}{
+    \begin{tikzpicture}[>=Latex, #1]%
+  }{
+    \end{tikzpicture}%
+  }
+  \NewDocumentEnvironment{handouttikz*}{O{}}{
+    \begin{center}%
+    \begin{adjustbox}{max width=\linewidth,center}%
+    \begin{tikzpicture}[>=Latex, #1]%
+  }{
+    \end{tikzpicture}%
+    \end{adjustbox}%
+    \end{center}%
+  }
+  \NewDocumentEnvironment{handoutdiagram}{O{}}{
+    \begin{adjustbox}{width=\linewidth,valign=t}%
+    \begin{tikzpicture}[>=Latex, #1]%
+  }{
+    \end{tikzpicture}%
+    \end{adjustbox}%
+  }
+\else
+  \BeforeBeginEnvironment{handouttikz}{%
+    \Needspace{6\baselineskip}%
+    \begin{samepage}%
+  }
+  \AfterEndEnvironment{handouttikz}{\end{samepage}}
+  \NewDocumentEnvironment{handouttikz}{O{}}{
+    \begin{center}%
+    \begin{tikzpicture}[>=Latex, #1]%
+  }{
+    \end{tikzpicture}%
+    \end{center}%
+  }
+\fi
+
+\ifhandoutrmtwo
+  \tcbset{
+    academic/.append style={
+      left=6pt,
+      right=6pt,
+      before skip=8pt,
+      after skip=8pt,
+      after title={.\par\vspace{0.5em}\nointerlineskip}
+    }
+  }
+
+  \newcommand{\HandoutFitDisplay}[1]{%
+    \begin{center}%
+    \adjustbox{max width=\dimexpr\linewidth-2pt\relax}{%
+      $\displaystyle #1$%
+    }%
+    \end{center}%
+  }
+
+  % Slightly larger math on reMarkable 2 (display ≈ 13pt vs default 11pt).
+  \AtBeginDocument{%
+    \DeclareMathSizes{11}{13}{10}{7.5}%
+  }
+
+  \makeatletter
+  \renewcommand{\maketitle}{%
+    \begingroup
+    \parindent\z@
+    \thispagestyle{fancy}%
+    \vspace*{-0.25em}%
+    {\small\textsc{University of Southern California}\par}%
+    \vspace{0.75em}%
+    {\Large\bfseries EE 483: Digital Signal Processing\par}%
+    \vspace{0.35em}%
+    {\normalsize Lecture \HandoutLectureNum: \HandoutLectureSubtitle\par}%
+    \vspace{0.9em}%
+    {\small
+      \renewcommand{\arraystretch}{1.15}%
+      \begin{tabular}{@{}l@{\quad}l@{}}%
+        \textit{Lecturer}      & \HandoutLecturer \\%
+        \textit{Collected by} & \HandoutCollectedBy \\%
+        \textit{Date}          & \@date \\%
+      \end{tabular}\par
+    }%
+    \vspace{0.9em}%
+    \noindent{\color{ee483rule}\rule{\textwidth}{0.4pt}}%
+    \vspace{0.5em}%
+    \endgroup
+  }
+  \makeatother
+\else
+  \newcommand{\HandoutFitDisplay}[1]{\[\displaystyle #1\]}
+\fi

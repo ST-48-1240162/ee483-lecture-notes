@@ -1,0 +1,174 @@
+\documentclass[11pt]{article}
+\usepackage[rm2]{lecturenote}
+\HandoutTitle{1}{Signals: Analog, Discrete-Time, and Digital}{August 25, 2026}
+
+\begin{document}
+\maketitle
+
+\section{What is a Digital Signal? (1D Case)}
+
+We distinguish three flavors of one-dimensional signals, based on how the
+independent variable (time) and the dependent variable (amplitude) are
+represented.
+
+\subsection{Continuous-Time (``Analog'') Signals}
+
+A continuous-time signal $x_a(t)$ is a real- or complex-valued function
+defined for all real-valued $t$.
+
+\begin{center}
+\begin{tikzpicture}[scale=1]
+\draw[-Latex] (-0.3,0) -- (6.6,0) node[right]{$t$};
+\draw[thick, ee483blue, domain=0:6.3, samples=150]
+  plot (\x, {0.9*sin(deg(\x*3.4))*exp(-0.12*\x) + 0.05*\x - 0.05});
+\end{tikzpicture}
+\end{center}
+
+\noindent Examples: speech signals, EEG, images formed with focused light.
+
+\subsection{Discrete-Time Signals}
+
+A discrete-time signal $x[n]$ is defined only for integer-valued $n$.
+
+\begin{center}
+\begin{tikzpicture}[scale=1]
+\draw[-Latex] (-0.5,0) -- (5.5,0) node[right]{$n$};
+\foreach \n/\val/\lbl in {0/1.2/{\pi/2},1/1.7/{2},2/-1.0/{-1},3/1.4/{},4/1.0/{}}
+  {\draw[thick] (\n,0) -- (\n,\val); \fill (\n,\val) circle (2.2pt);}
+\node[above] at (0,1.25) {\scriptsize $\pi/2$};
+\node[above right] at (1,1.75) {\scriptsize $2$};
+\node[below] at (2,-1.05) {\scriptsize $-1$};
+\foreach \n in {0,1,2,3,4} \node[below] at (\n,-0.15) {\n};
+\end{tikzpicture}
+\end{center}
+
+Discrete-time signals arise in (at least) two ways:
+\begin{itemize}
+  \item \textbf{Sampled continuous signals.} $x[n] = x_a(nT)$, e.g.\ a
+  sampled audio signal.
+  \item \textbf{Inherently discrete signals.} Quantities that only update at
+  discrete instants, e.g.\ the daily maximum temperature, or the number of
+  students late to class on days when class meets.
+\end{itemize}
+
+\subsection{Digital Signals}
+
+\begin{defbox}[title={Definition (Digital Signal)}]
+A \textbf{digital signal} is sampled in time \emph{and} in amplitude: each
+value $x[n]$ is stored with a finite number of bits, so the numbers are
+rounded. This is called \textbf{finite precision} or \textbf{quantization}.
+\end{defbox}
+
+\section{From the Real World to Numbers}
+
+\subsection{The Real ADC}
+
+\begin{center}
+\begin{tikzpicture}[node distance=14mm, >=Latex]
+\node (in) {$x_a(t)$};
+\node[draw, minimum width=2.4cm, minimum height=1cm, right=of in] (adc) {ADC};
+\node[right=of adc] (out) {$q[n]$};
+\draw[->] (in) -- (adc);
+\draw[->] (adc) -- (out);
+\node[below=2pt of adc, font=\scriptsize] {analog-to-digital converter};
+\node[above=2pt of out, font=\scriptsize, align=left] {digitized signal\\ (quantized in amplitude)};
+\end{tikzpicture}
+\end{center}
+
+\subsection{A Useful Model}
+
+We conceptually split the ADC into a time-sampling stage followed by an
+amplitude-quantization stage:
+
+\begin{center}
+\begin{tikzpicture}[node distance=12mm, >=Latex]
+\node (in) {$x_a(t)$};
+\node[draw, minimum width=1.9cm, minimum height=1cm, right=of in, align=center] (samp) {time\\ sample};
+\node[right=of samp] (xn) {$x[n]$};
+\node[draw, minimum width=1.9cm, minimum height=1cm, right=of xn] (quant) {quantize};
+\node[right=of quant] (qn) {$q[n]$};
+\draw[->] (in) -- (samp);
+\draw[->] (samp) -- (xn);
+\draw[->] (xn) -- (quant);
+\draw[->] (quant) -- (qn);
+\node[below=2pt of samp, font=\scriptsize] {discrete-time};
+\end{tikzpicture}
+\end{center}
+
+\subsection{An Even More Useful Model}
+
+Quantization is modeled as \emph{additive quantization noise} $e[n]$ injected
+after ideal time-sampling:
+
+\begin{center}
+\begin{tikzpicture}[node distance=12mm, >=Latex]
+\node (in) {$x_a(t)$};
+\node[draw, minimum width=1.9cm, minimum height=1cm, right=of in, align=center] (samp) {time\\ sampling};
+\node[right=of samp] (xn) {$x[n]$};
+\node[draw, circle, right=of xn] (sum) {$+$};
+\node[right=of sum] (qn) {$q[n]$};
+\node[above=8mm of sum] (e) {quantization noise $e[n]$};
+\draw[->] (in) -- (samp);
+\draw[->] (samp) -- (xn);
+\draw[->] (xn) -- (sum);
+\draw[->] (e) -- (sum);
+\draw[->] (sum) -- (qn);
+\end{tikzpicture}
+\end{center}
+
+\begin{notebox}
+Discrete-time systems \emph{can} be linear. \textbf{Digital systems cannot be
+linear}; quantization is an inherently nonlinear operation.
+\end{notebox}
+
+\section{DSP Topics for the Course}
+
+\begin{itemize}
+  \item \textbf{Sampling and reconstruction} (ADC and DAC)
+  \begin{itemize}
+    \item Nyquist rate
+  \end{itemize}
+  \item \textbf{Discrete-time linear systems}
+  $$x_a(t) \to \boxed{\text{linear system}} \to y_a(t), \qquad
+    x[n] \to \boxed{\text{linear system}} \to y[n]$$
+  \item \textbf{Signal representation and coding}
+  \begin{itemize}
+    \item Discrete Time Fourier Transform (DTFT)
+    \item Discrete Fourier Transform (DFT)
+    \item Discrete cosine transform and wavelets (WebP, JPEG, MPEG, MP3, etc.)
+  \end{itemize}
+  \item \textbf{Implementation}
+  \begin{itemize}
+    \item Design of digital filters
+    \item Hardware (CPU, DSP, GPU, FPGA)
+    \item Computational cost (algorithmic) and quantization / overflow
+    (configuration details)
+  \end{itemize}
+\end{itemize}
+
+\section{Why DSP Instead of Analog Signal Processing?}
+
+\begin{itemize}
+  \item Cost
+  \item Storage of data
+  \item Availability
+  \item Easily reconfigured
+  \item Implementation time
+  \item Reliability
+  \item Flexibility
+\end{itemize}
+
+\section*{Optional Readings}
+\begin{itemize}
+  \item Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Ch.\ 1, 2.1, 2.2, 2.4
+  \item Monson H. Hayes, \textit{Schaum's Outline of Digital Signal Processing}, 2nd ed., Ch.\ 1.1--1.3
+\end{itemize}
+
+\HandoutAppendixListStart
+  \HandoutAppendixListItem{app:scan}{A.\ Handwritten Lecture Note Scan (August 25, 2026)}
+\HandoutAppendixListEnd
+
+\HandoutAppendixSection{app:scan}{Handwritten Lecture Note Scan}
+\HandoutIncludeHandoutScan{lecture1_0825.pdf}
+
+\end{document}

@@ -1,0 +1,15 @@
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+texput.log
+
+# Full handouts (include textbook excerpts + scans; very large)
+lecture[0-9]*.pdf
+!pdf/*.pdf
+
+# Local scan assets (not redistributable)
+scans/
