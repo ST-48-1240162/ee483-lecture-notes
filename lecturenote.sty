@@ -60,27 +60,6 @@
     ]%
   }%
 }
-\IfFontExistsTF{National}{%
-  \newfontfamily\HandoutViterbiSansFont{National}[
-    BoldFont = {National Bold},
-    ItalicFont = {National Italic},
-    BoldItalicFont = {National Bold Italic},
-  ]%
-}{%
-  \IfFontExistsTF{TeX Gyre Heros}{%
-    \newfontfamily\HandoutViterbiSansFont{TeX Gyre Heros}[
-      BoldFont = {TeX Gyre Heros Bold},
-      ItalicFont = {TeX Gyre Heros Italic},
-      BoldItalicFont = {TeX Gyre Heros Bold Italic},
-    ]%
-  }{%
-    \newfontfamily\HandoutViterbiSansFont{Nimbus Sans}[
-      BoldFont = {Nimbus Sans Bold},
-      ItalicFont = {Nimbus Sans Italic},
-      BoldItalicFont = {Nimbus Sans Bold Italic},
-    ]%
-  }%
-}
 \newcommand{\HandoutCourseSubtitle}{Introduction to Digital Signal Processing}
 \newcommand{\HandoutViterbiCourseSubtitle}{%
   {\HandoutViterbiSerifFont\Large\HandoutCourseSubtitle\par}%

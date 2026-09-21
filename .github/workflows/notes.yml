@@ -12,9 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: build clean pdfs
-        run: make notes
+        run: make notes && make notes-compilation
       - uses: actions/upload-artifact@v6
         with:
           name: clean-pdfs
-          path: '*_clean.pdf'
+          path: |
+            *_clean.pdf
+            pdf/ee483_lectures_clean.pdf
           if-no-files-found: error
