@@ -1,8 +1,8 @@
-\documentclass[11pt]{article}
+\documentclass[handout_subfiles_root.tex]{subfiles}
 \usepackage[rm2]{lecturenote}
-\HandoutTitle{4}{Convolution, System Properties, and Difference Equations}{September 3, 2026}
 
 \begin{document}
+\HandoutTitle{4}{Convolution, System Properties, and Difference Equations}{September 3, 2026}
 \maketitle
 
 \HandoutMarkSection{1}{Impulse Response and the Convolution Sum}
@@ -41,7 +41,7 @@ labels the $k$th sample $x[k]$ of $\{x[n]\}$. In Eqs.~(4.16a)--(4.16b), $k$ is t
 convolution summation index; Eq.~(4.16b) forms $y[n]$ as a sum of input samples
 $x[n-k]$ weighted by $h[k]$ (see Mitra, Fig.~4.7).}
 
-\begin{examplebox}[title={Example (Computing the Convolution Sum)}, handout mark=2]
+\begin{examplebox}[title={Example (Computing the Convolution Sum)}, handout mark=2, breakable]
 We compute $y[n]=x[n]\circledast h[n]$ numerically for a
 short input and a short impulse response. Here $x[n]$ is the input and
 $h[n]=H\{\delta[n]\}$ is the impulse response of an LTI system with zero ICs.
@@ -55,14 +55,14 @@ relative to $x[m]$: at each $n$, multiply the overlapping samples and add.
 Let $h[n] = \{1,1,1\}$ and $x[n] = \{1,2,3\}$, with $n=0$ at the first listed
 sample of each sequence.
 
-\begin{handouttikz}[x=1.15cm, y=0.72cm]
+\begin{handouttikz}[x=1.1cm, y=0.62cm]
   \tikzset{
     cell/.style={draw, minimum width=0.78cm, minimum height=0.52cm, font=\small},
     lbl/.style={font=\small, anchor=east}
   }
 
-  \node[font=\small, align=left, anchor=west] at (-0.2,2.15)
-    {Flip $h[n]$ to get $g[m]=h[-m]$, then align $x[m]$ and $g[m]$.\\At $n=0$:};
+  \node[font=\footnotesize, align=left, anchor=west] at (-0.2,2.05)
+    {Flip $h[n]$ to $g[m]=h[-m]$; align $x[m]$ and $g[m]$. At $n=0$:};
 
   % column headers
   \node[lbl] at (-0.15,1.1) {$m$};

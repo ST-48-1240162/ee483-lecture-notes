@@ -1,8 +1,8 @@
-\documentclass[11pt]{article}
+\documentclass[handout_subfiles_root.tex]{subfiles}
 \usepackage[rm2]{lecturenote}
-\HandoutTitle{5}{The Discrete-Time Fourier Transform (DTFT)}{September 8, 2026}
 
 \begin{document}
+\HandoutTitle{5}{The Discrete-Time Fourier Transform (DTFT)}{September 8, 2026}
 \maketitle
 
 \HandoutMarkSection{1}{The Discrete-Time Fourier Transform (DTFT)}
@@ -171,10 +171,13 @@ x[n] &= \frac{1}{2\pi}\int_{-\pi}^{\pi}\left(\sum_{\ell=-\infty}^{\infty} x[\ell
 &= x[n]. \quad \blacksquare
 \end{align*}
 
-\HandoutMarkSubsection{6}{Convergence}
+\HandoutMarkSubsection{6}{Convergence\HandoutTitleFnmark}
+\footnotetext{cf. Mitra Sec.~3.2.4.}
 \label{sec:dtft-convergence}
 
-\textbf{Note:} Exchanging the order of integration and summation (above) assumed convergence.
+\begin{notebox}
+Exchanging the order of integration and summation (above) assumed convergence.
+\end{notebox}
 
 \begin{defbox}[title={Convergence}]
 An infinite series of the form $X(e^{j\omega}) = \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega n}$\,\HandoutEqRef{3.10} may or may not converge. Let

@@ -39,6 +39,52 @@
   ItalicFont = texgyrepagella-italic.otf,
   BoldItalicFont = texgyrepagella-bolditalic.otf
 ]
+% USC Viterbi official typefaces: Adobe Caslon Pro (serif), National (sans).
+% Fallbacks follow USC brand guidance when licensed fonts are unavailable.
+\IfFontExistsTF{Adobe Caslon Pro}{%
+  \newfontfamily\HandoutViterbiSerifFont{Adobe Caslon Pro}[
+    BoldFont = {Adobe Caslon Pro Bold},
+    ItalicFont = {Adobe Caslon Pro Italic},
+    BoldItalicFont = {Adobe Caslon Pro Bold Italic},
+  ]%
+}{%
+  \IfFontExistsTF{Libre Baskerville}{%
+    \newfontfamily\HandoutViterbiSerifFont{Libre Baskerville}[
+      BoldFont = {Libre Baskerville Bold},
+      ItalicFont = {Libre Baskerville Italic},
+      BoldItalicFont = {Libre Baskerville Bold Italic},
+    ]%
+  }{%
+    \newfontfamily\HandoutViterbiSerifFont{Baskervville}[
+      ItalicFont = {Baskervville Italic},
+    ]%
+  }%
+}
+\IfFontExistsTF{National}{%
+  \newfontfamily\HandoutViterbiSansFont{National}[
+    BoldFont = {National Bold},
+    ItalicFont = {National Italic},
+    BoldItalicFont = {National Bold Italic},
+  ]%
+}{%
+  \IfFontExistsTF{TeX Gyre Heros}{%
+    \newfontfamily\HandoutViterbiSansFont{TeX Gyre Heros}[
+      BoldFont = {TeX Gyre Heros Bold},
+      ItalicFont = {TeX Gyre Heros Italic},
+      BoldItalicFont = {TeX Gyre Heros Bold Italic},
+    ]%
+  }{%
+    \newfontfamily\HandoutViterbiSansFont{Nimbus Sans}[
+      BoldFont = {Nimbus Sans Bold},
+      ItalicFont = {Nimbus Sans Italic},
+      BoldItalicFont = {Nimbus Sans Bold Italic},
+    ]%
+  }%
+}
+\newcommand{\HandoutCourseSubtitle}{Introduction to Digital Signal Processing}
+\newcommand{\HandoutViterbiCourseSubtitle}{%
+  {\HandoutViterbiSerifFont\Large\HandoutCourseSubtitle\par}%
+}
 \RequirePackage{microtype}
 \RequirePackage{setspace}
 \ifhandoutrmtwo
@@ -165,11 +211,7 @@
 % Header / footer
 \pagestyle{fancy}
 \fancyhf{}
-\ifhandoutrmtwo
-  \fancyhead[L]{\small\textsc{EE 483 Notes}}
-\else
-  \fancyhead[L]{\small\textsc{EE 483: Lecture Notes}}
-\fi
+\fancyhead[L]{}
 \fancyhead[R]{\small\textsc{\LectureDateText}}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0pt}

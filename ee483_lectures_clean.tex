@@ -1,0 +1,28 @@
+\documentclass[11pt]{article}
+\makeatletter
+\def\HandoutCleanBuild{}
+\makeatother
+\usepackage[rm2]{lecturenote}
+\usepackage{subfiles}
+\input{ee483_compilation_cover.tex}
+
+\newcommand{\HandoutCompilationLecture}[4]{%
+  \clearpage
+  \setcounter{section}{0}%
+  \setcounter{subsection}{0}%
+  \phantomsection
+  \pdfbookmark[0]{Lecture~#1: #2 (#3)}{lecture.#1}%
+  \subfile{#4}%
+}
+
+\begin{document}
+\HandoutCompilationCover
+\clearpage
+
+\HandoutCompilationLecture{1}{Signals: Analog, Discrete-Time, and Digital}{August 25, 2026}{lecture1_0825}
+\HandoutCompilationLecture{2}{Systems: From Continuous-Time to Discrete-Time}{August 27, 2026}{lecture2_0827}
+\HandoutCompilationLecture{3}{Properties of Discrete-Time Systems}{September 1, 2026}{lecture3_0901}
+\HandoutCompilationLecture{4}{Convolution, System Properties, and Difference Equations}{September 3, 2026}{lecture4_0903}
+\HandoutCompilationLecture{5}{The Discrete-Time Fourier Transform (DTFT)}{September 8, 2026}{lecture5_0908}
+
+\end{document}

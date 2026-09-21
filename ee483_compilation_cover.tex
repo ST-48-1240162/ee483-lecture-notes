@@ -1,0 +1,25 @@
+% Compilation cover page.
+% Typographic layout inspired by the minimalist academic book template
+% pmichaillat/latex-book (MIT License): https://github.com/pmichaillat/latex-book
+
+\newcommand{\HandoutCompilationCover}{%
+  \begin{titlepage}
+    \thispagestyle{empty}
+    \parindent=0pt
+    \color{ee483ink}%
+    \vspace*{0.32\textheight}%
+    \HandoutViterbiCourseSubtitle
+    \vspace{1.35em}%
+    {\large\textit{Lecture Notes}\par}%
+    \vspace{0.35em}%
+    {\normalsize Collected Edition, Fall 2026\par}%
+    \vfill
+    {\small
+      \renewcommand{\arraystretch}{1.35}%
+      \begin{tabular}{@{}>{\itshape}l@{\quad}p{0.68\linewidth}@{}}%
+        Lecturer      & \HandoutLecturer \\%
+        Coverage      & Lectures 1--5 \hfill Updated \today \\%
+      \end{tabular}\par
+    }%
+  \end{titlepage}%
+}
