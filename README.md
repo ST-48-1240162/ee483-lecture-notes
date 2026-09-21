@@ -39,7 +39,7 @@ Full builds also pull textbook excerpts from `../../textbooks/` and scans from `
 
 ## Build
 
-Requires XeLaTeX (`fontspec`, `unicode-math`, `subfiles`, `tcolorbox`, …), TeX Gyre Pagella, and Latin Modern Math. The compilation cover subtitle uses USC Viterbi’s Adobe Caslon Pro when installed; otherwise Libre Baskerville or Baskervville.
+Requires XeLaTeX (`fontspec`, `unicode-math`, `subfiles`, `tcolorbox`, …), TeX Gyre Pagella, and Latin Modern Math. The compilation cover subtitle uses USC Viterbi’s Adobe Caslon Pro when installed; otherwise TeX Gyre Pagella (same as the body text).
 
 ```bash
 make clean

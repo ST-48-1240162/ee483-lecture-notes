@@ -34,9 +34,10 @@ lecture5: lecture5_0908.pdf lecture5_0908_clean.pdf
 	xelatex -interaction=nonstopmode $*
 
 # Clean: lecture notes only (no appendices)
-%_clean.pdf: %.tex lecturenote.sty
-	xelatex -interaction=nonstopmode -jobname=$*_clean "\def\HandoutCleanBuild{}\input{$*.tex}"
-	xelatex -interaction=nonstopmode -jobname=$*_clean "\def\HandoutCleanBuild{}\input{$*.tex}"
+%_clean.pdf: %.tex lecturenote.sty handout_subfiles_root.tex
+	-xelatex -interaction=nonstopmode -jobname=$*_clean "\def\HandoutCleanBuild{}\input{$*.tex}"
+	-xelatex -interaction=nonstopmode -jobname=$*_clean "\def\HandoutCleanBuild{}\input{$*.tex}"
+	test -f $@
 
 pdf:
 	mkdir -p pdf

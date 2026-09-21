@@ -39,8 +39,8 @@
   ItalicFont = texgyrepagella-italic.otf,
   BoldItalicFont = texgyrepagella-bolditalic.otf
 ]
-% USC Viterbi official typefaces: Adobe Caslon Pro (serif), National (sans).
-% Fallbacks follow USC brand guidance when licensed fonts are unavailable.
+% USC Viterbi cover subtitle: Adobe Caslon Pro when licensed; otherwise a serif
+% already bundled with TeX Live (no optional faces that CI may lack).
 \IfFontExistsTF{Adobe Caslon Pro}{%
   \newfontfamily\HandoutViterbiSerifFont{Adobe Caslon Pro}[
     BoldFont = {Adobe Caslon Pro Bold},
@@ -48,17 +48,11 @@
     BoldItalicFont = {Adobe Caslon Pro Bold Italic},
   ]%
 }{%
-  \IfFontExistsTF{Libre Baskerville}{%
-    \newfontfamily\HandoutViterbiSerifFont{Libre Baskerville}[
-      BoldFont = {Libre Baskerville Bold},
-      ItalicFont = {Libre Baskerville Italic},
-      BoldItalicFont = {Libre Baskerville Bold Italic},
-    ]%
-  }{%
-    \newfontfamily\HandoutViterbiSerifFont{Baskervville}[
-      ItalicFont = {Baskervville Italic},
-    ]%
-  }%
+  \newfontfamily\HandoutViterbiSerifFont{texgyrepagella-regular.otf}[
+    BoldFont = texgyrepagella-bold.otf,
+    ItalicFont = texgyrepagella-italic.otf,
+    BoldItalicFont = texgyrepagella-bolditalic.otf,
+  ]%
 }
 \newcommand{\HandoutCourseSubtitle}{Introduction to Digital Signal Processing}
 \newcommand{\HandoutViterbiCourseSubtitle}{%
