@@ -54,6 +54,4 @@ Regenerate figures (Octave; outputs land in `figures/`):
 ```bash
 octave figures/plot_dirichlet_zeros.m
 octave figures/plot_dirichlet_periodic.m
-octave figures/plot_dtft_symmetry.m
-octave figures/plot_exp_j2pi_kn.m
 ```
