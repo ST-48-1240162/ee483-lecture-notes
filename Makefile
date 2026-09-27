@@ -13,9 +13,11 @@ PUBLISHED_NOTES := \
 	pdf/lecture05_discrete_time_fourier_transform.pdf \
 	pdf/lecture06_dtft_fourier_series.pdf \
 	pdf/lecture07_linear_phase_filters.pdf \
-	pdf/lecture08_discrete_fourier_transform.pdf
+	pdf/lecture08_discrete_fourier_transform.pdf \
+	pdf/lecture09_fast_fourier_transform.pdf \
+	pdf/lecture10_dft_matrix_dct.pdf
 
-.PHONY: all notes notes-compilation compilation publish-notes clean lecture1 lecture2 lecture3 lecture4 lecture5 lecture6 lecture7 lecture8
+.PHONY: all notes notes-compilation compilation publish-notes clean lecture1 lecture2 lecture3 lecture4 lecture5 lecture6 lecture7 lecture8 lecture9 lecture10
 
 all: $(PDFS)
 
@@ -41,6 +43,8 @@ lecture5: lecture5_0908.pdf lecture5_0908_clean.pdf pdf/lecture05_discrete_time_
 lecture6: lecture6_0910.pdf lecture6_0910_clean.pdf pdf/lecture06_dtft_fourier_series.pdf
 lecture7: lecture7_0915.pdf lecture7_0915_clean.pdf pdf/lecture07_linear_phase_filters.pdf
 lecture8: lecture8_0917.pdf lecture8_0917_clean.pdf pdf/lecture08_discrete_fourier_transform.pdf
+lecture9: lecture9_0922.pdf lecture9_0922_clean.pdf pdf/lecture09_fast_fourier_transform.pdf
+lecture10: lecture10_0924.pdf lecture10_0924_clean.pdf pdf/lecture10_dft_matrix_dct.pdf
 
 publish-notes: $(PUBLISHED_NOTES)
 
@@ -59,6 +63,10 @@ pdf/lecture06_dtft_fourier_series.pdf: lecture6_0910_clean.pdf | pdf
 pdf/lecture07_linear_phase_filters.pdf: lecture7_0915_clean.pdf | pdf
 	cp -f $< $@
 pdf/lecture08_discrete_fourier_transform.pdf: lecture8_0917_clean.pdf | pdf
+	cp -f $< $@
+pdf/lecture09_fast_fourier_transform.pdf: lecture9_0922_clean.pdf | pdf
+	cp -f $< $@
+pdf/lecture10_dft_matrix_dct.pdf: lecture10_0924_clean.pdf | pdf
 	cp -f $< $@
 
 # Full: lecture notes + textbook excerpt + handwritten lecture note scan

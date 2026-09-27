@@ -1,0 +1,326 @@
+\documentclass[handout_subfiles_root.tex]{subfiles}
+\usepackage[rm2]{lecturenote}
+
+\begin{document}
+\HandoutTitle{9}{The Fast Fourier Transform (FFT)}{September 22, 2026}
+\maketitle
+
+\HandoutMarkSection{1}{\HandoutTitleWithFnmark{Fast Fourier Transform (Cooley--Tukey)}}
+\footnotetext{cf.\ Mitra Secs.~11.3--11.5.}
+
+\noindent\textbf{Notice:} the DFT (Lecture~8) is
+\begin{equation*}
+X[k] = \sum_{n=0}^{N-1} x[n]\,W_N^{nk}, \qquad 0\le k\le N-1.
+\end{equation*}
+
+\begin{factbox}[title={Direct DFT cost}]
+\begin{itemize}
+  \item For each $k$: $N$ multiplies, $N-1$ additions.
+  \item $\Rightarrow$ total: \HandoutHighlightYellow{$N^2$ multiplies, $N^2-N$ additions}.
+\end{itemize}
+\end{factbox}
+
+\noindent Suppose $x[n]$, $0\le n\le N-1$, where $N=2^M$ (\textbf{radix-2 FFT}). Let
+\begin{align*}
+y[n] &= x[2n],   & 0&\le n\le \tfrac{N}{2}-1 \quad \text{(even-indexed samples)}, \\
+z[n] &= x[2n+1], & 0&\le n\le \tfrac{N}{2}-1 \quad \text{(odd-indexed samples)}.
+\end{align*}
+
+\begin{factbox}[title={Claim}]
+We can easily compute $X[k]$ from the $\tfrac{N}{2}$-point DFTs $Y[k]$ and $Z[k]$.
+\end{factbox}
+
+\noindent Splitting the problem reduces the computation:
+\begin{equation*}
+\Big(\frac{N}{2}\Big)^2 + \Big(\frac{N}{2}\Big)^2 = \frac{N^2}{2} < N^2,
+\end{equation*}
+and each half can be split again, $\big(\tfrac{N}{2}\big)^2 \to \big(\tfrac{N}{4}\big)^2 + \big(\tfrac{N}{4}\big)^2 \to \cdots$ \quad (\textbf{divide-and-conquer}).
+
+\begin{handouttikz}[x=0.9cm, y=0.75cm, font=\small]
+  \node[draw, minimum width=1.6cm] (n)  at (0,0)  {$N^2$};
+  \node[draw, minimum width=1.4cm] (a)  at (-2,-1.3) {$(\frac{N}{2})^2$};
+  \node[draw, minimum width=1.4cm] (b)  at (2,-1.3)  {$(\frac{N}{2})^2$};
+  \node[draw, minimum width=1.1cm] (a1) at (-3,-2.6) {$(\frac{N}{4})^2$};
+  \node[draw, minimum width=1.1cm] (a2) at (-1,-2.6) {$(\frac{N}{4})^2$};
+  \node[draw, minimum width=1.1cm] (b1) at (1,-2.6)  {$(\frac{N}{4})^2$};
+  \node[draw, minimum width=1.1cm] (b2) at (3,-2.6)  {$(\frac{N}{4})^2$};
+  \foreach \p/\c in {n/a, n/b, a/a1, a/a2, b/b1, b/b2} {\draw[->] (\p) -- (\c);}
+  \node at (0,-3.45) {$\vdots$};
+\end{handouttikz}
+
+\HandoutMarkSubsection{2}{Historical Notes}
+
+\begin{itemize}
+  \item In 1994, the FFT was called ``the most important numerical algorithm of our lifetime.''\footnotemark{}
+  \item Cooley and Tukey published their FFT paper in 1965. But many similar FFT algorithms exist from earlier authors --- a ``\textbf{rediscovery}.''
+  \item The earliest known example is by \textbf{Gauss} in 1805.\footnotemark{}
+\end{itemize}
+\addtocounter{footnote}{-1}%
+\footnotetext{G.~Strang, ``Wavelets,'' \textit{American Scientist}, vol.~82, 1994.}%
+\stepcounter{footnote}%
+\footnotetext{M.~T.~Heideman, D.~H.~Johnson, and C.~S.~Burrus, ``Gauss and the history of the fast Fourier transform,'' \textit{IEEE ASSP Magazine}, 1984.}
+
+\begin{notebox}[title={Motivating applications}]
+\begin{itemize}
+  \item \textbf{Gauss:} interpolate the trajectories of asteroids.
+  \item \textbf{Tukey:} detecting Soviet nuclear tests using seismometers.
+\end{itemize}
+\end{notebox}
+
+\HandoutMarkSection{3}{Decimation-in-Time FFT (Radix-2)}
+
+Split the DFT sum into even ($n=2p$) and odd ($n=2p+1$) indices:
+\begin{align*}
+X[k] &= \sum_{p=0}^{\frac{N}{2}-1}\Big(x[2p]\,W_N^{2pk} + x[2p+1]\,W_N^{(2p+1)k}\Big) \\
+&= \sum_{p=0}^{\frac{N}{2}-1} y[p]\,W_{N/2}^{pk}
+ + \left[\sum_{p=0}^{\frac{N}{2}-1} z[p]\,W_{N/2}^{pk}\right] W_N^{k} \\
+&= \HandoutHighlightYellow{$Y[k] + Z[k]\,W_N^{k}$}, \qquad 0\le k\le \tfrac{N}{2}-1,
+\end{align*}
+using $W_N^{2pk} = e^{-j\frac{2\pi}{N}2pk} = e^{-j\frac{2\pi}{N/2}pk} = W_{N/2}^{pk}$. For the upper half of the outputs,
+\begin{align*}
+X\!\left[k+\tfrac{N}{2}\right] &= \sum_{p=0}^{\frac{N}{2}-1} y[p]\,W_{N/2}^{\left(k+\frac{N}{2}\right)p}
+ + \left[\sum_{p=0}^{\frac{N}{2}-1} z[p]\,W_{N/2}^{\left(k+\frac{N}{2}\right)p}\right] W_N^{k+\frac{N}{2}} \\
+&= Y[k] + Z[k]\,W_N^{k}\,W_N^{N/2},
+\end{align*}
+because
+\begin{align*}
+W_{N/2}^{N/2} &= \Big(e^{-j\frac{4\pi}{N}}\Big)^{N/2} = e^{-j2\pi} = 1
+  && \text{($Y$, $Z$ are $\tfrac{N}{2}$-periodic)}, \\
+W_N^{N/2} &= \Big(e^{-j\frac{2\pi}{N}}\Big)^{N/2} = e^{-j\pi} = -1.
+\end{align*}
+
+\begin{factbox}[title={Radix-2 DIT butterfly}]
+\begin{align*}
+X[k] &= Y[k] + W_N^{k}\,Z[k], \\
+X\!\left[k+\tfrac{N}{2}\right] &= Y[k] - W_N^{k}\,Z[k],
+\qquad \text{for } 0\le k\le \tfrac{N}{2}-1.
+\end{align*}
+\end{factbox}
+
+\HandoutMarkSubsection{4}{``Butterfly Diagram''}
+
+\begin{handouttikz}[x=1cm, y=0.62cm, font=\small]
+  % input labels and DFT blocks
+  \foreach \i/\lab in {0/{x[0]}, 1/{x[2]}, 3/{x[N-2]}} {\node[anchor=east] (xe\i) at (0,-\i) {$\lab$};}
+  \node at (-0.45,-2) {$\vdots$};
+  \foreach \i/\lab in {5/{x[1]}, 6/{x[3]}, 8/{x[N-1]}} {\node[anchor=east] (xo\i) at (0,-\i) {$\lab$};}
+  \node at (-0.45,-7) {$\vdots$};
+  \node[draw, minimum width=1.3cm, minimum height=2.3cm, align=center] (D1) at (1.1,-1.5) {$\frac{N}{2}$-pt\\DFT};
+  \node[draw, minimum width=1.3cm, minimum height=2.3cm, align=center] (D2) at (1.1,-6.5) {$\frac{N}{2}$-pt\\DFT};
+  \foreach \i in {0,1,3} {\draw[->] (0.05,-\i) -- (0.45,-\i);}
+  \foreach \i in {5,6,8} {\draw[->] (0.05,-\i) -- (0.45,-\i);}
+  % Y and Z outputs
+  \foreach \i/\lab in {0/{Y[0]}, 1/{Y[1]}, 3/{Y[\frac{N}{2}-1]}} {
+    \draw[->] (1.75,-\i) -- (2.1,-\i); \node[anchor=west, inner sep=1pt] at (2.1,-\i) {$\lab$};}
+  \foreach \i/\lab in {5/{Z[0]}, 6/{Z[1]}, 8/{Z[\frac{N}{2}-1]}} {
+    \draw[->] (1.75,-\i) -- (2.1,-\i); \node[anchor=west, inner sep=1pt] at (2.1,-\i) {$\lab$};}
+  \node at (2.5,-2) {$\vdots$}; \node at (2.5,-7) {$\vdots$};
+  % butterflies
+  \def\xa{4.9} \def\xb{7.7}
+  \foreach \k/\w in {0/0, 1/1, 3/{\frac{N}{2}-1}} {
+    \pgfmathtruncatemacro{\kk}{\k+5}
+    \draw[thick] (3.85,-\k) -- (\xa,-\k);
+    \draw[thick, ee483link] (3.85,-\kk) -- (\xa,-\kk)
+      node[midway, above, font=\scriptsize, inner sep=1.5pt] {$\times W_N^{\w}$};
+    \draw[thick, ee483ink] (\xa,-\k) -- (\xb,-\k);
+    \draw[thick, ee483ink] (\xa,-\k) -- (\xb,-\kk);
+    \draw[thick, ee483link] (\xa,-\kk) -- (\xb,-\k);
+    \draw[thick, ee483link] (\xa,-\kk) -- (\xb,-\kk);
+    \fill (\xa,-\k) circle (1.4pt); \fill (\xa,-\kk) circle (1.4pt);
+    \fill (\xb,-\k) circle (1.6pt); \fill (\xb,-\kk) circle (1.6pt);
+    \node[font=\scriptsize, red, anchor=south, inner sep=1pt] at (\xb-0.3,-\kk) {$-1$};
+  }
+  \foreach \i/\lab in {0/{X[0]}, 1/{X[1]}, 3/{X[\frac{N}{2}-1]}, 5/{X[\frac{N}{2}]}, 6/{X[\frac{N}{2}+1]}, 8/{X[N-1]}} {
+    \draw[->] (\xb,-\i) -- (\xb+0.45,-\i); \node[anchor=west] at (\xb+0.45,-\i) {$\lab$};}
+  \node at (\xb+0.9,-2) {$\vdots$}; \node at (\xb+0.9,-7) {$\vdots$};
+\end{handouttikz}
+{\centering\scriptsize Each $Y[k]$ goes to both $X[k]$ and $X[k+\frac{N}{2}]$; $W_N^kZ[k]$ is added to $X[k]$ and subtracted (\textcolor{red}{$-1$}) from $X[k+\frac{N}{2}]$.\par}
+
+\subsection{Cost of an $N$-point FFT}
+
+\begin{equation*}
+\text{Cost of an $N$-point FFT} = 2\cdot\big(\text{cost of $\tfrac{N}{2}$-pt FFT}\big) + \begin{cases} N & \text{multiplies} \\ N & \text{additions} \end{cases}
+\end{equation*}
+If $N=2^M$ $\Rightarrow$ we can recurse:
+\begin{equation*}
+2\cdot\left(2\cdot\big(\text{cost of $\tfrac{N}{4}$-pt FFT}\big) + \begin{cases} \frac{N}{2} & \text{mult} \\ \frac{N}{2} & \text{add} \end{cases}\right) + \begin{cases} N & \text{mult} \\ N & \text{add} \end{cases}
+\end{equation*}
+\begin{equation*}
+\Rightarrow\ M=\log_2 N \ \text{stages} \ \Rightarrow\ \HandoutHighlightYellow{$N\log_2 N$ multiplies / additions}.
+\end{equation*}
+
+\begin{notebox}[title=\HandoutNoteAddendumTitle]
+In the butterfly, the product $W_N^k Z[k]$ is computed \emph{once} and then added to and subtracted from $Y[k]$; so each stage really needs only $\tfrac{N}{2}$ complex multiplications (and $N$ complex additions), giving $\tfrac{N}{2}\log_2 N$ multiplications in total. Many of these are trivial ($W_N^0=1$, $W_N^{N/4}=-j$), so practical counts are lower still. Either way the order is $\mathcal{O}(N\log_2 N)$ versus $\mathcal{O}(N^2)$: for $N=1024$, about $10^4$ versus $10^6$.
+\end{notebox}
+
+\HandoutMarkLeft{5}%
+\begin{handouttikz}[x=0.55cm, y=0.055cm, font=\small]
+  \draw[->] (0,0) -- (11.2,0) node[right] {$N$};
+  \draw[->] (0,0) -- (0,68) node[above] {\footnotesize cost};
+  \draw[thick, domain=0:8.1, samples=60] plot (\x, {\x*\x});
+  \draw[thick, ee483link, domain=1:10.5, samples=60] plot (\x, {\x*ln(\x)/ln(2)});
+  \draw[thick, ee483rule, domain=0:10.5] plot (\x, {\x});
+  \node[anchor=south] at (8.1,65.6) {$N^2$};
+  \node[anchor=west, ee483link] at (10.5,35.6) {$N\log_2 N$};
+  \node[anchor=west, ee483rule] at (10.5,10.5) {$N$};
+\end{handouttikz}
+
+\section{Decimation-in-Frequency FFT}
+
+Now split the \emph{time} range into its two halves:
+\begin{align*}
+X[k] &= \sum_{n=0}^{N-1} x[n]\,W_N^{nk}
+= \sum_{m=0}^{\frac{N}{2}-1} x[m]\,W_N^{mk} + \sum_{m=0}^{\frac{N}{2}-1} x\!\left[m+\tfrac{N}{2}\right] W_N^{\left(m+\frac{N}{2}\right)k}.
+\end{align*}
+\textbf{For $k$ even}, $k=2q$:
+\begin{align*}
+X[2q] &= \sum_{m=0}^{\frac{N}{2}-1}\Big(x[m] + x\!\left[m+\tfrac{N}{2}\right]\underbrace{W_N^{\frac{N}{2}\cdot 2q}}_{\HandoutUnderbraceLabel{=1}}\Big)\,W_N^{2mq} \\
+&= \sum_{m=0}^{\frac{N}{2}-1}\Big(x[m] + x\!\left[m+\tfrac{N}{2}\right]\Big)\,W_{N/2}^{mq}.
+\end{align*}
+\textbf{For $k$ odd}, $k=2q+1$:
+\begin{align*}
+X[2q+1] &= \sum_{m=0}^{\frac{N}{2}-1}\Big[x[m] + x\!\left[m+\tfrac{N}{2}\right]\underbrace{W_N^{\frac{N}{2}(2q+1)}}_{\HandoutUnderbraceLabel{=-1}}\Big]\,W_N^{(2q+1)m} \\
+&= \sum_{m=0}^{\frac{N}{2}-1}\Big[x[m] - x\!\left[m+\tfrac{N}{2}\right]\Big]\,W_{N/2}^{mq}\,W_N^{m}.
+\end{align*}
+
+\begin{factbox}[title={DIF in words}]
+The even-indexed outputs are the $\tfrac{N}{2}$-point DFT of $x[m]+x[m+\tfrac{N}{2}]$; the odd-indexed outputs are the $\tfrac{N}{2}$-point DFT of $\big(x[m]-x[m+\tfrac{N}{2}]\big)W_N^{m}$. The butterfly (add/subtract, then twiddle) now comes \emph{before} the smaller DFTs, and the outputs come out in even/odd order.
+\end{factbox}
+
+\HandoutMarkSection{6}{Beyond Radix-2}
+
+\begin{itemize}
+  \item Can generalize to \textbf{radix-3} ($N=3^M$) $\Rightarrow$ perform 3 DFTs of size $\tfrac{N}{3}$ on
+  $x[3n]$, $x[3n+1]$, $x[3n+2]$, and combine into $X[k]$, $X[k+\tfrac{N}{3}]$, $X[k+\tfrac{2N}{3}]$.
+  \item Can generalize to the \textbf{radix-$R$} case ($N=R^M$).
+  \item Can generalize to
+  \begin{equation*}
+  N = \underbrace{N_1\cdot N_2\cdot N_3\cdots}_{\HandoutUnderbraceLabel{\text{product of prime numbers}}}
+  \end{equation*}
+  \vspace{0.2em}
+  (\textbf{mixed radix}): radix-$N_1$ stage $\to$ radix-$N_2$ stage $\to\cdots$
+\end{itemize}
+
+\section{Applications}
+
+\subsection{Convolution}
+
+\noindent Let $x[n]$, $0\le n\le N-1$, and $h[n]$, $0\le n\le N-1$. Direct linear convolution:
+\begin{equation*}
+y[n] = \sum_{k=0}^{N-1} x[k]\,h[n-k], \qquad 0\le n\le 2N-2.
+\end{equation*}
+$N$ multiplications per $y[n]$ $\Rightarrow$ $2N^2-2N$ multiplications.\footnotemark{}
+\footnotetext{Bounding each of the $2N-1$ outputs by $N$ products gives $N(2N-1)=2N^2-N$. Counting only the nonzero terms, every product $x[k]h[m]$ with $0\le k,m\le N-1$ appears exactly once, so the exact count is $N^2$. Either way it is $\mathcal{O}(N^2)$.}
+
+\HandoutMarkSubsection{7}{Circular Convolution Approach}
+
+\noindent Using the zero-padding result of Lecture~8 (pad to length $2N-1$):
+\begin{itemize}
+  \item 2 length-$(2N-1)$ FFTs: $\;2\big[(2N-1)\log_2(2N-1)\big]$ mult.
+  \item Pointwise multiplication: $\;(2N-1)$ mult.
+  \item 1 length-$(2N-1)$ inverse FFT: $\;(2N-1)\log_2(2N-1)$ mult.
+\end{itemize}
+\begin{equation*}
+\Rightarrow\ \HandoutHighlightYellow{$3\,(2N-1)\log_2(2N-1) + (2N-1)$ mult}\quad\text{vs.}\quad \mathcal{O}(N^2)\ \text{directly}.
+\end{equation*}
+\noindent\textit{In practice one pads to the next power of two $\ge 2N-1$ so that the radix-2 FFT applies.}
+
+\subsection{Frequency Responses}
+
+\noindent Recall
+\begin{equation*}
+X[k] = X(e^{j\omega})\Big|_{\omega=\frac{2\pi k}{N}}, \quad k=0,\dots,N-1,
+\qquad
+H(e^{j\omega}) = \frac{\displaystyle\sum_{\ell=0}^{M} p_\ell\,e^{-j\omega\ell}}{\displaystyle\sum_{\ell=0}^{N} d_\ell\,e^{-j\omega\ell}}.
+\end{equation*}
+\begin{factbox}[title={Evaluating $H(e^{j\omega})$ on a grid}]
+Let $S\ge\max(M,N)$ and zero-pad the coefficient sequences $\{p_\ell\}$, $\{d_\ell\}$ to length $S$.\footnotemark{} Then
+\begin{equation*}
+H(e^{j\omega})\Big|_{\omega=\frac{2\pi k}{S}} = \frac{\mathrm{FFT}_S\{p\}[k]}{\mathrm{FFT}_S\{d\}[k]}, \qquad k=0,\dots,S-1.
+\end{equation*}
+\end{factbox}
+\footnotetext{The coefficient sequences have lengths $M+1$ and $N+1$, so strictly $S\ge\max(M,N)+1$ is needed for the length-$S$ DFT to contain every coefficient. (This is what MATLAB's \texttt{freqz} does internally.)}
+
+\HandoutMarkSection{8}{Zero-Padding}
+
+\noindent Consider a length-$N$ sequence $x[n]$ and ``zero-pad'' it to length $L>N$:
+\begin{equation*}
+\tilde x[n] = \begin{cases} x[n], & 0\le n\le N-1, \\ 0, & N\le n\le L-1. \end{cases}
+\end{equation*}
+If we let
+\begin{align*}
+\tilde X[k] &= \sum_{n=0}^{L-1}\tilde x[n]\,e^{-j\frac{2\pi kn}{L}}
+= \sum_{n=0}^{N-1} x[n]\,e^{-j\frac{2\pi kn}{L}}
+= \HandoutHighlightYellow{$X(e^{j\omega})\Big|_{\omega=\frac{2\pi k}{L}}$}, \qquad k=0,\dots,L-1.
+\end{align*}
+
+\begin{factbox}[title={Property}]
+Zero-padding in discrete time gives \textbf{interpolation} but \textbf{does not} provide additional information
+$=$ \textbf{periodic sinc interpolation} in the frequency domain.
+\end{factbox}
+
+\begin{examplebox}[title={Example (illustration, not in orig lecture note)}]
+$x[n]=1$ for $0\le n\le 3$ ($N=4$), so $|X(e^{j\omega})| = \big|\sin(2\omega)/\sin(\omega/2)\big|$ (Lecture~5). The $4$-point DFT samples the DTFT only at $\omega=0,\frac{\pi}{2},\pi,\frac{3\pi}{2}$, giving $\{4,0,0,0\}$ --- the lobes are invisible. Zero-padding to $L=16$ samples the \emph{same} curve more densely:
+\begin{handouttikz}[x=0.62cm, y=0.62cm, font=\small]
+  \draw[->] (0,0) -- (10.6,0) node[right] {$\omega$};
+  \draw[->] (0,0) -- (0,4.8);
+  \draw[ee483rule, thick, domain=0.02:9.9, samples=200, smooth]
+    plot (\x, {abs(sin(deg(2*\x*2*pi/10))/sin(deg(\x*2*pi/10/2)))});
+  \foreach \k in {1,...,15} {
+    \pgfmathsetmacro{\xx}{\k*10/16}
+    \pgfmathsetmacro{\v}{abs(sin(deg(2*\xx*2*pi/10))/sin(deg(\xx*2*pi/10/2)))}
+    \draw[ee483link] (\xx,0) -- (\xx,\v); \fill[ee483link] (\xx,\v) circle (1.5pt);
+  }
+  \draw[ee483link] (0,0) -- (0,4); \fill[ee483link] (0,4) circle (1.5pt);
+  \foreach \k in {1,2,3} {\fill[red] ({\k*2.5},0) circle (2.2pt);}
+  \fill[red] (0,4) circle (2.2pt);
+  \foreach \x/\l in {0/0, 5/{\pi}, 10/{2\pi}} {\node[below] at (\x,0) {$\l$};}
+  \node[anchor=west, font=\scriptsize] at (2.6,4.5) {\textcolor{red}{$\bullet$} $N=4$ DFT};
+  \node[anchor=west, font=\scriptsize, ee483link] at (2.6,3.9) {$\bullet$ $L=16$ (zero-padded)};
+  \node[anchor=west, font=\scriptsize, ee483rule] at (2.6,3.3) {--- $|X(e^{j\omega})|$};
+\end{handouttikz}
+Both sets of samples lie on the same DTFT; zero-padding only reveals more of it (no new resolution).
+\end{examplebox}
+
+\HandoutMarkSection{9}{DFT Index vs.\ Frequency}
+
+\begin{equation*}
+X[k] = X(e^{j\omega})\Big|_{\omega=\frac{2\pi k}{N}}, \qquad k=0,\dots,N-1.
+\end{equation*}
+
+\begin{handouttikz}[x=1cm, y=1cm, font=\small]
+  \draw[->, thick] (0,0) -- (8.6,0);
+  \node[anchor=east] at (-0.2,0) {$k$};
+  \foreach \x/\l in {0/0, 0.7/1, 4.2/{\frac{N}{2}}, 7.7/{N-1}} {\draw (\x,0.12) -- (\x,-0.12) node[below] {$\l$};}
+  \begin{scope}[yshift=-1.4cm]
+    \draw[->, thick] (0,0) -- (8.6,0);
+    \node[anchor=east] at (-0.2,0) {$\omega$};
+    \foreach \x/\l in {0/0, 0.7/{\frac{2\pi}{N}}, 4.2/{\pi}, 7.7/{2\pi(1-\frac{1}{N})}} {\draw (\x,0.12) -- (\x,-0.12) node[below] {$\l$};}
+    \node[font=\small, ee483link, anchor=west] at (7.95,-1.25) {$\equiv -\frac{2\pi}{N}$};
+    \draw[->, ee483link] (7.7,-0.95) |- (7.95,-1.25);
+    \node[font=\footnotesize] (hf) at (4.2,-1.55) {high frequency};
+    \draw[->] (hf.north) -- (4.2,-0.7);
+    \draw[<->, ee483link, thick] (0.15,-0.75) .. controls (1.5,-2.6) and (6.4,-2.6) .. (7.6,-1.55);
+    \node[font=\footnotesize, ee483link, anchor=north] at (4.2,-2.5) {low frequencies (both ends)};
+  \end{scope}
+\end{handouttikz}
+
+\begin{notebox}[title={Note}]
+The \texttt{fftshift} command in MATLAB will place the \textbf{zero frequency at the center} instead of at the edge, i.e., it reorders $k=\tfrac{N}{2},\dots,N-1,0,\dots,\tfrac{N}{2}-1$ so that the axis runs over $-\pi\le\omega<\pi$.
+\end{notebox}
+
+\section*{Readings}
+\begin{itemize}
+  \item Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Ch.\ 11.3--11.5
+  \item Monson H. Hayes, \textit{Schaum's Outline of Digital Signal Processing}, 2nd ed., Ch.\ 7
+\end{itemize}
+
+\HandoutAppendixListStart
+  \HandoutAppendixListItem{app:scan9}{A.\ Handwritten Lecture Note Scan (September 22, 2026)}
+\HandoutAppendixListEnd
+
+\HandoutAppendixSection{app:scan9}{Handwritten Lecture Note Scan}
+% Scan file also contains unrelated pages (another course) after p.~9; include EE 483 pages only.
+\HandoutIncludeHandoutScan[pages=1-9]{lecture9_0922.pdf}
+
+\end{document}

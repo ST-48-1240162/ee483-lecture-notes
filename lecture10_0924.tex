@@ -1,0 +1,274 @@
+\documentclass[handout_subfiles_root.tex]{subfiles}
+\usepackage[rm2]{lecturenote}
+
+\begin{document}
+\HandoutTitle{10}{DFT Matrix, DCT, and Transforms as Representations}{September 24, 2026}
+\maketitle
+
+\HandoutMarkSection{1}{DFT in Matrix Form}
+
+\begin{equation*}
+X[k] = \sum_{n=0}^{N-1} x[n]\,W_N^{kn}, \quad 0\le k\le N-1
+\qquad\Longleftrightarrow\qquad
+\vec{X} = \mathbf{D}_N\,\vec{x},
+\end{equation*}
+\begin{equation*}
+\begin{bmatrix} X[0] \\ X[1] \\ X[2] \\ \vdots \\ X[N-1] \end{bmatrix}
+=
+\underbrace{\begin{bmatrix}
+W_N^0 & W_N^0 & W_N^0 & \cdots & W_N^0 \\
+W_N^0 & W_N^1 & W_N^2 & \cdots & W_N^{N-1} \\
+W_N^0 & W_N^2 & W_N^4 & \cdots & W_N^{2(N-1)} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+W_N^0 & W_N^{N-1} & W_N^{2(N-1)} & \cdots & W_N^{(N-1)^2}
+\end{bmatrix}}_{\HandoutUnderbraceLabel{\mathbf{D}_N,\ \ [\mathbf{D}_N]_{kn}=W_N^{kn}}}
+\begin{bmatrix} x[0] \\ x[1] \\ x[2] \\ \vdots \\ x[N-1] \end{bmatrix}.
+\end{equation*}
+\vspace{0.3em}
+
+\begin{factbox}[title={Claim}]
+$\mathbf{D}_N$ and $\mathbf{D}_N^{-1}$ are related:
+\begin{equation*}
+\mathbf{D}_N^{-1} = \frac{1}{N}\,\mathbf{D}_N^{H}
+\qquad\Rightarrow\qquad
+\tfrac{1}{\sqrt N}\mathbf{D}_N \text{ is a \textbf{unitary} matrix (after scaling).}
+\end{equation*}
+A unitary matrix $\mathbf{U}$ satisfies $\mathbf{U}^{-1} = \mathbf{U}^H$.
+\end{factbox}
+
+\begin{notebox}[title=\HandoutNoteAddendumTitle]
+The claim is the inverse DFT of Lecture~8 in matrix language: $[\mathbf{D}_N^H]_{nk} = W_N^{-kn}$, and
+\begin{equation*}
+\big[\mathbf{D}_N^H\mathbf{D}_N\big]_{\ell k} = \sum_{n=0}^{N-1} W_N^{-\ell n}\,W_N^{kn} = N\,\delta\big[\HandoutMod{k-\ell}{N}\big]
+\quad\Rightarrow\quad \mathbf{D}_N^H\mathbf{D}_N = N\,\mathbf{I}.
+\end{equation*}
+\end{notebox}
+
+\begin{factbox}[title={Property (energy preservation)}]
+For unitary $\mathbf{U}$ and $\vec{X}\triangleq\mathbf{U}\vec{x}$,
+\begin{align*}
+\sum_{n=0}^{N-1}|x[n]|^2 = \vec{x}^H\vec{x}
+&= \vec{x}^H\,\mathbf{U}^{-1}\mathbf{U}\,\vec{x}
+ = \vec{x}^H\,\mathbf{U}^{H}\mathbf{U}\,\vec{x}
+ = (\mathbf{U}\vec{x})^H\,\mathbf{U}\vec{x} \\
+&= \vec{X}^H\vec{X} = \sum_{k=0}^{N-1}|X[k]|^2.
+\end{align*}
+\end{factbox}
+\noindent With $\mathbf{U}=\frac{1}{\sqrt N}\mathbf{D}_N$ this is exactly Parseval's theorem for the DFT, $\sum|x[n]|^2 = \frac{1}{N}\sum|X[k]|^2$ (Lecture~8).
+
+\HandoutMarkSubsection{2}{Unitary Transforms}
+
+\begin{itemize}
+  \item Unitary matrices/transforms \textbf{preserve signal energy} (Parseval's theorem) $\Rightarrow$ good for approximation.
+\end{itemize}
+
+\begin{factbox}[title={Inverse of a unitary transform}]
+If
+\begin{equation*}
+\mathcal{T}\{x[n]\}[k] = \sum_{n=0}^{N-1} c[n,k]\,x[n]
+\end{equation*}
+and $\mathcal{T}\{\cdot\}$ is unitary, then
+\begin{equation*}
+\mathcal{T}^{-1}\{X[k]\}[n] = \sum_{k=0}^{N-1} c^*[n,k]\,X[k].
+\end{equation*}
+\end{factbox}
+\noindent For the DFT, $c[n,k] = W_N^{nk}$ and $c^*[n,k]=W_N^{-nk}$ (we still need the factor $\tfrac{1}{N}$, since $\mathbf{D}_N$ itself is unitary only after scaling by $\tfrac{1}{\sqrt N}$).
+
+\section{Discrete Cosine Transform (DCT)}
+
+\begin{defbox}[title={DCT (one version)\footnotemark}]
+\begin{equation*}
+X[k] = w[k]\sum_{n=0}^{N-1} x[n]\cos\!\left(\frac{\pi(2n+1)k}{2N}\right),
+\qquad
+w[k] = \begin{cases} \dfrac{1}{\sqrt N}, & k=0, \\[6pt] \sqrt{\dfrac{2}{N}}, & 1\le k\le N-1. \end{cases}
+\end{equation*}
+\end{defbox}
+\footnotetext{This is the orthonormal \textbf{DCT-II}, the version computed by MATLAB's \texttt{dct}; other DCT types (I, III, IV) differ in how the length-$N$ block is symmetrically extended.}
+
+\begin{itemize}
+  \item Like a DFT of a \textbf{symmetric length-$2N$ sequence} (shown below).
+  \item Real sequences are mapped to real sequences.
+  \item Used in compression (JPEG, MPEG, MP3, \dots).
+  \item Can also be used for denoising.
+\end{itemize}
+
+\begin{handouttikz}[x=0.34cm, y=0.95cm, font=\scriptsize]
+  \foreach \k [count=\c from 0] in {0,1,2,3} {
+    \begin{scope}[xshift=\c*3.2cm]
+      \draw[->, ee483rule] (-0.4,0) -- (7.8,0);
+      \node[font=\small] at (3.5,1.35) {$k=\k$};
+      \foreach \n in {0,...,7} {
+        \pgfmathsetmacro{\v}{(\k==0 ? 0.7071 : 1)*cos(deg(pi*(2*\n+1)*\k/16))}
+        \draw[thick, ee483link] (\n,0) -- (\n,\v);
+        \fill[ee483link] (\n,\v) circle (1.5pt);
+      }
+    \end{scope}
+  }
+\end{handouttikz}
+{\centering\scriptsize First four DCT-II basis vectors $\cos\!\big(\frac{\pi(2n+1)k}{2N}\big)$ for $N=8$ (scaled by $w[k]\sqrt{N/2}$), $n=0,\dots,7$.\par}
+
+\HandoutMarkSubsection{3}{DCT, KLT, and the Inverse DCT}
+
+\begin{itemize}
+  \item The DCT approximates the \textbf{Karhunen--Lo\`eve Transform (KLT)} for a 1st-order Markov chain (EE~562).
+  \item The KLT is a \textbf{decorrelating} transform.
+\end{itemize}
+
+\begin{defbox}[title={Inverse DCT (unitary)}]
+\begin{equation*}
+x[n] = \sum_{k=0}^{N-1} w[k]\cos\!\left(\frac{\pi(2n+1)k}{2N}\right) X[k].
+\end{equation*}
+\end{defbox}
+\noindent This is the unitary-inverse rule above with $c[n,k] = w[k]\cos\!\big(\frac{\pi(2n+1)k}{2N}\big)$ real, so $c^*=c$.
+
+\subsection{Why ``a DFT of a Symmetric Length-$2N$ Sequence''}
+
+\noindent Consider the symmetric extension
+\begin{equation*}
+\tilde x[n] = \begin{cases} x[n], & 0\le n\le N-1, \\ x[2N-1-n], & N\le n\le 2N-1. \end{cases}
+\end{equation*}
+
+\begin{handouttikz}[x=0.42cm, y=0.3cm, font=\scriptsize]
+  \draw[->, ee483rule] (-0.5,0) -- (16.3,0) node[right] {$n$};
+  \foreach \n/\v in {0/2, 1/3, 2/4.2, 3/3.4, 4/2.2, 5/1.6, 6/2.4, 7/3} {
+    \draw[thick, ee483ink] (\n,0) -- (\n,\v); \fill[ee483ink] (\n,\v) circle (1.5pt);
+    \pgfmathtruncatemacro{\m}{15-\n}
+    \draw[thick, ee483link] (\m,0) -- (\m,\v); \fill[ee483link] (\m,\v) circle (1.5pt);
+  }
+  \draw[densely dashed, red] (7.5,-0.4) -- (7.5,5.5);
+  \node[below] at (0,0) {$0$}; \node[below] at (7,0) {$N-1$}; \node[below] at (15,0) {$2N-1$};
+  \node[anchor=south, red] at (7.5,5.5) {mirror at $n=N-\tfrac12$};
+  \node[anchor=west] at (0.5,4.9) {$x[n]$};
+  \node[anchor=west, ee483link] at (9.2,4.9) {$x[2N-1-n]$};
+\end{handouttikz}
+
+\noindent Its $2N$-point DFT is
+\begin{align*}
+\tilde X[k] &= \sum_{n=0}^{N-1} x[n]\,W_{2N}^{nk} + \sum_{n=N}^{2N-1} x[2N-1-n]\,W_{2N}^{nk} \\
+&= \sum_{n=0}^{N-1} x[n]\,\underbrace{\Big[W_{2N}^{nk} + W_{2N}^{-(n+1)k}\Big]}_{\HandoutUnderbraceLabel{\text{almost a cosine}}}
+\end{align*}
+(in the second sum substitute $m=2N-1-n$ and use $W_{2N}^{2Nk}=1$). Multiplying by the half-sample phase $W_{2N}^{k/2}$ centers the pair:
+\begin{align*}
+\tilde X[k]\,W_{2N}^{k/2} &= \sum_{n=0}^{N-1} x[n]\,\underbrace{\Big[W_{2N}^{(n+\frac12)k} + W_{2N}^{-(n+\frac12)k}\Big]}_{\HandoutUnderbraceLabel{2\cos\left(\frac{2\pi(n+\frac12)k}{2N}\right)}}
+= 2\sum_{n=0}^{N-1} x[n]\cos\!\left(\frac{\pi(2n+1)k}{2N}\right).
+\end{align*}
+\vspace{0.2em}
+
+\noindent The scaling term $w[k]$ ensures that the transform is \textbf{unitary}.
+
+\begin{notebox}[title=\HandoutNoteAddendumTitle]
+So, for $0\le k\le N-1$, $\;X_{\mathrm{DCT}}[k] = \tfrac{w[k]}{2}\,W_{2N}^{k/2}\,\tilde X[k]$: the DCT can be computed with one $2N$-point FFT. Because the extension $\tilde x$ has no jump at the block boundary (unlike the implicit periodic extension of the DFT), its spectrum decays faster --- one reason the DCT compacts energy into few coefficients and suits compression.
+\end{notebox}
+
+\HandoutMarkSection{4}{2D Transforms (Separable)}
+
+\noindent Input $x[m,n]$, $0\le m,n\le N-1$. The \textbf{2D DFT} is
+\begin{equation*}
+X[k,q] = \sum_{m=0}^{N-1}\underbrace{\left[\sum_{n=0}^{N-1} x[m,n]\,W_N^{nq}\right]}_{\HandoutUnderbraceLabel{\text{1D DFT of each row}}} W_N^{mk}.
+\end{equation*}
+\vspace{0.1em}
+
+\noindent The outer sum is then a \textbf{1D DFT of each column} of the row-transformed array. (Separable: $N$ row DFTs followed by $N$ column DFTs.)
+
+\section{Wavelet Transforms (EE~596)}
+
+\noindent Discrete, unitary. One level splits the signal into a lowpass and a highpass branch, each downsampled by~$2$:
+
+\begin{handouttikz}[x=1cm, y=1cm, font=\small]
+  \node (x) at (0,0) {$x[n]$};
+  \coordinate (s) at (1,0);
+  \node[draw, minimum width=1cm] (h1) at (2.2,0.7) {$h_1[n]$};
+  \node[draw, minimum width=1cm] (h2) at (2.2,-0.7) {$h_2[n]$};
+  \node[draw, circle, inner sep=1pt] (d1) at (4.1,0.7) {$\downarrow 2$};
+  \node[draw, circle, inner sep=1pt] (d2) at (4.1,-0.7) {$\downarrow 2$};
+  \node[anchor=west] (y1) at (4.8,0.7) {$y_1[n]=x_1[2n]$};
+  \node[anchor=west] (y2) at (4.8,-0.7) {$y_2[n]=x_2[2n]$};
+  \draw[thick] (x) -- (s); \fill (s) circle (1.8pt);
+  \draw[->, thick] (s) |- (h1.west); \draw[->, thick] (s) |- (h2.west);
+  \draw[->, thick] (h1) -- node[above, font=\scriptsize] {$x_1[n]$} (d1);
+  \draw[->, thick] (h2) -- node[above, font=\scriptsize] {$x_2[n]$} (d2);
+  \draw[->, thick] (d1) -- (y1); \draw[->, thick] (d2) -- (y2);
+\end{handouttikz}
+\noindent with $h_1[n]=$ \textbf{low-pass} filter and $h_2[n]=$ \textbf{high-pass} filter. Repeating on the lowpass branch gives a \textbf{multiresolution analysis}:
+
+\begin{handouttikz}[x=1cm, y=1cm, font=\small]
+  \tikzset{wb/.style={draw, minimum width=1.3cm, minimum height=0.7cm}}
+  \node (x) at (0,0) {$x[n]$};
+  \node[wb] (w1) at (1.8,0) {wavelet};
+  \node[wb] (w2) at (4.7,1.0) {wavelet};
+  \node[wb] (w3) at (7.6,2.0) {wavelet};
+  \draw[->, thick] (x) -- (w1);
+  \foreach \a/\b in {w1/w2, w2/w3} {
+    \draw[->, thick] ($(\a.east)+(0,0.18)$) -- ++(0.4,0) |- (\b.west);
+    \node[font=\scriptsize, anchor=south east] at ($(\b.west)+(-0.05,0.02)$) {lowpass};
+    \draw[->, thick] ($(\a.east)+(0,-0.18)$) -- ++(1.1,0) node[right, font=\scriptsize] {highpass};
+  }
+  \draw[->, thick] ($(w3.east)+(0,0.18)$) -- ++(0.8,0) node[right] {$\cdots$};
+  \draw[->, thick] ($(w3.east)+(0,-0.18)$) -- ++(0.8,0) node[right, font=\scriptsize] {highpass};
+  \node[font=\small\itshape] at (4.7,-1.0) {``multiresolution analysis''};
+\end{handouttikz}
+
+\HandoutMarkSection{5}{Transforms as Representations}
+
+\noindent We may be used to thinking of transforms as \textbf{operations} that we apply to signals to gain insight.
+But it can also be useful to think of them as \textbf{representations} of the signal in a \textbf{new basis}, e.g.,
+\begin{equation*}
+x[n] = \sum_{k} X[k]\,\underbrace{\varphi_k[n]}_{\HandoutUnderbraceLabel{\text{basis function}}}.
+\end{equation*}
+\vspace{0.2em}
+
+\noindent The \textbf{inversion formula} tells you what the $\varphi_k$ are:
+
+\begin{examplebox}[title={Examples}]
+\begin{itemize}
+  \item \textbf{DFT:} the basis functions are complex exponentials,
+  $\displaystyle \varphi_k[n] = \frac{1}{N}\,e^{+j\frac{2\pi kn}{N}}.$
+  \item \textbf{DCT:} the basis functions are cosines,
+  $\displaystyle \varphi_k[n] = w[k]\cos\!\left(\frac{\pi(2n+1)k}{2N}\right).$
+  \item \textbf{``Identity transform'':} the basis functions are shifted impulses,
+  $\displaystyle \varphi_k[n] = \delta[n-k].$
+\end{itemize}
+\end{examplebox}
+
+\HandoutMarkSubsection{6}{Wavelet Bases}
+
+\noindent Wavelet basis functions have \textbf{different extents at different decomposition levels}:
+\begin{itemize}
+  \item shifting \& stretching some original function, $\;\varphi_k[n] \sim f\!\left(\dfrac{n-m_k}{\alpha}\right)$;
+  \item fractal ``\textbf{self-similarity}.''
+\end{itemize}
+
+\begin{itemize}
+  \item ``\textbf{Haar}'' wavelets are good for approximating \textbf{piecewise constant} signals.
+  \item Other families (e.g., ``\textbf{Daubechies}'' wavelets) are good at approximating more complicated signals (like \textbf{piecewise polynomials}).
+\end{itemize}
+
+\begin{handouttikz}[x=0.3cm, y=0.55cm, font=\scriptsize]
+  \tikzset{haar/.style={thick, ee483link}}
+  \foreach \lev/\len/\yy/\lab in {1/16/0/{level 1: long}, 2/8/-2.4/{level 2}, 3/4/-4.8/{level 3: short}} {
+    \draw[ee483rule] (-0.5,\yy) -- (33,\yy);
+    \node[anchor=east] at (-0.8,\yy) {\lab};
+  }
+  % level 1: one long Haar function
+  \draw[haar] (0,0) -- (0,0.8) -- (16,0.8) -- (16,-0.8) -- (32,-0.8) -- (32,0);
+  % level 2: two shifted, compressed copies
+  \foreach \s in {0,16} {\draw[haar] (\s,-2.4) -- (\s,-1.3) -- (\s+8,-1.3) -- (\s+8,-3.5) -- (\s+16,-3.5) -- (\s+16,-2.4);}
+  % level 3: four shifted, compressed copies
+  \foreach \s in {0,8,16,24} {\draw[haar] (\s,-4.8) -- (\s,-3.7) -- (\s+4,-3.7) -- (\s+4,-5.9) -- (\s+8,-5.9) -- (\s+8,-4.8);}
+\end{handouttikz}
+{\centering\scriptsize Haar basis functions (illustration, not in orig lecture note): each level shifts and compresses the same ``up--down'' shape.\par}
+
+\section*{Readings}
+\begin{itemize}
+  \item Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Ch.\ 5, 3.8
+  \item Monson H. Hayes, \textit{Schaum's Outline of Digital Signal Processing}, 2nd ed., Ch.\ 3
+\end{itemize}
+
+\HandoutAppendixListStart
+  \HandoutAppendixListItem{app:scan10}{A.\ Handwritten Lecture Note Scan (September 24, 2026)}
+\HandoutAppendixListEnd
+
+\HandoutAppendixSection{app:scan10}{Handwritten Lecture Note Scan}
+\HandoutIncludeHandoutScan{lecture10_0924.pdf}
+
+\end{document}
