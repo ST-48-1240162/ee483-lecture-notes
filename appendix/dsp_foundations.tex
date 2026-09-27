@@ -1,0 +1,64 @@
+% Course-wide reference: Euler identities, analytic signals, common norms.
+% Included from ee483_lectures_clean.tex and full lecture handouts (not per-lecture clean PDFs).
+
+\subsection*{Euler's formula and variants}
+
+\begin{equation*}
+e^{j\theta} = \cos\theta + j\sin\theta
+\qquad\text{(Euler's formula).}
+\end{equation*}
+
+\noindent Identities used in GLP proofs, Fourier pairs, and Hilbert/analytic-signal material:
+\begin{align*}
+e^{j\theta}+e^{-j\theta} &= 2\cos\theta, &
+\cos\theta &= \tfrac{1}{2}\bigl(e^{j\theta}+e^{-j\theta}\bigr), \\
+e^{j\theta}-e^{-j\theta} &= 2j\sin\theta, &
+\sin\theta &= \frac{1}{2j}\bigl(e^{j\theta}-e^{-j\theta}\bigr), \\
+e^{j\pi/2} &= j, \qquad e^{-j\pi/2} &= -j.
+\end{align*}
+
+\subsection*{Analytic signal}
+
+\begin{defbox}[title={Analytic signal}]
+A signal whose spectrum has \textbf{no negative-frequency components} is called an \textbf{analytic signal}.
+
+\medskip
+\noindent\textbf{Continuous time.}\quad For real $x(t)$ with Fourier transform $X(j\Omega)$, form
+\begin{equation*}
+z(t) = x(t) + j\,\hat{x}(t), \qquad \hat{x}(t)=\mathcal{H}\{x(t)\},
+\end{equation*}
+where $\mathcal{H}\{\cdot\}$ is an ideal Hilbert transformer ($\mp j$ on $\Omega\gtrless0$). Then $z(t)$ is analytic: $Z(j\Omega)=0$ for $\Omega<0$ (positive frequencies retained; cf.\ Lecture~7).
+
+\medskip
+\noindent\textbf{Discrete time.}\quad Similarly $z[n]=x[n]+j\,\hat{x}[n]$ with $\hat{x}[n]=x[n]\circledast h_{\mathrm{HT}}[n]$ and ideal $H_{\mathrm{HT}}(e^{j\omega})=\mp j$ on $[0,\pi)$ / $(-\pi,0)$ gives $Z(e^{j\omega})=0$ on $-\pi\le\omega<0$.
+\end{defbox}
+
+\noindent\smallskip
+\noindent\small In-phase / quadrature: $x$ is the \textbf{in-phase} and $\hat{x}$ the \textbf{quadrature} component of $z$. Often $|z(t)|$ is the \textbf{instantaneous envelope} and $\arg z(t)$ the instantaneous phase (narrowband / AM settings).
+
+\subsection*{Common norms and energy}
+
+\noindent\textbf{Discrete-time sequences} $x[n]$ (when the sums converge):
+\begin{align*}
+\|x\|_1 &= \sum_{n=-\infty}^{\infty} |x[n]|, &
+\|x\|_2 &= \sqrt{\sum_{n=-\infty}^{\infty}|x[n]|^2}, &
+\|x\|_\infty &= \sup_{n\in\mathbb{Z}} |x[n]|.
+\end{align*}
+
+\noindent\textbf{Continuous-time signals} $x(t)$ (when the integrals converge):
+\begin{align*}
+\|x\|_1 &= \int_{-\infty}^{\infty}|x(t)|\,dt, &
+\|x\|_2 &= \sqrt{\int_{-\infty}^{\infty}|x(t)|^2\,dt}, &
+\|x\|_\infty &= \sup_{t\in\mathbb{R}} |x(t)|.
+\end{align*}
+
+\begin{factbox}[title={Parseval (DTFT)}]
+When the DTFT exists in the usual sense,
+\begin{equation*}
+\sum_{n=-\infty}^{\infty}|x[n]|^2
+= \frac{1}{2\pi}\int_{-\pi}^{\pi}\bigl|X(e^{j\omega})\bigr|^2\,d\omega
+= \|X\|_2^2 \quad \text{(energy in time = energy in frequency).}
+\end{equation*}
+\end{factbox}
+
+\noindent\small\textit{Ref.:}\ J.\ O.\ Smith, ``The Analytic Signal and Hilbert Transform Filters'' (\S5.3.4), \url{https://ccrma.stanford.edu/~jos/st/Analytic_Signals_Hilbert_Transform.html}.

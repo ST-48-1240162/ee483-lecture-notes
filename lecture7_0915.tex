@@ -1,0 +1,678 @@
+\documentclass[handout_subfiles_root.tex]{subfiles}
+\usepackage[rm2]{lecturenote}
+
+\begin{document}
+\definecolor{ee483lastsum}{RGB}{150, 0, 185}
+\definecolor{ee483pinkfg}{RGB}{200, 45, 105}
+\newcommand{\HandoutPinkEmph}[1]{\textcolor{ee483pinkfg}{\mathbf{#1}}}
+\newcommand{\HandoutPinkSup}[1]{{\scriptscriptstyle\HandoutPinkEmph{#1}}}
+\definecolor{ee483orangedot}{RGB}{230, 115, 25}
+\newcommand{\HandoutEulerMark}{%
+  \raisebox{-0.28ex}{\textcolor{ee483orangedot}{\fontsize{18}{18}\selectfont\textbullet}}%
+}
+\newcommand{\HandoutEulerMarkAnchor}{eulerCosRemark}
+\newcommand{\HandoutEulerMarkLink}{%
+  \hyperlink{\HandoutEulerMarkAnchor}{\HandoutEulerMark}%
+}
+\newcommand{\HandoutEulerMarkLinkMath}{%
+  \mathord{\text{\HandoutEulerMarkLink}}%
+}
+\newcommand{\HandoutEulerRemarkTitleAnchor}{%
+  \HandoutEulerMark\hspace{0.3em}Remark%
+}
+\newcommand{\HandoutPiHalfMarkAnchor}{unitCirclePiHalfRemark}
+\newcommand{\HandoutPiHalfMarkLink}{%
+  \hyperlink{\HandoutPiHalfMarkAnchor}{\HandoutEulerMark}%
+}
+\newcommand{\HandoutPiHalfMarkLinkMath}{%
+  \mathord{\text{\HandoutPiHalfMarkLink}}%
+}
+\newcommand{\HandoutPiHalfRemarkTitleAnchor}{%
+  \HandoutEulerMark\hspace{0.3em}Remark%
+}
+\newcommand{\HandoutEulerAddendumNoteTitle}{%
+  \texorpdfstring{%
+    \bfseries\itshape\hypertarget{\HandoutEulerMarkAnchor}{\HandoutEulerRemarkTitleAnchor}\hfill\normalfont\small\textit{(addendum to orig lecture note)}}{%
+    Remark (addendum)}}
+\newcommand{\HandoutPiHalfAddendumNoteTitle}{%
+  \texorpdfstring{%
+    \bfseries\itshape\hypertarget{\HandoutPiHalfMarkAnchor}{\HandoutPiHalfRemarkTitleAnchor}\hfill\normalfont\small\textit{(addendum to orig lecture note)}}{%
+    Remark (addendum)}}
+\HandoutTitle{7}{Linear Phase Filters}{September 15, 2026}
+\maketitle
+
+\HandoutMarkSection{1}{Linear Phase Filters}
+
+\begin{examplebox}[title={Example (Delay System)}]
+\begin{equation*}
+h[n] = \delta[n-M] \qquad \text{(delay system)}
+\end{equation*}
+\begin{equation*}
+H(e^{j\omega}) = \sum_{n=-\infty}^{\infty} \delta[n-M]\,e^{-j\omega n} = e^{-j\omega M}.
+\end{equation*}
+\begin{equation*}
+\big|H(e^{j\omega})\big| = 1, \qquad \theta(\omega) = -\omega M.
+\end{equation*}
+\noindent Here $\theta(\omega)$ is a \textbf{linear function of $\omega$} (slope $-M$): phase grows in proportion to frequency, so \HandoutHighlightYellow{linear phase $=$ constant delay}.
+\end{examplebox}
+
+\subsection{Why Linear Phase? Causal Approximation of Ideal Filters}
+
+Linear phase is useful for \textbf{causal} systems. The ideal lowpass filter
+\begin{center}
+\begin{tikzpicture}[x=0.8cm, y=0.8cm, >=Latex]
+  \node[anchor=east] at (-4.1,0.55) {$H(e^{j\omega}) =$};
+  \draw[->] (-3.7,0) -- (3.9,0) node[right] {$\omega$};
+  \draw[very thick] (-3.5,0) -- (-1.2,0) -- (-1.2,1) -- (1.2,1) -- (1.2,0) -- (3.5,0);
+  \draw (0,-0.08) -- (0,1.25);
+  \node[below] at (0,0) {\small $0$};
+  \foreach \x/\l in {-3.1416/{-\pi}, 3.1416/{\pi}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {\small $\l$};}
+  \node[right] at (1.2,1) {\small $1$};
+\end{tikzpicture}
+\end{center}
+has the non-causal, infinitely long impulse response
+\begin{equation*}
+h[n] = \mathrm{sinc}(\cdots)
+\end{equation*}
+(symmetric about $n=0$).
+\textit{Truncate} it to a finite window $-M\le n\le M$ and \textbf{delay} it by $M$ samples, so that the window starts at $n=0$:
+
+\begin{handouttikz}[x=0.3cm, y=1.7cm]
+  \draw[->] (-13,0) -- (13.5,0) node[right] {$n$};
+  \foreach \n in {-12,...,12} {
+    \ifnum\n=0 \def\v{1}\else\pgfmathsetmacro{\v}{sin(deg(\n*pi/3))/(\n*pi/3)}\fi
+    \ifnum\n<-7 \def\clr{ee483rule}\else\ifnum\n>7 \def\clr{ee483rule}\else\def\clr{ee483ink}\fi\fi
+    \draw[thick, \clr] (\n,0) -- (\n,\v);
+    \fill[\clr] (\n,\v) circle (1.8pt);
+  }
+  \draw[densely dashed, ee483link, line width=0.6pt] (-7.5,-0.35) rectangle (7.5,1.2);
+  \node[below, font=\small, text=red] at (0,-0.02) {$0$};
+  \node[below, font=\small, text=ee483link] at (-7,-0.38) {$\boldsymbol{0}$};
+  \node[below, font=\small, text=ee483link] at (7,-0.38) {$\boldsymbol{2M}$};
+  \node[below, font=\scriptsize, ee483link] at (0,-0.38) {\textit{new index after delay by $M$}};
+  \node[anchor=west, font=\small] at (7.8,0.9) {$h[n]=\mathrm{sinc}(\cdots)$};
+\end{handouttikz}
+
+\begin{center}
+\begin{tikzpicture}[>=Latex]
+  \node (x) at (0,0) {$x[n]$};
+  \node[draw, minimum width=1.1cm, minimum height=0.65cm] (h) at (1.9,0) {$h[n]$};
+  \node[draw, minimum width=1.3cm, minimum height=0.65cm, text=ee483link] (d) at (4.0,0) {$\boldsymbol{\delta}[n-M]$};
+  \node[anchor=west] (y) at (5.5,0) {$H(e^{j\omega})\,e^{-j\omega M}$};
+  \draw[->, thick] (x) -- (h);
+  \draw[->, thick] (h) -- (d);
+  \draw[->, thick] (d) -- (y);
+  \draw[thick] (1.05,0.65) rectangle (5.25,-0.65);
+\end{tikzpicture}
+\end{center}
+
+\HandoutMarkSection{2}{Generalized Linear Phase (GLP)}
+
+\begin{defbox}[title={Def}]
+A system has \textbf{generalized linear phase (GLP)} if
+\begin{equation*}
+H(e^{j\omega}) = \underbrace{R(e^{j\omega})}_{\HandoutUnderbraceLabel{\text{real function}}}\,e^{j(k_1+\omega k_2)},
+\end{equation*}
+where $R(e^{j\omega})$ is real-valued (i.e., has phase $0$ or $\pi$), and $k_1,k_2$ are constants.
+\end{defbox}
+
+\noindent GLP filters: \textbf{linear phase in the passband} (the sign flips of $R$ only add jumps of $\pi$).
+
+\begin{factbox}[title={Property}]
+A \textbf{sufficient} condition for GLP for a real-valued, causal, length-$N$ FIR filter is that
+\begin{align*}
+h[n] &= \pm\,h[N-1-n] \quad \text{for }\forall\, n, \\
+\text{with } h[n] &= 0 \ \ \forall\, n<0,\ n\ge N.
+\end{align*}
+If $h[0]\ne 0$ and $h[N-1]\ne 0$, then the condition is also \textbf{necessary}.
+\end{factbox}
+
+\begin{examplebox}[title={Examples}]
+\begin{itemize}
+  \item $h[n] = \{\underset{\uparrow}{1},\,1\}$, \quad $h[-n] = \{1,\,\underset{\uparrow}{1}\}$, \quad $h[N-1-n] = \{\underset{\uparrow}{1},\,1\}$ \ \checkmark
+  \par\smallskip
+  \begin{handouttikz}[x=0.46cm, y=0.85cm]
+    \begin{scope}[shift={(0,0)}]
+      \node[font=\small] at (0.62,1.72) {$h[n]$};
+      \draw[->, ee483ink] (-1.1,0) -- (2.35,0);
+      \foreach \n in {-1,0,1,2} {
+        \ifnum\n=0
+          \node[below, font=\small] at (\n,0) {$\underset{\uparrow}{\textcolor{red}{0}}$};
+        \else
+          \node[below, font=\small] at (\n,0) {$\n$};
+        \fi
+      }
+      \foreach \n in {0,1} {
+        \draw[thick, ee483ink] (\n,0) -- (\n,1);
+        \fill[ee483ink] (\n,1) circle (1.8pt);
+        \node[above=0.12em, font=\scriptsize] at (\n,1) {$1$};
+      }
+    \end{scope}
+    \begin{scope}[shift={(5,0)}]
+      \node[font=\small] at (-0.28,1.72) {$h[-n]$};
+      \draw[->, ee483ink] (-1.4,0) -- (1.85,0);
+      \foreach \n in {-2,-1,0,1} {
+        \ifnum\n=0
+          \node[below, font=\small] at (\n,0) {$\underset{\uparrow}{\textcolor{red}{0}}$};
+        \else
+          \node[below, font=\small] at (\n,0) {$\n$};
+        \fi
+      }
+      \foreach \n in {-1,0} {
+        \draw[thick, ee483ink] (\n,0) -- (\n,1);
+        \fill[ee483ink] (\n,1) circle (1.8pt);
+        \node[above=0.12em, font=\scriptsize] at (\n,1) {$1$};
+      }
+    \end{scope}
+    \begin{scope}[shift={(10,0)}]
+      \node[font=\small] at (0.62,1.72) {$h[N-1-n]$};
+      \draw[->, ee483ink] (-1.1,0) -- (2.35,0);
+      \foreach \n in {-1,0,1,2} {
+        \ifnum\n=0
+          \node[below, font=\small] at (\n,0) {$\underset{\uparrow}{\textcolor{red}{0}}$};
+        \else
+          \node[below, font=\small] at (\n,0) {$\n$};
+        \fi
+      }
+      \foreach \n in {0,1} {
+        \draw[thick, ee483ink] (\n,0) -- (\n,1);
+        \fill[ee483ink] (\n,1) circle (1.8pt);
+        \node[above=0.12em, font=\scriptsize] at (\n,1) {$1$};
+      }
+    \end{scope}
+  \end{handouttikz}
+  {\centering\scriptsize $\uparrow$ marks $n=0$ on each axis.\par\smallskip}
+  \item $h[n] = \{\underset{\uparrow}{1},\,-1\}$, \quad $h[N-1-n] = \{\underset{\uparrow}{-1},\,1\}$ \ \checkmark
+  \item $h[n] = \{\underset{\uparrow}{1},\,-1,\,1,\,-1\}$, \quad $h[N-1-n] = \{\underset{\uparrow}{-1},\,1,\,-1,\,1\}$ \ \checkmark \quad ($N=4$, Type~4 antisymmetric)
+  \item $h[n] = \{\underset{\uparrow}{-1},\,2,\,1\}$, \quad $h[0] = -h[2]$ but $h[1] = -h[1]$ fails \ $\boldsymbol{\times}$
+\end{itemize}
+\textit{Odd-length filters with antisymmetry cannot satisfy GLP unless the middle sample is $0$.}
+\end{examplebox}
+
+\noindent with $h[n]=0$ for $n\ge N$ and $n<0$.
+
+\HandoutMarkSubsection{3}{Four Types of FIR GLP Filters}
+
+\begin{itemize}
+  \item Even symmetric or antisymmetric ($+$ or $-$ in $h[n] = \pm h[N-1-n]$),
+  \item $N$ odd or even.
+\end{itemize}
+
+\begin{notebox}[title={Notation: this handout vs.\ Mitra}]
+In this handout, $N$ denotes the FIR filter \textbf{length}: the samples are
+$h[0],\ldots,h[N-1]$, and the filter order is $N-1$.
+In Mitra Ch.~7, $N$ denotes the filter \textbf{order}: the samples are
+$h[0],\ldots,h[N]$, and the length is $N+1$. Hence
+\begin{equation*}
+N_{\text{handout}}=N_{\text{Mitra}}+1.
+\end{equation*}
+The Type~1--4 definitions are the same; only the meaning of the symbol $N$
+differs. For example, Mitra's Type~3 has even order $N$, hence odd length
+$N+1$, corresponding to §2.1.2 below.
+\end{notebox}
+
+\subsubsection{$N$ odd, symmetric and its proof (Mitra Type~1)}
+\noindent Assume $N = 2M+1 \iff M = N-M-1$, and $h[n] = h[N-1-n]$ for all $n$. Then
+\begin{align*}
+\HandoutHighlightYellow{$H(e^{j\omega})$} &= \sum_{n=0}^{N-1} h[n]\,e^{-j\omega n} \\
+&= \sum_{n=0}^{M-1} h[n]\,e^{-j\omega n}
++ \underbrace{\HandoutHighlightMath{$h[M]\,e^{-j\omega M}$}}_{\HandoutUnderbraceLabel{\text{middle point}}}
++ {\color{ee483lastsum}\sum_{n=M+1}^{N-1} h[n]\,e^{-j\omega n}} \\
+&= e^{-j\omega M}\left(h[M] + \sum_{n=0}^{M-1} h[n]\,e^{-j\omega(n-M)} + \fcolorbox{ee483lastsum}{white}{\color{ee483lastsum}$\displaystyle\sum_{n=M+1}^{N-1} h[n]\,e^{-j\omega(n-M)}$}\right).
+\end{align*}
+In the \textcolor{ee483lastsum}{\textbf{last sum}}, let $n = N-1-k \iff k = N-1-n$:
+\begin{equation*}
+\sum_{\textcolor{red}{k=M-1}}^{\textcolor{red}{\mathbf{0}}} h[N-1-k]\,e^{-j\omega(N-1-k-M)} = \sum_{\textcolor{red}{\mathbf{k=0}}}^{\textcolor{red}{M-1}} h[N-1-k]\,e^{-j\omega\HandoutPinkSup{(M-k)}}.
+\end{equation*}
+\HandoutMarkLeft{4}%
+Renaming $\HandoutPinkEmph{k\to n}$ and using $h[N-1-n]=h[n]$:
+\begin{align*}
+\HandoutHighlightYellow{$H(e^{j\omega})$} &= e^{-j\omega M}\Bigg[h[M] + \sum_{n=0}^{M-1}\Biggl( \symbf{h}\symbf{[}\symbf{n}\symbf{]}\,e^{-j\omega(n-M)} \notag\\
+&\hspace{9.4em} + \boxed{\underbrace{h[N-1-n]}_{\HandoutUnderbraceLabel{\symbf{h}\symbf{[}\symbf{n}\symbf{]}}}\,e^{+j\omega\HandoutPinkSup{(n-M)}}}\Biggr)\Bigg] \\
+&= \underbrace{e^{-j\omega M}}_{\HandoutUnderbraceLabel{\text{linear phase}}}\,
+\left[\underbrace{\mkern5mu h[M] + \HandoutEulerMarkLinkMath\,\mathbf{2}\sum_{n=0}^{M-1} h[n]\,\mathop{\mathbf{cos}\!}\big(\omega[n-M]\big)\mkern5mu}_{\HandoutUnderbraceLabel{\text{real function}}}\right]. \quad \blacksquare \MitraTag{7.53}
+\end{align*}
+
+\begin{notebox}[title=\HandoutEulerAddendumNoteTitle]
+How to see $e^{-j\omega(n-M)} + e^{+j\omega(n-M)} = 2\cos\bigl(\omega(n-M)\bigr)$: this follows directly from \textbf{Euler's formula}. Let
+\begin{equation*}
+\theta = \omega(n-M).
+\end{equation*}
+Then consider
+\begin{equation*}
+e^{-j\theta} + e^{j\theta}.
+\end{equation*}
+From Euler's formula,
+\begin{equation*}
+e^{j\theta} = \cos\theta + j\sin\theta,
+\end{equation*}
+and
+\begin{equation*}
+e^{-j\theta}
+= \cos(-\theta) + j\sin(-\theta)
+= \cos\theta - j\sin\theta.
+\end{equation*}
+Therefore,
+\begin{align*}
+e^{-j\theta} + e^{j\theta}
+&= (\cos\theta - j\sin\theta)
+ + (\cos\theta + j\sin\theta) \\
+&= 2\cos\theta.
+\end{align*}
+Substituting $\theta = \omega(n-M)$, we obtain
+\begin{equation*}
+\boxed{
+e^{-j\omega(n-M)}
++
+e^{j\omega(n-M)}
+=
+2\cos\bigl(\omega(n-M)\bigr)
+}.
+\end{equation*}
+The intuition is that the two complex exponentials are complex conjugates:
+\begin{equation*}
+\underbrace{\cos\theta-j\sin\theta}_{\HandoutUnderbraceLabel{e^{-j\theta}}}
++
+\underbrace{\cos\theta+j\sin\theta}_{\HandoutUnderbraceLabel{e^{j\theta}}}.
+\end{equation*}
+Their imaginary parts cancel,
+\begin{equation*}
+-j\sin\theta+j\sin\theta=0,
+\end{equation*}
+while their real parts add:
+\begin{equation*}
+\cos\theta+\cos\theta=2\cos\theta.
+\end{equation*}
+\end{notebox}
+
+\subsubsection{$N$ odd, antisymmetric (odd symmetry) and its proof (Mitra Type~3)}
+\noindent Assume $N = 2M+1$ is odd (so $M = \tfrac{N-1}{2} = N-M-1$), $h[n]\in\mathbb{R}$ for all $n$, and $h[n] = -h[N-1-n]$ for all $n$ (Type~3).
+
+\noindent At the center tap, $h[M] = -h[N-1-M] = -h[M]$, hence $h[M]=0$. Then
+\begin{equation*}
+H(e^{j\omega}) = 2\,e^{-j\left(\frac{\pi}{2}+\omega M\right)}\sum_{n=0}^{M-1} h[n]\sin\!\big(\omega[n-M]\big)
+\qquad \left(\text{Recall: }\,\HandoutPiHalfMarkLinkMath\ e^{\pm j\frac{\pi}{2}} = \pm j\right). \MitraTag{7.57}
+\end{equation*}
+
+\begin{notebox}[title=\HandoutPiHalfAddendumNoteTitle]
+\textbf{Unit-circle picture} for $e^{\pm j\pi/2}=\pm j$: each $e^{j\theta}$ is the point on the \textbf{unit circle} at angle~$\theta$ counterclockwise from the positive real axis,
+\begin{equation*}
+e^{j\theta}=\cos\theta+j\sin\theta.
+\end{equation*}
+\begin{center}
+\begin{handouttikz}[scale=1.35]
+  \draw[thick, ee483ink] (0,0) circle (1);
+  \draw[->] (-1.2,0) -- (1.28,0) node[right, font=\scriptsize] {Re};
+  \draw[->] (0,-1.2) -- (0,1.28) node[above, font=\scriptsize] {Im};
+  \fill[ee483ink] (1,0) circle (1.6pt) node[below right, font=\scriptsize, yshift=-1pt] {$1$};
+  \fill[ee483ink] (0,1) circle (1.6pt) node[above, font=\scriptsize, xshift=-2pt] {$j$};
+  \fill[ee483ink] (0,-1) circle (1.6pt) node[below, font=\scriptsize] {$-j$};
+  \draw[ee483link, thick, -Latex] (1,0) arc (0:90:1);
+  \node[ee483link, font=\scriptsize] at (0.62,0.72) {$+\tfrac{\pi}{2}$};
+  \draw[ee483link, thick, -Latex] (1,0) arc (0:-90:1);
+  \node[ee483link, font=\scriptsize] at (0.62,-0.62) {$-\tfrac{\pi}{2}$};
+\end{handouttikz}
+\end{center}
+\noindent At $\theta=+\tfrac{\pi}{2}$: $\cos(\tfrac{\pi}{2})=0$, $\sin(\tfrac{\pi}{2})=1$, so $e^{+j\pi/2}=j$.
+At $\theta=-\tfrac{\pi}{2}$: $e^{-j\pi/2}=-j$.
+Thus the two Recall values are quarter-turns from $1$: \textbf{up} to $+j$, \textbf{down} to $-j$.
+
+\noindent In the formula above,
+\begin{equation*}
+e^{-j\left(\frac{\pi}{2}+\omega M\right)}
+= \underbrace{e^{-j\pi/2}}_{\substack{\text{\footnotesize fixed quarter-turn}\\[-0.15em] =-j}}
+\qquad
+\underbrace{e^{-j\omega M}}_{\substack{\text{\footnotesize linear-phase factor}\\[-0.15em]\text{\footnotesize varies with }\omega}}.
+\end{equation*}
+Antisymmetry turns paired exponentials into sines and picks up this extra $\pm j$ factor---the ``initial'' phase offset $\pm\frac{\pi}{2}$ in the Note below---whereas symmetry ($h[n]=h[N-1-n]$) leaves a real cosine sum (phase $0$ or $\pi$).
+\end{notebox}
+
+\subsubsection{$N$ even, antisymmetric (odd symmetry) and its proof (Mitra Type~4; from HW4)}
+\noindent Assume $N = 2M$ is even, $h[n]\in\mathbb{R}$ for all $n$, and $h[n] = -h[N-1-n]$ for all $n$ (Type~4). There is no center tap at $n=\tfrac{N-1}{2}=M-\tfrac{1}{2}$; the impulse response is antisymmetric about the midpoint between samples $M-1$ and $M$. Then
+\begin{align*}
+\HandoutHighlightYellow{$H(e^{j\omega})$}
+&= \sum_{n=0}^{N-1} h[n]\,e^{-j\omega n}
+= \sum_{n=0}^{M-1} h[n]\,e^{-j\omega n}
++ {\color{ee483lastsum}\sum_{n=M}^{N-1} h[n]\,e^{-j\omega n}}.
+\end{align*}
+In the \textcolor{ee483lastsum}{\textbf{last sum}}, let $n = N-1-k$ (so $k = N-1-n$):
+\begin{equation*}
+\sum_{\textcolor{red}{k=0}}^{\textcolor{red}{M-1}} h[N-1-k]\,e^{-j\omega(N-1-k)}.
+\end{equation*}
+\HandoutMarkLeft{5}%
+Renaming $\HandoutPinkEmph{k\to n}$ and using $h[N-1-n]=-h[n]$:
+\begin{align*}
+\HandoutHighlightYellow{$H(e^{j\omega})$}
+&= \sum_{n=0}^{M-1} h[n]\Bigl(e^{-j\omega n}-e^{-j\omega(N-1-n)}\Bigr) \\
+&= e^{-j\omega\left(M-\frac{1}{2}\right)}
+\sum_{n=0}^{M-1} h[n]\Bigl(e^{-j\omega\left(n-M+\frac{1}{2}\right)}
+-e^{+j\omega\left(n-M+\frac{1}{2}\right)}\Bigr) \\
+&= \underbrace{2\,e^{-j\left(\frac{\pi}{2}+\omega\left(M-\frac{1}{2}\right)\right)}}_{\HandoutUnderbraceLabel{\text{linear phase}}}\,
+\underbrace{\sum_{n=0}^{M-1} h[n]\sin\!\big(\omega[n-M+\tfrac{1}{2}]\big)}_{\HandoutUnderbraceLabel{\text{real function}}}.
+\quad \blacksquare \MitraTag{7.58}
+\end{align*}
+\noindent The group delay is $\tfrac{N-1}{2}=M-\tfrac{1}{2}$ samples (a half-integer), as in the Type~1--4 table below; compare with §2.1.2 (Type~3), where odd $N$ gives delay $M$ and $\sin\big(\omega[n-M]\big)$ instead of $\sin\big(\omega[n-M+\tfrac{1}{2}]\big)$.
+
+\subsubsection{$N$ even, symmetric and its proof (Mitra Type~2)}
+\noindent Assume $N = 2M$ is even, $h[n]\in\mathbb{R}$ for all $n$, and $h[n] = h[N-1-n]$ for all $n$ (Type~2). The axis of symmetry is at $n=\tfrac{N-1}{2}=M-\tfrac{1}{2}$ (between samples $M-1$ and $M$; there is no center tap). Then
+\begin{align*}
+\HandoutHighlightYellow{$H(e^{j\omega})$} &= \sum_{n=0}^{N-1} h[n]\,e^{-j\omega n} \\
+&= \sum_{n=0}^{M-1} h[n]\,e^{-j\omega n}
++ {\color{ee483lastsum}\sum_{n=M}^{N-1} h[n]\,e^{-j\omega n}} \\
+&= e^{-j\omega\left(M-\frac{1}{2}\right)}\left(\sum_{n=0}^{M-1} h[n]\,e^{-j\omega\left(n-M+\frac{1}{2}\right)} + \fcolorbox{ee483lastsum}{white}{\color{ee483lastsum}$\displaystyle\sum_{n=M}^{N-1} h[n]\,e^{-j\omega\left(n-M+\frac{1}{2}\right)}$}\right).
+\end{align*}
+In the \textcolor{ee483lastsum}{\textbf{last sum}}, let $n = N-1-k \iff k = N-1-n$:
+\begin{equation*}
+\sum_{\textcolor{red}{k=M-1}}^{\textcolor{red}{\mathbf{0}}} h[N-1-k]\,e^{-j\omega(N-1-k-M)} = \sum_{\textcolor{red}{\mathbf{k=0}}}^{\textcolor{red}{M-1}} h[N-1-k]\,e^{-j\omega\HandoutPinkSup{(M-1-k)}}.
+\end{equation*}
+\HandoutMarkLeft{6}%
+Renaming $\HandoutPinkEmph{k\to n}$ and using $h[N-1-n]=h[n]$:
+\begin{align*}
+\HandoutHighlightYellow{$H(e^{j\omega})$} &= e^{-j\omega\left(M-\frac{1}{2}\right)}\Bigg[\sum_{n=0}^{M-1}\Biggl( \symbf{h}\symbf{[}\symbf{n}\symbf{]}\,e^{-j\omega\left(n-M+\frac{1}{2}\right)} \notag\\
+&\hspace{9.4em} + \boxed{\underbrace{h[N-1-n]}_{\HandoutUnderbraceLabel{\symbf{h}\symbf{[}\symbf{n}\symbf{]}}}\,e^{+j\omega\left(n-M+\frac{1}{2}\right)}}\Biggr)\Bigg] \\
+&= \underbrace{e^{-j\omega\left(M-\frac{1}{2}\right)}}_{\HandoutUnderbraceLabel{\text{linear phase}}}\,
+\left[\underbrace{\mkern5mu \HandoutEulerMarkLinkMath\,\mathbf{2}\sum_{n=0}^{M-1} h[n]\,\mathop{\mathbf{cos}\!}\big(\omega[n-M+\tfrac{1}{2}]\big)\mkern5mu}_{\HandoutUnderbraceLabel{\text{real function}}}\right]. \quad \blacksquare \MitraTag{7.56}
+\end{align*}
+\noindent The group delay is $\tfrac{N-1}{2}=M-\tfrac{1}{2}$ samples. At $\omega=\pi$, each $\cos\big(\omega[n-M+\tfrac{1}{2}]\big)$ is zero, so $H(e^{j\pi})=0$ (Type~2 cannot be a strict highpass); compare §2.1.1 (Type~1, \HandoutMitraTagText{7.53}), where length-$N$ is odd and $\cos\big(\omega[n-M]\big)$.
+
+\begin{notebox}[title={Note}]
+\textbf{Recall from the beginning:} $e^{-j\omega M}$ corresponds to a delay of $M$ samples.
+GLP FIR filters are associated with a \textbf{delay of $M$ samples} (larger $M$ $\Rightarrow$ longer delay).
+\begin{itemize}
+  \item Symmetric ($+$) $\Rightarrow$ ``initial'' phase of $0$ or $\pi$.
+  \item Antisymmetric ($-$) $\Rightarrow$ ``initial'' phase of $\pm\frac{\pi}{2}$ $\Rightarrow$ good for: differentiation; Hilbert transform.
+\end{itemize}
+\begin{center}
+\begin{minipage}[t]{0.46\linewidth}
+\centering
+\textbf{Symmetric ($+$): real axis}\par\smallskip
+\begin{handouttikz}[scale=1.05, >=Latex]
+  \draw[ee483rule] (0,0) circle (0.9);
+  \draw[->] (-1.15,0) -- (1.2,0) node[right, font=\scriptsize] {Re};
+  \draw[->] (0,-1.1) -- (0,1.15) node[above, font=\scriptsize] {Im};
+  \draw[->, very thick, ee483link] (0,0) -- (0.9,0);
+  \draw[->, very thick, ee483lastsum] (0,0) -- (-0.9,0);
+  \fill[ee483link] (0.9,0) circle (1.7pt);
+  \fill[ee483lastsum] (-0.9,0) circle (1.7pt);
+  \node[above right, font=\scriptsize, ee483link] at (0.9,0) {$1=e^{j0}$};
+  \node[above left, font=\scriptsize, ee483lastsum] at (-0.9,0) {$-1=e^{j\pi}$};
+\end{handouttikz}
+\[
+\text{initial phase}=0\ \text{or}\ \pi
+\]
+\end{minipage}\hfill
+\begin{minipage}[t]{0.46\linewidth}
+\centering
+\textbf{Antisymmetric ($-$): imaginary axis}\par\smallskip
+\begin{handouttikz}[scale=1.05, >=Latex]
+  \draw[ee483rule] (0,0) circle (0.9);
+  \draw[->] (-1.15,0) -- (1.2,0) node[right, font=\scriptsize] {Re};
+  \draw[->] (0,-1.1) -- (0,1.15) node[above, font=\scriptsize] {Im};
+  \draw[->, very thick, ee483link] (0,0) -- (0,0.9);
+  \draw[->, very thick, ee483lastsum] (0,0) -- (0,-0.9);
+  \fill[ee483link] (0,0.9) circle (1.7pt);
+  \fill[ee483lastsum] (0,-0.9) circle (1.7pt);
+  \node[above right, font=\scriptsize, ee483link] at (0,0.9) {$j=e^{j\pi/2}$};
+  \node[below right, font=\scriptsize, ee483lastsum] at (0,-0.9) {$-j=e^{-j\pi/2}$};
+\end{handouttikz}
+\[
+\text{initial phase}=+\frac{\pi}{2}\ \text{or}\ -\frac{\pi}{2}
+\]
+\end{minipage}
+\end{center}
+\end{notebox}
+
+\begin{notebox}[title=\HandoutNoteAddendumTitle]
+\begin{center}
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}ccll@{}}
+\toprule
+Type & Symmetry & $N$ (len.) & Forced zeros of $H(e^{j\omega})$ \\
+\midrule
+1 & $h[n]=h[N-1-n]$ & odd & none \\
+2 & $h[n]=h[N-1-n]$ & even & $\omega=\pi$ \\
+3 & $h[n]=-h[N-1-n]$ (odd symmetry) & odd & $\omega=0$ and $\omega=\pi$ \\
+4 & $h[n]=-h[N-1-n]$ (odd symmetry) & even & $\omega=0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{itemize}
+  \item Type~2 cannot realize a highpass filter.
+  \item Types~3/4 are antisymmetric (odd symmetry), have phase offset
+  $\pm\frac{\pi}{2}$, and satisfy $H(e^{j0})=0$; they suit differentiators
+  and Hilbert transformers.
+\end{itemize}
+\end{notebox}
+
+\HandoutMarkSection{5}{Differentiators and Hilbert Transformers}
+
+\subsection{Differentiator}
+\begin{equation*}
+\frac{dx(t)}{dt} \ \longleftrightarrow\ j\Omega\,X(j\Omega)
+\qquad\Longrightarrow\qquad
+H(e^{j\omega}) \approx j\omega
+\end{equation*}
+(periodization and approximated appropriately).
+\begin{equation*}
+H_{\mathrm{DIF}}(e^{j\omega}) = j\omega, \qquad 0 \le |\omega| \le \pi. \MitraTag{7.100; 10.26}
+\end{equation*}
+\noindent\textbf{GLP check (§2).}\quad With $R(e^{j\omega})=\omega$ (real; phase $0$ or $\pi$) and $k_1=\frac{\pi}{2}$, $k_2=0$,
+\begin{align*}
+H_{\mathrm{DIF}}(e^{j\omega})
+&= R(e^{j\omega})\,e^{j(k_1+\omega k_2)} \\
+&= \omega\,e^{j\pi/2} && \text{\footnotesize (Recall: Euler $e^{j\theta}=\cos\theta+j\sin\theta$, $\theta=\tfrac{\pi}{2}\Rightarrow e^{j\pi/2}=j$)} \\
+&= j\omega, \qquad \omega\in[-\pi,\pi].
+\end{align*}
+\noindent The fixed factor $e^{j\pi/2}$ is the same \emph{initial phase} $\frac{\pi}{2}$ as in antisymmetric Types~3/4 (§2); here $k_2=0$, so there is no extra linear phase term $-\omega M$ beyond that offset.
+
+\subsection{Hilbert Transformer}
+\noindent The ideal Hilbert transformer, also called a 90-degree phase shifter,\footnotemark{} is characterized by a frequency response
+\footnotetext{Ideal Hilbert transform filtering has $\bigl|H(\Omega)\bigr|=1$ for all $\Omega$ (\textbf{allpass} magnitude): phase $-\frac{\pi}{2}$ at each positive frequency and $+\frac{\pi}{2}$ at each negative frequency. This is why Mitra calls it a \textbf{90-degree phase shifter}. Contrast §5.1 (differentiator), where $|H|\propto|\Omega|$. Cf.\ J.\ O.\ Smith, ``The Analytic Signal and Hilbert Transform Filters'' (\S5.3.4).}
+\begin{equation*}
+H(j\Omega) = \begin{cases} -j, & \Omega \ge 0 \\ +j, & \Omega < 0 \end{cases}
+\end{equation*}
+\noindent\textit{(Here $\Omega$ is the continuous-time angular frequency, usually in rad/s.)}
+\noindent\textbf{DTFT (ideal Hilbert transformer).}\quad Frequency response $H(e^{j\omega})$:
+\begin{equation*}
+H(e^{j\omega}) \approx \begin{cases} -j, & 0 \le \omega < \pi \\ +j, & -\pi \le \omega < 0 \end{cases}
+\MitraTag{10.24}
+\end{equation*}
+\noindent\textit{(Here $\omega$ is the discrete-time normalized angular frequency, in rad/sample.)}
+
+\begin{center}
+\begin{handouttikz}[>=Stealth, line width=0.6pt]
+  \node (in) at (0,0) {$x(t)$};
+  \coordinate (split) at (2,0);
+  \node[draw, minimum width=2.8cm, minimum height=1.2cm, align=center]
+       (ht) at (4.6,0) {Hilbert\\transformer};
+  \node[anchor=west] (out2) at (8,0)   {$\hat{x}(t)$};
+  \node[anchor=west] (out1) at (8,1.4) {$x(t)$};
+  \draw (in.east) -- (split);
+  \draw[->] (split) -- (ht.west);
+  \draw[->] (ht.east) -- (out2.west);
+  \draw[->] (split) |- (out1.west);
+  \fill (split) circle (1.5pt);
+\end{handouttikz}
+\par\smallskip
+{\small\textit{Generation of an analytic signal using a Hilbert transformer. (Mitra Figure~1.3, Sec.~1.2.3)}\par}
+\end{center}
+
+\medskip
+\noindent Form the complex signal
+\begin{equation*}
+z(t) = x(t) + j\,\hat{x}(t)\footnotemark{} \MitraTagRef{1.8}
+\end{equation*}
+\noindent where $\hat{x}(t)=x(t)\circledast h(t)$:
+\footnotetext{The signals $x(t)$ and $\hat{x}(t)$ are called, respectively, the \textbf{in-phase} and \textbf{quadrature} components of $z(t)$.}
+\begin{equation*}
+Z(j\Omega) = \begin{cases} X(j\Omega) + X(j\Omega), & \Omega\ge 0 \\ X(j\Omega) - X(j\Omega), & \Omega<0 \end{cases}
+= \begin{cases} 2X(j\Omega), & \Omega\ge 0 \\ 0, & \Omega<0 \end{cases} \MitraTag{1.9}
+\end{equation*}
+$\Rightarrow$ created a complex-valued signal with a \textbf{single-sided} Fourier transform (the \textit{analytic signal})\footnotemark{}.
+
+\footnotetext{Why form $z=x+j\hat{x}$? The analytic signal can be written $z(t)=A(t)e^{j\psi(t)}$, with $|z(t)|=A(t)$ the \textbf{instantaneous envelope} and $\psi(t)$ the instantaneous phase (so $f(t)=\frac{1}{2\pi}\frac{d\psi}{dt}$ is instantaneous frequency). That is the usual motivation for envelope detection, AM demodulation, and related bandpass processing once $\hat{x}=\mathcal{H}\{x\}$ is available. Cf.\ accepted answer to ``Meaning of Hilbert Transform'': \url{https://dsp.stackexchange.com/questions/25845/meaning-of-hilbert-transform}.}
+
+\begin{examplebox}[breakable, title={\HandoutExampleMitraSecTitle{Example (Amplitude Modulation)}{Sec.~1.2.4}}, handout mark=6]
+Let $a(t)$ be a lowpass signal with spectrum $A(j\Omega)$, and $x(t) = a(t)\cos(\Omega_0 t + \phi)$.
+
+\begin{handouttikz}[x=0.55cm, y=0.8cm]
+  \tikzset{tri/.style={thick}}
+  % A(jW)
+  \begin{scope}
+    \draw[->] (-7,0) -- (7.3,0) node[right] {$\Omega$};
+    \draw (0,-0.05) -- (0,1.3);
+    \draw[tri] (-1.3,0) -- (0,1) -- (1.3,0);
+    \node[anchor=west, font=\small] at (1.2,1) {$A(j\Omega)$};
+  \end{scope}
+  % X(jW)
+  \begin{scope}[yshift=-1.8cm]
+    \draw[->] (-7,0) -- (7.3,0) node[right] {$\Omega$};
+    \draw (0,-0.05) -- (0,1.3);
+    \draw[tri] (-5.3,0) -- (-4,0.5) -- (-2.7,0);
+    \draw[tri] (2.7,0) -- (4,0.5) -- (5.3,0);
+    \node[below, font=\small] at (-4,0) {$-\Omega_0$};
+    \node[below, font=\small] at (4,0) {$\Omega_0$};
+    \node[anchor=west, font=\small] at (-7,1.05) {$X(j\Omega)$};
+  \end{scope}
+  % Z(jW)
+  \begin{scope}[yshift=-3.6cm]
+    \draw[->] (-7,0) -- (7.3,0) node[right] {$\Omega$};
+    \draw (0,-0.05) -- (0,1.3);
+    \draw[tri] (2.7,0) -- (4,1) -- (5.3,0);
+    \node[below, font=\small] at (4,0) {$\Omega_0$};
+    \node[anchor=west, font=\small] at (-7,1.05) {$|Z(j\Omega)|$};
+  \end{scope}
+\end{handouttikz}
+
+\noindent Assuming the bandwidth of $a(t)$ is smaller than $\Omega_0$, form the analytic signal from §5.2 ($z=x+j\hat{x}$, \HandoutEqRef{1.8}):
+\begin{align*}
+z(t) &= x(t) + j\,\hat{x}(t), \qquad \hat{x}(t)=\mathcal{H}\{x(t)\}.
+\end{align*}
+\noindent The Hilbert transformer applies $-j$ on $\Omega\ge 0$ (§5.2); for a \textbf{narrowband} real AM waveform, the envelope varies slowly compared with the carrier, so the phase shift acts on $\cos(\Omega_0 t+\phi)$ while $a(t)$ is treated as fixed:
+\begin{align*}
+\hat{x}(t) &= \mathcal{H}\bigl\{a(t)\cos(\Omega_0 t+\phi)\bigr\}
+\approx a(t)\,\mathcal{H}\bigl\{\cos(\Omega_0 t+\phi)\bigr\}
+= a(t)\sin(\Omega_0 t+\phi).
+\end{align*}
+\noindent{\small Carrier check ($\theta=\Omega_0 t+\phi$):
+$\cos\theta=\tfrac{1}{2}(e^{j\theta}+e^{-j\theta})$; the $+\Omega_0$ and $-\Omega_0$ terms pick up $-j$ and $+j$ (§5.2), so $\mathcal{H}\{\cos\theta\}=\sin\theta$.}
+\noindent With \HandoutEulerMarkLink{} $e^{j\theta}=\cos\theta+j\sin\theta$,
+\begin{align*}
+z(t) &= a(t)\cos\theta + j\,a(t)\sin\theta
+= a(t)\,e^{j(\Omega_0 t+\phi)}.
+\end{align*}
+\noindent Hence
+\begin{equation*}
+\quad\Longrightarrow\quad
+\begin{cases}
+|z(t)| = |a(t)| & \text{(envelope detection)}, \\[2pt]
+a(t) = z(t)\,e^{-j(\Omega_0 t+\phi)} & \text{(demodulation)}.
+\end{cases}
+\end{equation*}
+\end{examplebox}
+
+\HandoutMarkSection{7}{Phase Delay and Group Delay}
+
+\begin{defbox}[title={Phase Delay}]
+\begin{equation*}
+\tau_p(\omega_0) \triangleq -\frac{\theta(\omega_0)}{\omega_0}. \MitraTag{4.95}
+\end{equation*}
+\end{defbox}
+Indeed, for input $e^{j\omega_0 n}$,
+\begin{align*}
+e^{j\omega_0 n} \ \to\ \boxed{h[n]}\ \to\ \big|H(e^{j\omega_0})\big|\,e^{j(\omega_0 n + \theta(\omega_0))}
+&= \big|H(e^{j\omega_0})\big|\,e^{j\omega_0\left(n-\left(\frac{-\theta(\omega_0)}{\omega_0}\right)\right)} \\
+&= \big|H(e^{j\omega_0})\big|\,e^{j\omega_0\left(n-\tau_p(\omega_0)\right)}.
+\end{align*}
+
+\begin{defbox}[title={Group Delay}]
+\begin{equation*}
+\tau_g(\omega) = -\frac{d\theta(\omega)}{d\omega}. \MitraTag{4.96}
+\end{equation*}
+\end{defbox}
+
+\begin{itemize}
+  \item \textbf{Constant group delay:} relative phases of different frequency components will be maintained.
+  \item \textbf{GLP:} constant $\tau_g(\omega)$ for almost all $\omega$ (except at the jumps of $\pi$).
+  \item \textbf{Non-constant phase or group delay:} distortion.\footnotemark{}
+\end{itemize}
+\footnotetext{Example: HW4 Problem~5(b)---filters~(2), (4), (6), and~(7) from that set's LTI list. On a symmetric test input, $\tau_g(\omega)$ varies with $\omega$, frequency components misalign, and the pulse shape is warped (GLP filters~(1) and~(5) preserve symmetry).}
+
+\HandoutMarkSection{8}{All-Pass Filters}
+
+\begin{defbox}[title={All-Pass Filter}]
+$\big|H(e^{j\omega})\big| = 1$, while $\theta(\omega)$ is typically \textbf{not} linear.
+(All-pass filters can compensate nonlinear phase from other systems; that is why we sometimes intentionally add all-pass (nonlinear-phase) stages for \textbf{phase equalization}, without changing magnitude.)
+\end{defbox}
+
+\begin{examplebox}[title={Example (LDE)}]
+\begin{equation*}
+\sum_{k=0}^{M} d_k\,y[n-k] = \sum_{k=0}^{M} d^*_{M-k}\,x[n-k].
+\end{equation*}
+If the frequency response is convergent,
+\begin{equation*}
+H(e^{j\omega}) = \frac{\displaystyle\sum_{k=0}^{M} d^*_{M-k}\,e^{-j\omega k}}{\displaystyle\sum_{k=0}^{M} d_k\,e^{-j\omega k}},
+\qquad \big|H(e^{j\omega})\big| = 1.
+\end{equation*}
+\end{examplebox}
+
+\begin{notebox}[title=\HandoutNoteAddendumTitle]
+Why $|H|=1$ in general: substituting $m = M-k$ in the numerator,
+\begin{equation*}
+\sum_{k=0}^{M} d^*_{M-k}\,e^{-j\omega k} = e^{-j\omega M}\sum_{m=0}^{M} d^*_m\,e^{+j\omega m}
+= e^{-j\omega M}\left(\sum_{m=0}^{M} d_m\,e^{-j\omega m}\right)^{\!*},
+\end{equation*}
+so the numerator and denominator have equal magnitude. The example below checks this directly.
+\end{notebox}
+
+\begin{examplebox}[title={Example}]
+$d_k = \{\underset{\uparrow}{1},\ \tfrac{1}{2}\}$:
+\begin{equation*}
+y[n] + \tfrac{1}{2}\,y[n-1] = \tfrac{1}{2}\,x[n] + x[n-1]
+\quad\Longleftrightarrow\quad
+y[n] = -\tfrac{1}{2}\,y[n-1] + \tfrac{1}{2}\,x[n] + x[n-1].
+\end{equation*}
+\noindent Now we prove that this is an all-pass filter:
+\begin{align*}
+H(e^{j\omega}) &= \frac{\frac{1}{2} + e^{-j\omega}}{1 + \frac{1}{2}e^{-j\omega}}
+= \frac{\frac{1}{2} + \cos\omega - j\sin\omega}{1 + \frac{1}{2}\cos\omega - \frac{j}{2}\sin\omega}, \\[4pt]
+\intertext{We take the square of the magnitude:}
+\big|H(e^{j\omega})\big|^2 &= \frac{\left(\frac{1}{2}+\cos\omega\right)^2 + \sin^2\omega}{\left(1+\frac{1}{2}\cos\omega\right)^2 + \left(\frac{1}{2}\sin\omega\right)^2}\text{\qquad\footnotemark{}}
+\end{align*}%
+\HandoutMarkBeforeAlign{9}%
+\vspace{-1.6em}%
+\begin{align*}
+\phantom{\big|H(e^{j\omega})\big|^2} &= \frac{\frac{1}{4} + \cos\omega + \overbrace{\cos^2\omega + \sin^2\omega}^{=1}}{1 + \cos\omega + \frac{1}{4}\cos^2\omega + \frac{1}{4}\sin^2\omega}
+= \frac{\frac{5}{4} + \cos\omega}{\frac{5}{4} + \cos\omega} = \mathbf{1}.
+\end{align*}
+\end{examplebox}
+\footnotetext{Use two facts:
+\begin{itemize}[nosep,topsep=2pt,leftmargin=1.4em]
+  \item $\left|\dfrac{A}{B}\right|^2=\dfrac{|A|^2}{|B|^2}$
+  \item For $z=x+jy$: $|z|^2=x^2+y^2$
+\end{itemize}
+Expanding with Euler's formula $e^{-j\omega}=\cos\omega-j\sin\omega$:
+\begin{itemize}[nosep,topsep=2pt,leftmargin=1.4em]
+  \item Numerator: $\tfrac12+\cos\omega-j\sin\omega \Rightarrow |\cdot|^2=\left(\tfrac12+\cos\omega\right)^2+\sin^2\omega$
+  \item Denominator: $1+\tfrac12\cos\omega-\tfrac{j}{2}\sin\omega \Rightarrow |\cdot|^2=\left(1+\tfrac12\cos\omega\right)^2+\left(\tfrac12\sin\omega\right)^2$
+  \item The minus signs vanish when squared
+  \item Dividing the two gives the first step:
+    $\displaystyle \big|H(e^{j\omega})\big|^2=\frac{\left(\tfrac12+\cos\omega\right)^2+\sin^2\omega}{\left(1+\tfrac12\cos\omega\right)^2+\left(\tfrac12\sin\omega\right)^2}$
+\end{itemize}}
+
+\section*{Readings}
+\begin{itemize}
+  \item Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Ch.\ 5.2
+  \item Monson H. Hayes, \textit{Schaum's Outline of Digital Signal Processing}, 2nd ed., Ch.\ 6
+\end{itemize}
+
+\HandoutAppendixListStart
+  \HandoutAppendixListItem{app:scan7}{A.\ Handwritten Lecture Note Scan (September 15, 2026)}
+\HandoutAppendixListEnd
+
+\HandoutAppendixSection{app:scan7}{Handwritten Lecture Note Scan}
+\HandoutIncludeHandoutScan{lecture7_0915.pdf}
+
+\end{document}

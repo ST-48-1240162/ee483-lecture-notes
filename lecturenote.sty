@@ -142,7 +142,7 @@
   boxrule=0pt, arc=0pt, left=3pt, right=3pt, top=2pt, bottom=2pt, boxsep=0pt}
 
 % Underbrace label: \mathclap prevents long labels from widening the brace.
-\newcommand{\HandoutUnderbraceLabel}[1]{\mathclap{\scriptsize #1}}
+\newcommand{\HandoutUnderbraceLabel}[1]{\mathclap{\footnotesize #1}}
 
 % Side-by-side block diagram (left) and equation derivation (right).
 \newcommand{\HandoutDiagramEqLayoutStart}{%
@@ -305,6 +305,11 @@
 \newcommand{\hxfer}{H}
 \newcommand{\dtft}{\mathrm{DTFT}}
 \DeclareMathOperator{\median}{median}
+% DFT helpers: modulo-N index and N-point circular convolution (Mitra notation).
+\newcommand{\HandoutMod}[2]{\langle #1\rangle_{#2}}
+\newcommand{\HandoutCircConv}[1][N]{\mathbin{\tikz[baseline=(cc.base)]{%
+  \node[draw, circle, line width=0.4pt, inner sep=0pt, minimum size=1.05em,
+    font=\scriptsize] (cc) {$#1$};}}}
 
 \setlist{itemsep=2pt,topsep=4pt,parsep=0pt}
 
@@ -397,17 +402,25 @@
 
 % Mitra textbook equation reference (4th ed.).
 \makeatletter
-\newcommand{\HandoutMitraTagText}[1]{\text{\scriptsize\textit{(Mitra~#1)}}}
-\newcommand{\HandoutMitraInlineText}[1]{\;\text{\scriptsize\textit{(Mitra~#1)}}}
+\newcommand{\HandoutMitraTagInner}[1]{{\small\textit{(Mitra~#1)}}}
+\newcommand{\HandoutMitraTagText}[1]{\HandoutMitraTagInner{#1}}
+\newcommand{\HandoutMitraInlineText}[1]{\,\HandoutMitraTagInner{#1}}
 \newcommand{\MitraEq}[1]{\HandoutMitraInlineText{#1}}  % inline, after prose or $...$
 \newcommand{\HandoutEqRef}[1]{\hyperref[eq:mitra-#1]{(#1)}}  % clickable (3.10)-style eq.\ ref
-\newcommand{\MitraTag}[1]{\tag*{\HandoutMitraTagText{#1}}}  % right-aligned in display math
+\newcommand{\MitraTag}[1]{\tag*{\HandoutMitraTagInner{#1}}}  % right-aligned in display math
 \newcommand{\MitraTagRef}[1]{\MitraTag{#1}\label{eq:mitra-#1}}  % tag + label for \HandoutEqRef
 \newcommand{\MitraEqDoubt}[1]{\HandoutMitraInlineText{#1}\textcolor{red}{?}}
-\newcommand{\MitraEqDoubtTag}[1]{\tag*{\HandoutMitraTagText{#1}\textcolor{red}{?}}}
+\newcommand{\MitraEqDoubtTag}[1]{\tag*{\HandoutMitraTagInner{#1}\textcolor{red}{?}}}
 \newcommand{\HandoutMitraSecRef}[1]{\textnormal{(cf.\ Mitra~Sec.~#1)}}
+\newcommand{\HandoutExampleMitraSecTitle}[2]{%
+  \texorpdfstring{#1\hfill\normalfont\HandoutMitraTagText{#2}}{#1}}%
+\newcommand{\HandoutNoteAddendumTitle}{%
+  \texorpdfstring{%
+    Remark\hfill\normalfont\small\textit{(addendum to orig lecture note)}}{%
+    Remark (addendum)}}%
 % Footnote mark flush right on a section/box title line (use with \footnotetext after).
 \newcommand{\HandoutTitleFnmark}{\hfill\protect\footnotemark}
+\newcommand{\HandoutTitleWithFnmark}[1]{\texorpdfstring{#1\HandoutTitleFnmark}{#1}}
 
 % Suppress automatic (1), (2), ... equation numbers; \MitraTag uses \tag* (not \tag).
 \AtBeginDocument{\renewcommand{\tagform@}[1]{}}

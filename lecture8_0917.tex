@@ -1,0 +1,291 @@
+\documentclass[handout_subfiles_root.tex]{subfiles}
+\usepackage[rm2]{lecturenote}
+
+\begin{document}
+\HandoutTitle{8}{The Discrete Fourier Transform (DFT)}{September 17, 2026}
+\maketitle
+
+\HandoutMarkSection{1}{The Discrete Fourier Transform (DFT)}
+
+\begin{defbox}[title={Def}]
+The DFT is a mapping of a length-$N$ sequence $x[n]$, $0\le n\le N-1$, into a length-$N$ Fourier representation $X[k]$, $k=0,\dots,N-1$, according to
+\begin{equation*}
+X[k] = \sum_{n=0}^{N-1} x[n]\,e^{-j\frac{2\pi kn}{N}}.
+\end{equation*}
+\end{defbox}
+
+\noindent It is a \textbf{sampled version of the DTFT} for a finite-length sequence:
+\begin{equation*}
+X[k] = X(e^{j\omega})\Big|_{\omega=\frac{2\pi k}{N}}.
+\end{equation*}
+$\Rightarrow$ \HandoutHighlightYellow{discrete in both time and frequency}.
+
+\begin{defbox}[title={Inverse DFT}]
+\begin{equation*}
+x[n] = \frac{1}{N}\sum_{k=0}^{N-1} X[k]\,e^{+j\frac{2\pi kn}{N}}, \qquad n=0,\dots,N-1.
+\end{equation*}
+\end{defbox}
+
+\HandoutMarkSubsection{2}{Twiddle-Factor Notation}
+
+With $W_N = e^{-j\frac{2\pi}{N}}$,
+\begin{align*}
+X[k] &= \sum_{n=0}^{N-1} x[n]\,W_N^{kn}, \qquad 0\le k\le N-1, \\
+x[n] &= \frac{1}{N}\sum_{k=0}^{N-1} X[k]\,W_N^{-kn}, \qquad 0\le n\le N-1.
+\end{align*}
+
+\paragraph{Verification of the inverse formula.}
+\begin{align*}
+X[\ell] &= \sum_{n=0}^{N-1} x[n]\,W_N^{\ell n}
+= \sum_{n=0}^{N-1}\left[\frac{1}{N}\sum_{k=0}^{N-1} X[k]\,W_N^{-kn}\right] W_N^{\ell n} \\
+&= \sum_{k=0}^{N-1} X[k]\,\underbrace{\left[\frac{1}{N}\sum_{n=0}^{N-1} W_N^{-(k-\ell)n}\right]}_{\HandoutUnderbraceLabel{(\ast)}}.
+\end{align*}
+Summing the geometric series,
+\begin{align*}
+(\ast) &= \frac{1}{N}\,\frac{1-W_N^{-(k-\ell)N}}{1-W_N^{-(k-\ell)}}
+= \frac{1}{N}\,\frac{1-e^{j2\pi(k-\ell)}}{1-e^{j\frac{2\pi(k-\ell)}{N}}} \\
+&= \frac{1}{N}\,\frac{e^{j\pi(k-\ell)}\left(e^{-j\pi(k-\ell)}-e^{j\pi(k-\ell)}\right)}{e^{j\frac{\pi(k-\ell)}{N}}\left(e^{-j\frac{\pi(k-\ell)}{N}}-e^{j\frac{\pi(k-\ell)}{N}}\right)} \\
+&= \frac{1}{N}\,\frac{\sin\!\big(\pi[k-\ell]\big)\,e^{j\pi(k-\ell)}}{\sin\!\big(\frac{\pi}{N}[k-\ell]\big)\,e^{j\frac{\pi(k-\ell)}{N}}}
+\end{align*}
+\noindent\HandoutMarkLeft{3}Hence
+\begin{equation*}
+(\ast) = \begin{cases} 1, & k-\ell = rN,\ r \text{ integer}, \\ 0, & \text{else} \end{cases}
+\;=\; \delta\big[\HandoutMod{k-\ell}{N}\big].
+\end{equation*}
+
+\begin{notebox}[title=\HandoutNoteAddendumTitle]
+The geometric-series formula is only valid when $W_N^{-(k-\ell)}\ne 1$, i.e., $k-\ell\ne rN$; in that case $\sin(\pi[k-\ell])=0$ while $\sin(\frac{\pi}{N}[k-\ell])\ne 0$, so $(\ast)=0$.
+When $k-\ell = rN$, every term of the sum equals $W_N^{-rNn}=1$, so $(\ast) = \frac{1}{N}\cdot N = 1$ directly (this is also the $0/0$ limit of the Dirichlet-kernel expression).
+\end{notebox}
+
+\begin{defbox}[title={Modulo Operation $\HandoutMod{n}{N}$}]
+$k = \HandoutMod{n}{N}$ if $k\in\{0,\dots,N-1\}$ and there exists an integer $\ell$ such that $n = k + \ell N$.
+\end{defbox}
+
+\begin{examplebox}[title={Example ($N=3$)}]
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|ccccccccc}
+$n$ & $-2$ & $-1$ & $0$ & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ \\
+\hline
+$\HandoutMod{n}{3}$ & $1$ & $2$ & $0$ & $1$ & $2$ & $0$ & $1$ & $2$ & $0$
+\end{tabular}
+\end{center}
+\end{examplebox}
+
+\noindent Therefore
+\begin{equation*}
+X[\ell] = \sum_{k=0}^{N-1} X[k]\,\delta\big[\HandoutMod{k-\ell}{N}\big] = X[\ell] \quad \text{for } \ell\in\{0,\dots,N-1\}. \quad \blacksquare
+\end{equation*}
+
+\begin{examplebox}[title={Example}, handout mark=4]
+$g[n] = \cos\!\left(\dfrac{2\pi rn}{N}\right)$, $\;0\le n\le N-1$, with $r$ an integer, $0\le r\le N-1$.
+\begin{equation*}
+g[n] = \tfrac{1}{2}\left(W_N^{-rn} + W_N^{rn}\right)
+\end{equation*}
+\begin{align*}
+\Rightarrow\ G[k] &= \frac{1}{2}\left(\sum_{n=0}^{N-1} W_N^{-(r-k)n} + \sum_{n=0}^{N-1} W_N^{-(-r-k)n}\right) \\
+&= \frac{1}{2}\Big(N\,\delta\big[\HandoutMod{r-k}{N}\big] + N\,\delta\big[\HandoutMod{-r-k}{N}\big]\Big).
+\end{align*}
+For $0\le k\le N-1$:
+\begin{equation*}
+G[k] = \begin{cases} \dfrac{N}{2}, & k = r,\ \ k = N-r, \\[4pt] 0, & \text{else}, \end{cases}
+\qquad \text{(unless $r=0$ or $r=N/2$)}
+\end{equation*}
+using $\HandoutMod{-r-k}{N} = \HandoutMod{N-r-k}{N}$. When $r=0$ or $r=N/2$, the two impulses coincide and $G[r] = N$.
+\end{examplebox}
+
+\HandoutMarkSection{5}{\HandoutTitleWithFnmark{DFT Properties}}
+\footnotetext{cf.\ Mitra Tables~5.1, 5.2, and~5.3 (reproduced in the appendix of the full build).}
+
+\subsection{Periodicity}
+
+\begin{factbox}[title={Property}]
+\begin{align*}
+X[\ell N + k] &= X[k], \qquad k=0,\dots,N-1,\ \ \ell \text{ an integer}, \\
+x[mN + n] &= x[n], \qquad n=0,\dots,N-1,\ \ m \text{ an integer},
+\end{align*}
+when the DFT / IDFT formulas are evaluated outside $0,\dots,N-1$.
+\end{factbox}
+Because
+\begin{equation*}
+W_N^N = e^{-j\frac{2\pi}{N}N} = e^{-j2\pi} = 1
+\quad\Rightarrow\quad
+W_N^{\ell N+k} = (1)^{\ell}\,W_N^{k} = W_N^{k}.
+\end{equation*}
+
+\subsection{Circular Shift}
+
+Consider $x[n]$, $0\le n\le N-1$. The ordinary shift $x_1[n] = x[n-n_0]$ is \textbf{no longer defined} over $0\le n\le N-1$.
+\begin{equation*}
+\Rightarrow\ \text{circular shifts:}\qquad x_1[n] = x\big[\HandoutMod{n-n_0}{N}\big].
+\end{equation*}
+
+\begin{examplebox}[title={Example (Right Circular Shift)}, handout mark=6]
+Let $0<n_0\le N-1$:
+\begin{equation*}
+x_1[n] = x\big[\HandoutMod{n-n_0}{N}\big] = \begin{cases} x[n-n_0], & n_0\le n\le N-1, \\ x[N+n-n_0], & 0\le n\le n_0-1. \end{cases}
+\end{equation*}
+
+\begin{handouttikz}[x=0.62cm, y=0.36cm]
+  \foreach \n/\v in {0/1, 1/2, 2/3, 3/4} {
+    \draw[thick] (\n,0) -- (\n,\v); \fill (\n,\v) circle (2pt);
+    \node[above, font=\scriptsize] at (\n,\v) {$\v$};
+    \node[below, font=\scriptsize] at (\n,0) {$\n$};
+  }
+  \draw[->] (-0.6,0) -- (4.0,0) node[right] {$n$};
+  \node[font=\small] at (1.5,-2.1) {$x[n]$};
+  \draw[->, thick] (4.9,2) -- (6.3,2) node[midway, above, font=\small] {$n_0=1$};
+  \begin{scope}[xshift=4.4cm]
+    \foreach \n/\v in {0/4, 1/1, 2/2, 3/3} {
+      \draw[thick] (\n,0) -- (\n,\v); \fill (\n,\v) circle (2pt);
+      \node[above, font=\scriptsize] at (\n,\v) {$\v$};
+      \node[below, font=\scriptsize] at (\n,0) {$\n$};
+    }
+    \draw[->] (-0.6,0) -- (4.0,0) node[right] {$n$};
+    \node[font=\small] at (1.5,-2.1) {$x\big[\HandoutMod{n-1}{4}\big]$};
+  \end{scope}
+\end{handouttikz}
+
+\begin{equation*}
+x[n] = \{\underset{\uparrow}{1},2,3,4\}, \qquad
+x\big[\HandoutMod{n-1}{4}\big] = \{\underset{\uparrow}{4},1,2,3\},
+\end{equation*}
+\begin{equation*}
+x\big[\HandoutMod{n-2}{4}\big] = \{\underset{\uparrow}{3},4,1,2\}
+= x\big[\HandoutMod{n+2}{4}\big].
+\end{equation*}
+\end{examplebox}
+
+\begin{factbox}[title={Property (Circular Time-Shifting)}]
+Let $g[n] \longleftrightarrow G[k]$ and $\tilde g[n] = g\big[\HandoutMod{n-n_0}{N}\big]$. Then
+\begin{equation*}
+\tilde G[k] = W_N^{kn_0}\,G[k] = e^{-j\frac{2\pi kn_0}{N}}\,G[k].
+\end{equation*}
+\end{factbox}
+
+\HandoutMarkParagraph{7}{Proof.}
+\begin{align*}
+\tilde G[k] &= \sum_{n=0}^{N-1} g\big[\HandoutMod{n-n_0}{N}\big]\,W_N^{kn}
+= \sum_{n=0}^{n_0-1} g[n+N-n_0]\,W_N^{kn} + \sum_{n=n_0}^{N-1} g[n-n_0]\,W_N^{kn}.
+\end{align*}
+Let $m = n+N-n_0$ ($n = m-N+n_0$) in the first sum and $p = n-n_0$ ($n=p+n_0$) in the second:
+\begin{align*}
+\tilde G[k] &= \sum_{m=N-n_0}^{N-1} g[m]\,W_N^{k(m-N+n_0)} + \sum_{p=0}^{N-1-n_0} g[p]\,W_N^{k(p+n_0)} \\
+&= \sum_{n=0}^{N-1} g[n]\,W_N^{k(n+n_0)} \qquad \left(W_N^{-kN}=1\right) \\
+&= W_N^{kn_0}\left[\sum_{n=0}^{N-1} g[n]\,W_N^{kn}\right]
+= W_N^{kn_0}\,G[k]
+= e^{-j\frac{2\pi kn_0}{N}}\,G[k]. \quad \blacksquare
+\end{align*}
+
+\HandoutMarkSubsection{8}{Convolution}
+
+\noindent Linear convolution and the DTFT:
+\begin{equation*}
+x[n]\circledast h[n] \ \overset{\text{DTFT}}{\longleftrightarrow}\ X(e^{j\omega})\,H(e^{j\omega}).
+\end{equation*}
+If $x[n]$ has length $N_1$ and $h[n]$ has length $N_2$, then $y[n] = x[n]\circledast h[n]$ has length $N_1+N_2-1$: it is possibly nonzero for $0\le n\le N_1+N_2-2$ and is zero otherwise.
+
+\begin{defbox}[title={Circular Convolution (two length-$N$ sequences)}]
+\begin{equation*}
+y_c[n] = \sum_{m=0}^{N-1} x[m]\,h\big[\HandoutMod{n-m}{N}\big], \qquad 0\le n\le N-1,
+\end{equation*}
+\begin{equation*}
+y_c[n] = x[n] \HandoutCircConv h[n] = h[n] \HandoutCircConv x[n].
+\end{equation*}
+\end{defbox}
+
+\begin{factbox}[title={Convolution Theorem}]
+If $y_c[n] = x[n] \HandoutCircConv h[n]$, then $Y_c[k] = X[k]\,H[k]$.
+\end{factbox}
+
+\HandoutMarkParagraph{9}{Proof.}
+\begin{align*}
+Y_c[k] &= \sum_{n=0}^{N-1}\left[\sum_{m=0}^{N-1} x\big[\HandoutMod{n-m}{N}\big]\,h[m]\right] W_N^{kn}
+= \sum_{m=0}^{N-1} h[m]\left[\sum_{n=0}^{N-1} x\big[\HandoutMod{n-m}{N}\big]\,W_N^{kn}\right] \\
+&= \left[\sum_{m=0}^{N-1} h[m]\,W_N^{km}\right] X[k] \qquad \text{(circular time-shift)} \\
+&= H[k]\,X[k]. \quad \checkmark
+\end{align*}
+
+\subsection{Linear Convolution via Circular Convolution}
+
+If $x[n]$, $0\le n\le N_1-1$, and $h[n]$, $0\le n\le N_2-1$, then
+\begin{equation*}
+y[n] = x[n]\circledast h[n], \qquad 0\le n\le N_1+N_2-2.
+\end{equation*}
+
+\begin{factbox}[title={Property}]
+If
+\begin{equation*}
+\tilde x[n] = \begin{cases} x[n], & 0\le n\le N_1-1, \\ 0, & N_1\le n< N, \end{cases}
+\qquad \text{where } N\ge N_1+N_2-1,
+\end{equation*}
+and similarly define a ``zero-padded'' length-$N$ $\tilde h[n]$, then
+\begin{equation*}
+\tilde x[n] \HandoutCircConv \tilde h[n] = x[n]\circledast h[n] \qquad \text{for } 0\le n\le N-1.
+\end{equation*}
+\end{factbox}
+
+\begin{factbox}[title={Consequence: we can compute $\circledast$ using $\HandoutCircConv$!}, handout mark=10]
+\begin{enumerate}
+  \item Zero-pad both sequences to the same length $N\ge N_1+N_2-1$.
+  \item Take length-$N$ DFTs of both.
+  \item Multiply the DFTs together.
+  \item Take the inverse DFT of the result.
+\end{enumerate}
+\end{factbox}
+
+\begin{notebox}[title=\HandoutNoteAddendumTitle]
+Why $N\ge N_1+N_2-1$: circular convolution equals the linear convolution \emph{aliased} with period $N$,
+$\tilde x[n]\HandoutCircConv\tilde h[n] = \sum_{r} y[n+rN]$ for $0\le n\le N-1$. Since $y[n]$ occupies $N_1+N_2-1$ samples, no shifted copies overlap exactly when $N\ge N_1+N_2-1$.
+With a fast algorithm (FFT) for the DFT, this is how long convolutions are computed in practice (cf.\ Mitra Ch.~11).
+\end{notebox}
+
+\subsection{Parseval's Theorem}
+
+\begin{factbox}[title={Property}]
+\begin{equation*}
+\sum_{n=0}^{N-1} x^*[n]\,y[n] = \frac{1}{N}\sum_{k=0}^{N-1} X^*[k]\,Y[k]
+\quad\Rightarrow\quad
+\sum_{n=0}^{N-1} |x[n]|^2 = \frac{1}{N}\sum_{k=0}^{N-1} |X[k]|^2.
+\end{equation*}
+\end{factbox}
+
+\subsection{Symmetry}
+
+\begin{factbox}[title={Property}]
+If $x[n]$ is real,
+\begin{equation*}
+X[k] = X^*[N-k] = X^*\big[\HandoutMod{-k}{N}\big], \qquad 0\le k\le N-1.
+\end{equation*}
+\end{factbox}
+\noindent(For $k=0$, read $X^*[N]$ as $X^*[0]$ by periodicity; the modulo form handles this automatically.)
+
+\section*{Readings}
+\begin{itemize}
+  \item Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Ch.\ 5.4, 5.5, 5.7, 11.3--11.5
+  \item Monson H. Hayes, \textit{Schaum's Outline of Digital Signal Processing}, 2nd ed., Ch.\ 6, 7
+\end{itemize}
+
+\HandoutAppendixListStart
+  \HandoutAppendixListItem{app:dsp-foundations}{A.\ DSP Foundations (Euler, Analytic Signals, Norms)}
+  \HandoutAppendixListItem{app:mitra-tables5}{B.\ Mitra Tables 5.1, 5.2, and 5.3}
+  \HandoutAppendixListItem{app:scan8}{C.\ Handwritten Lecture Note Scan (September 17, 2026)}
+\HandoutAppendixListEnd
+
+\HandoutAppendixSection{app:dsp-foundations}{DSP Foundations (Euler, Analytic Signals, Norms)}
+\ifhandoutclean\else
+\input{appendix/dsp_foundations.tex}
+\clearpage
+\fi
+
+\HandoutAppendixSection{app:mitra-tables5}{Mitra Tables 5.1, 5.2, and 5.3}
+\ifhandoutclean\else
+\input{appendix/mitra_tables_5_1_5_2_5_3.tex}
+\clearpage
+\fi
+
+\HandoutAppendixSection{app:scan8}{Handwritten Lecture Note Scan}
+\HandoutIncludeHandoutScan{lecture8_0917.pdf}
+
+\end{document}

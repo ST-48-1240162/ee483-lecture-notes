@@ -1,0 +1,272 @@
+\documentclass[handout_subfiles_root.tex]{subfiles}
+\usepackage[rm2]{lecturenote}
+
+\begin{document}
+\HandoutTitle{6}{DTFT and Fourier Series}{September 10, 2026}
+\maketitle
+
+\HandoutMarkSection{1}{DTFT Pair (Recap)}
+
+\begin{defbox}[title={DTFT and Inverse DTFT}]
+\begin{align}
+X(e^{j\omega}) &= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega n}, \MitraTag{3.10}\\
+x[n] &= \frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\,e^{j\omega n}\,d\omega. \MitraTag{3.14}
+\end{align}
+$\Rightarrow$ $x[n]$ is represented as a \textbf{mixture of infinitely many sinusoids} $e^{j\omega n}$.
+\end{defbox}
+
+\subsection{DTFT and Fourier Series}
+
+For a periodic signal $s(t)$ with period $T$,
+\begin{equation*}
+s(t) = \sum_{n=-\infty}^{\infty} c_n\,e^{+j\frac{2\pi}{T}tn}.
+\end{equation*}
+Compare with
+\begin{equation*}
+X(e^{j\omega}) = \underbrace{\sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega n}}_{\HandoutUnderbraceLabel{\text{Fourier series representation of the $2\pi$-periodic function } X(e^{j\omega})}}
+\end{equation*}
+\vspace{0.4em}
+
+\noindent i.e., the samples $x[n]$ play the role of the Fourier series coefficients of $X(e^{j\omega})$ (with period $T=2\pi$ and the sign of the exponent flipped).
+
+\begin{factbox}[title={Duality}]
+\begin{itemize}
+  \item \textbf{DTFT:} discrete in time, periodic in frequency.
+  \item \textbf{Fourier series:} periodic in time, discrete in frequency.
+\end{itemize}
+\end{factbox}
+
+\HandoutMarkSection{2}{\HandoutTitleWithFnmark{DTFT Properties}}
+\footnotetext{cf.\ Mitra Sec.~3.2 and Table~3.4 (reproduced in the appendix of Lecture~5).}
+
+\subsection{Shift Properties}
+
+\begin{factbox}[title={Property}]
+\begin{align*}
+\text{Time shift:}\qquad y[n-M] &\ \longleftrightarrow\ e^{-j\omega M}\,Y(e^{j\omega}), \\
+\text{Frequency shift:}\qquad y[n]\,e^{-j\theta_0 n} &\ \longleftrightarrow\ Y\!\left(e^{j(\omega+\theta_0)}\right).
+\end{align*}
+\end{factbox}
+
+\subsection{Convolution Theorems}
+
+\begin{factbox}[title={Property}]
+\begin{align*}
+\sum_{k=-\infty}^{\infty} y[k]\,x[n-k] &\ \longleftrightarrow\ X(e^{j\omega})\,Y(e^{j\omega}), \\
+y[n]\,x[n] &\ \longleftrightarrow\ \frac{1}{2\pi}\int_{-\pi}^{\pi} Y\!\left(e^{j(\omega-\theta)}\right)X(e^{j\theta})\,d\theta.
+\end{align*}
+\end{factbox}
+
+\paragraph{Proof (convolution).}
+\begin{align*}
+\sum_{n=-\infty}^{\infty}\left(\sum_{k=-\infty}^{\infty} y[k]\,x[n-k]\right)e^{-j\omega n}
+&= \sum_{k=-\infty}^{\infty} y[k]\left(\sum_{n=-\infty}^{\infty} x[n-k]\,e^{-j\omega n}\right) \\
+&= \underbrace{\left(\sum_{k=-\infty}^{\infty} y[k]\,e^{-j\omega k}\right)}_{\HandoutUnderbraceLabel{Y(e^{j\omega})}} X(e^{j\omega}). \quad \blacksquare
+\end{align*}
+The inner sum in the first line is the DTFT of $x[n-k]$, which by the time-shift property is $e^{-j\omega k}X(e^{j\omega})$.
+
+\HandoutMarkSubsection{3}{Parseval's Theorem}
+
+\begin{factbox}[title={Property}]
+\begin{equation*}
+\sum_{n=-\infty}^{\infty} x[n]\,y^*[n] = \frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\,Y^*(e^{j\omega})\,d\omega.
+\end{equation*}
+\textbf{Note:} setting $y[n]=x[n]$ gives the energy relation
+\begin{equation*}
+\sum_{n=-\infty}^{\infty} |x[n]|^2 = \frac{1}{2\pi}\int_{-\pi}^{\pi} \big|X(e^{j\omega})\big|^2\,d\omega.
+\end{equation*}
+\end{factbox}
+
+\paragraph{Proof.} Substitute the inverse DTFT $x[n] = \frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\,e^{j\omega n}\,d\omega$:
+\begin{align*}
+\sum_{n=-\infty}^{\infty} x[n]\,y^*[n]
+&= \sum_{n=-\infty}^{\infty}\left(\frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\,e^{j\omega n}\,d\omega\right) y^*[n] \\
+&= \frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\left(\sum_{n=-\infty}^{\infty} y^*[n]\,e^{j\omega n}\right) d\omega \\
+&= \frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\,
+  \underbrace{\left(\sum_{n=-\infty}^{\infty} y[n]\,e^{-j\omega n}\right)^{\!*}}_{\HandoutUnderbraceLabel{Y^*(e^{j\omega})}} d\omega. \quad \blacksquare
+\end{align*}
+
+\begin{examplebox}[title={Example}, handout mark=4]
+Find the DTFT of $x[n] = (n+1)\,\alpha^n u[n]$, $|\alpha|<1$.
+
+\noindent We know
+\begin{equation*}
+\underbrace{\alpha^n u[n]}_{\HandoutUnderbraceLabel{y[n]}} \ \longleftrightarrow\ \underbrace{\frac{1}{1-\alpha e^{-j\omega}}}_{\HandoutUnderbraceLabel{Y(e^{j\omega})}},
+\qquad\text{and}\qquad x[n] = n\,y[n] + y[n].
+\end{equation*}
+\textbf{Property (differentiation in frequency):} $\;n\,y[n] \longleftrightarrow j\,\dfrac{dY(e^{j\omega})}{d\omega}$. Hence
+\begin{equation*}
+x[n] \ \longleftrightarrow\ j\,\frac{dY(e^{j\omega})}{d\omega} + Y(e^{j\omega})
+= \HandoutHighlightYellow{$\dfrac{1}{\left(1-\alpha e^{-j\omega}\right)^2}$}.
+\end{equation*}
+\end{examplebox}
+
+\begin{notebox}[title=\HandoutNoteAddendumTitle]
+The last step, written out:
+\begin{equation*}
+j\,\frac{dY(e^{j\omega})}{d\omega}
+= j\cdot\frac{-\,j\alpha e^{-j\omega}}{\left(1-\alpha e^{-j\omega}\right)^2}
+= \frac{\alpha e^{-j\omega}}{\left(1-\alpha e^{-j\omega}\right)^2},
+\qquad
+Y(e^{j\omega}) = \frac{1-\alpha e^{-j\omega}}{\left(1-\alpha e^{-j\omega}\right)^2},
+\end{equation*}
+and the two numerators add up to~$1$.
+\end{notebox}
+
+\section{Frequency Response}
+
+\begin{center}
+\begin{tikzpicture}[>=Latex]
+  \node (x) at (0,0) {$x[n]$};
+  \node[draw, rectangle, minimum width=1.2cm, minimum height=0.7cm] (h) at (2,0) {$h[n]$};
+  \node (y) at (4,0) {$y[n]$};
+  \node[font=\small] at (2,0.65) {LTI};
+  \draw[->, thick] (x.east) -- (h.west);
+  \draw[->, thick] (h.east) -- (y.west);
+\end{tikzpicture}
+\end{center}
+
+\begin{notebox}[title={Note}]
+From now on, our discussion will assume \textbf{zero ICs}, such that if $x[n]=0$ for all $n$, then $y[n]=0$ for all $n$.
+This removes the potential problem of having multiple responses corresponding to different ICs.
+\end{notebox}
+
+\noindent\HandoutMarkLeft{5}For an LTI system,
+\begin{equation*}
+y[n] = x[n]\circledast h[n] = \sum_{k=-\infty}^{\infty} h[k]\,x[n-k].
+\end{equation*}
+If $x[n] = e^{j\omega n}$, $-\infty<n<\infty$:
+\begin{align*}
+y[n] &= \sum_{k=-\infty}^{\infty} h[k]\,e^{j\omega(n-k)}
+= \underbrace{e^{j\omega n}}_{\HandoutUnderbraceLabel{x[n]}}\ \underbrace{\sum_{k=-\infty}^{\infty} h[k]\,e^{-j\omega k}}_{\HandoutUnderbraceLabel{H(e^{j\omega})}}.
+\end{align*}
+$\Rightarrow$ $e^{j\omega n}$ is an \textbf{eigenfunction} of the system (with eigenvalue $H(e^{j\omega})$).
+
+\begin{defbox}[title={Frequency Response}]
+$H(e^{j\omega})$ is the \textbf{frequency response} (the DTFT of the impulse response). In polar form,
+\begin{equation*}
+H(e^{j\omega}) = \big|H(e^{j\omega})\big|\,e^{j\theta(\omega)}.
+\end{equation*}
+\textbf{Gain:}\footnotemark{}
+\begin{equation*}
+\mathcal{G}(\omega) = 20\log_{10}\!\left(\frac{|H(e^{j\omega})|}{|H(e^{j0})|}\right)\ \mathrm{dB}.
+\end{equation*}
+\textbf{Attenuation:} $-\,$Gain (in dB).
+\end{defbox}
+\footnotetext{As written in lecture, the gain is normalized by the DC value $|H(e^{j0})|$. Mitra (Sec.~4.8) defines the gain function without normalization, $\mathcal{G}(\omega)=20\log_{10}|H(e^{j\omega})|$ dB; the two differ only by a constant offset.}
+
+\begin{examplebox}[title={Example (Moving-Average Filter)}, handout mark=6, breakable]
+\begin{equation*}
+h[n] = \begin{cases} \dfrac{1}{M}, & 0\le n\le M-1 \\[4pt] 0, & \text{else} \end{cases}
+\end{equation*}
+\begin{align*}
+H(e^{j\omega}) &= \frac{1}{M}\sum_{n=0}^{M-1} e^{-j\omega n}
+= \frac{1}{M}\,\frac{\sin\!\left(\omega M/2\right)}{\sin\!\left(\omega/2\right)}\,e^{-j\left(\frac{M-1}{2}\right)\omega}
+\end{align*}
+(cf.\ the rectangular window in Lecture~5).
+
+\paragraph{Magnitude response.}
+\begin{equation*}
+\big|H(e^{j\omega})\big| = \left|\frac{1}{M}\,\frac{\sin(\omega M/2)}{\sin(\omega/2)}\right|.
+\end{equation*}
+
+\paragraph{Phase response.}
+\begin{equation*}
+\theta(\omega) = -\frac{(M-1)}{2}\,\omega + \pi\sum_{k=1}^{\lfloor M/2\rfloor} u\!\left(\omega-\frac{2\pi k}{M}\right), \qquad 0\le\omega\le\pi.
+\end{equation*}
+The jumps of $\pi$ occur at the zeros $\omega = 2\pi k/M$ of the magnitude, where the real factor $\sin(\omega M/2)/\sin(\omega/2)$ changes sign.
+
+\begin{center}
+\begin{tikzpicture}[x=0.95cm, y=1cm, >=Latex,
+    declare function={Mavg=5;}]
+  % --- magnitude ---
+  \draw[->] (-3.5,0) -- (3.75,0) node[right] {$\omega$};
+  \draw[->] (0,-0.1) -- (0,1.35);
+  \foreach \x/\l in {-3.1416/{-\pi}, 3.1416/{\pi}} {\draw (\x,0.07) -- (\x,-0.07) node[below] {$\l$};}
+  \node[below left, inner sep=1pt] at (0,0) {\small $0$};
+  \draw[thick, domain=-3.1416:-0.01, samples=160, smooth]
+    plot (\x, {abs(sin(deg(\x*Mavg/2))/sin(deg(\x/2)))/Mavg});
+  \draw[thick, domain=0.01:3.1416, samples=160, smooth]
+    plot (\x, {abs(sin(deg(\x*Mavg/2))/sin(deg(\x/2)))/Mavg});
+  \fill (0,1) circle (1.6pt) node[right=1pt] {\small $1$};
+  \node[anchor=west, font=\small] at (-3.5,1.2) {$|H(e^{j\omega})|$};
+  \foreach \k in {1,2} {
+    \draw[densely dashed, ee483rule] ({2*pi*\k/5},0) -- ({2*pi*\k/5},-3.0);
+    \draw[densely dashed, ee483rule] ({-2*pi*\k/5},0) -- ({-2*pi*\k/5},-3.0);
+  }
+  % --- phase ---
+  \begin{scope}[yshift=-2.1cm, y=0.32cm]
+    \draw[->] (-3.5,0) -- (3.75,0) node[right] {$\omega$};
+    \draw[->] (0,-3.4) -- (0,3.4);
+    \foreach \x/\l in {-3.1416/{-\pi}, 3.1416/{\pi}} {\draw (\x,0.2) -- (\x,-0.2) node[below] {$\l$};}
+    \node[anchor=west, font=\small] at (-3.5,3.1) {$\theta(\omega)$};
+    % theta = -2w + pi*(#jumps), M=5: zeros at 2pi/5, 4pi/5
+    \draw[thick] (0,0) -- ({2*pi/5},{-2*2*pi/5});
+    \draw[thick] ({2*pi/5},{-2*2*pi/5+pi}) -- ({4*pi/5},{-2*4*pi/5+pi});
+    \draw[thick] ({4*pi/5},{-2*4*pi/5+2*pi}) -- (pi,{-2*pi+2*pi});
+    \draw[thick] (0,0) -- ({-2*pi/5},{2*2*pi/5});
+    \draw[thick] ({-2*pi/5},{2*2*pi/5-pi}) -- ({-4*pi/5},{2*4*pi/5-pi});
+    \draw[thick] ({-4*pi/5},{2*4*pi/5-2*pi}) -- (-pi,{2*pi-2*pi});
+    \foreach \s in {1,-1} {
+      \draw[densely dotted] ({\s*2*pi/5},{-\s*2*2*pi/5}) -- ({\s*2*pi/5},{-\s*2*2*pi/5+\s*pi});
+      \draw[densely dotted] ({\s*4*pi/5},{-\s*2*4*pi/5+\s*pi}) -- ({\s*4*pi/5},{-\s*2*4*pi/5+\s*2*pi});
+    }
+    \node[anchor=south east, font=\scriptsize] at ({2*pi/5-0.02},{-2*2*pi/5+pi+0.15}) {jump $\pi$};
+  \end{scope}
+\end{tikzpicture}\\[-0.2em]
+{\scriptsize Magnitude and phase of the moving-average filter for $M=5$ (zeros at $\omega=\pm 2\pi/5,\ \pm 4\pi/5$).}
+\end{center}
+\end{examplebox}
+
+\HandoutMarkSection{7}{\HandoutTitleWithFnmark{Linear Difference Equations and Frequency Response}}
+\footnotetext{The handwritten page opens with ``Phase is important!''---a teaser for the linear-phase discussion in Lecture~7.}
+
+\begin{equation*}
+\sum_{k=0}^{N} d_k\,y[n-k] = \sum_{q=0}^{M} p_q\,x[n-q].
+\end{equation*}
+Take the DTFT of both sides:
+\begin{equation*}
+\sum_{n=-\infty}^{\infty}\left[\sum_{k=0}^{N} d_k\,y[n-k]\right]e^{-j\omega n}
+= \sum_{n=-\infty}^{\infty}\left[\sum_{q=0}^{M} p_q\,x[n-q]\right]e^{-j\omega n}
+\end{equation*}
+\begin{equation*}
+\Rightarrow\quad \sum_{k=0}^{N} d_k\,Y(e^{j\omega})\,e^{-j\omega k} = \sum_{q=0}^{M} p_q\,X(e^{j\omega})\,e^{-j\omega q}.
+\end{equation*}
+
+\begin{factbox}[title={Frequency Response of an LDE}]
+For an LTI system, $Y(e^{j\omega}) = H(e^{j\omega})\,X(e^{j\omega})$, so
+\begin{equation*}
+H(e^{j\omega}) = \frac{Y(e^{j\omega})}{X(e^{j\omega})}
+= \frac{\displaystyle\sum_{q=0}^{M} p_q\,e^{-j\omega q}}{\displaystyle\sum_{k=0}^{N} d_k\,e^{-j\omega k}}.
+\end{equation*}
+\end{factbox}
+
+\begin{notebox}[title={Note}]
+Using this formula requires caution, because it is only applicable when the DTFT \textbf{converges} (cf.\ Lecture~5, Sec.~\textit{Convergence}).
+\end{notebox}
+
+\begin{examplebox}[title={Example}, handout mark=8]
+$y[n] = \alpha\,y[n-1] + x[n]$, $|\alpha|<1$.
+\begin{equation*}
+p_q = \{\underset{\uparrow}{1}\}, \qquad d_k = \{\underset{\uparrow}{1},\ -\alpha\}.
+\end{equation*}
+\begin{equation*}
+H(e^{j\omega}) = \frac{1}{1-\alpha e^{-j\omega}}, \qquad |\alpha|<1 \ \text{(convergence)}.
+\end{equation*}
+This agrees with the DTFT of $h[n]=\alpha^n u[n]$ computed in Lecture~5.
+\end{examplebox}
+
+\section*{Readings}
+\begin{itemize}
+  \item Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Ch.\ 3.6, 3.7, 4.6.4, 4.8, 4.9
+  \item Monson H. Hayes, \textit{Schaum's Outline of Digital Signal Processing}, 2nd ed., Ch.\ 2.7, 5.3
+\end{itemize}
+
+\HandoutAppendixListStart
+  \HandoutAppendixListItem{app:scan6}{A.\ Handwritten Lecture Note Scan (September 10, 2026)}
+\HandoutAppendixListEnd
+
+\HandoutAppendixSection{app:scan6}{Handwritten Lecture Note Scan}
+\HandoutIncludeHandoutScan{lecture6_0910.pdf}
+
+\end{document}

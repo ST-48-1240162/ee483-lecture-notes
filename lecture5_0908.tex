@@ -111,7 +111,7 @@ X(e^{j\omega})\Big|_{\omega=0} = \sum_{n=0}^{N-1} e^{-j\omega n}\Big|_{\omega=0}
 \end{equation}
 Limits: $\displaystyle\lim_{\omega\to 0} \frac{f(\omega)}{g(\omega)}$. For small $\omega$, $\dfrac{\omega\frac{N}{2}}{\frac{\omega}{2}} = N$.
 
-\HandoutMarkSection{5}{DTFT Properties\HandoutTitleFnmark}
+\HandoutMarkSection{5}{\HandoutTitleWithFnmark{DTFT Properties}}
 \footnotetext{cf. Mitra Sec.~3.2.2, Basic Properties.}
 
 \subsection{Periodicity}
@@ -130,7 +130,7 @@ X\!\left(e^{j(\omega_0+2\pi k)}\right) &= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j(
 &= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega_0 n} = X(e^{j\omega_0}), \quad \text{for all values of $k$.} \quad \blacksquare
 \end{align*}
 
-\begin{notebox}[title={Remark\hfill\textnormal{\small\textit{(addendum to orig lecture note)}}}]
+\begin{notebox}[title=\HandoutNoteAddendumTitle]
 Why is $e^{-j2\pi kn}=1$? Both $k$ and $n$ are integers, so $kn\in\Z$ and the angle $-2\pi kn$ is an integer multiple of $2\pi$.
 Each full turn on the unit circle returns to~$1$:
 \begin{equation*}
@@ -171,7 +171,7 @@ x[n] &= \frac{1}{2\pi}\int_{-\pi}^{\pi}\left(\sum_{\ell=-\infty}^{\infty} x[\ell
 &= x[n]. \quad \blacksquare
 \end{align*}
 
-\HandoutMarkSubsection{6}{Convergence\HandoutTitleFnmark}
+\HandoutMarkSubsection{6}{\HandoutTitleWithFnmark{Convergence}}
 \footnotetext{cf. Mitra Sec.~3.2.4.}
 \label{sec:dtft-convergence}
 

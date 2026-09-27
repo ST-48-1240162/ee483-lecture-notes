@@ -20,9 +20,9 @@ PDFs in [`pdf/`](pdf/) are clean builds (notes only, no textbook pages or handwr
 | [3](pdf/lecture03_properties_discrete_time_systems.pdf) | Sep 1 | Properties of Discrete-Time Systems | Mitra 4.5 to 4.7; Hayes 1.5, 2.4 | ✅ |
 | [4](pdf/lecture04_convolution_system_properties_difference_equations.pdf) | Sep 3 | Convolution, System Properties, and Difference Equations | Mitra 3.2, 3.3; Hayes 2.5, 2.6 | ✅ |
 | [5](pdf/lecture05_discrete_time_fourier_transform.pdf) | Sep 8 | Discrete-Time Fourier Transform (DTFT) | Mitra 3.1, 3.2, 3.4, 4.8; Hayes 2.7 | ✅ |
-| — | — | [Collected edition (lectures 1–5)](pdf/ee483_lectures_clean.pdf) | — | ✅ |
+| — | — | [Collected edition (lectures 1–5, 7)](pdf/ee483_lectures_clean.pdf) | — | ✅ |
 | 6 | Sep 10 | DTFT and Fourier Series | Mitra 3.6, 3.7, 4.6.4, 4.8, 4.9; Hayes 2.7, 5.3 | 🚧 |
-| 7 | Sep 15 | Linear Phase Filters | Mitra 5.2; Hayes 6 | 🚧 |
+| [7](pdf/lecture07_linear_phase_filters.pdf) | Sep 15 | Linear Phase Filters | Mitra 5.2; Hayes 6 | ✅ |
 | 8 | Sep 17 | Discrete Fourier Transform (DFT) | Mitra 5.4, 5.5, 5.7, 11.3 to 11.5; Hayes 6 to 7 | 🚧 |
 
 ## Repository layout
@@ -30,9 +30,9 @@ PDFs in [`pdf/`](pdf/) are clean builds (notes only, no textbook pages or handwr
 | Path | Contents |
 |------|----------|
 | `lecture*_*.tex` | Lecture sources (`lecturenote.sty` shared style) |
-| `pdf/` | Clean PDFs linked from the table above |
+| `pdf/` | Published clean PDFs for README links (generated; see Build) |
 | `figures/` | Plot scripts (Octave) and generated PDFs/images |
-| `appendix/` | Shared LaTeX snippets (e.g. Mitra tables) |
+| `appendix/` | Shared LaTeX snippets (Mitra tables; `dsp_foundations.tex` course reference) |
 | `scans/` | Handwritten lecture scans (local only; used in full builds) |
 
 Full builds also pull textbook excerpts from `../../textbooks/` and scans from `scans/`.
@@ -43,11 +43,13 @@ Requires XeLaTeX (`fontspec`, `unicode-math`, `subfiles`, `tcolorbox`, …), TeX
 
 ```bash
 make clean
-make notes              # clean PDFs only (same as CI)
-make notes-compilation  # one PDF: cover + lectures 1–5 → pdf/ee483_lectures_clean.pdf
-make all                # full + clean PDFs for every lecture
-make lecture5           # single lecture
+make notes              # *_clean.pdf (gitignored) + copy → pdf/lecture*.pdf (same as CI)
+make notes-compilation  # pdf/ee483_lectures_clean.pdf (collected clean edition)
+make lecture7           # full lecture7_0915.pdf (local; scans/appendix) + clean + pdf/ publish
+make all                # every lecture: full + clean + pdf/ publish
 ```
+
+**PDF layout:** edit only `lecture*_*.tex`. **Clean** builds are automatic (`\HandoutCleanBuild{}` → `lectureN_*_clean.pdf`). **Published** copies land in `pdf/` for the table above. **Full** handouts (`lectureN_*.pdf` at repo root, with Mitra excerpts and scans) are local-only (`.gitignore`); run `make lectureN` when you have `scans/` and textbooks.
 
 Regenerate figures (Octave; outputs land in `figures/`):
 

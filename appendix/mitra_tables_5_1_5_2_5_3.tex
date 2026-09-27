@@ -1,0 +1,104 @@
+% Mitra 4th ed.: Tables 5.1, 5.2, and 5.3 (DFT properties appendix).
+
+\begin{table}[H]
+\centering
+\caption{Symmetry properties of the DFT of a complex sequence (Mitra Table~5.1).}
+\label{tab:dft-complex-symmetry}
+
+\begin{tabular}{cc}
+\toprule
+\textbf{Length-$N$ Sequence} & \textbf{$N$-point DFT} \\
+\midrule
+$x[n]$ & $X[k]$ \\
+\midrule
+$x^{*}[n]$ & $X^{*}[\HandoutMod{-k}{N}]$ \\[0.8em]
+$x^{*}[\HandoutMod{-n}{N}]$ & $X^{*}[k]$ \\[0.8em]
+$\operatorname{Re}\{x[n]\}$ &
+$X_{\mathrm{pcs}}[k]=\dfrac{1}{2}\left\{X[\HandoutMod{k}{N}]+X^{*}[\HandoutMod{-k}{N}]\right\}$ \\[0.8em]
+$j\operatorname{Im}\{x[n]\}$ &
+$X_{\mathrm{pca}}[k]=\dfrac{1}{2}\left\{X[\HandoutMod{k}{N}]-X^{*}[\HandoutMod{-k}{N}]\right\}$ \\[0.8em]
+$x_{\mathrm{pcs}}[n]$ & $\operatorname{Re}\{X[k]\}$ \\[0.8em]
+$x_{\mathrm{pca}}[n]$ & $j\operatorname{Im}\{X[k]\}$ \\
+\bottomrule
+\end{tabular}
+
+\medskip
+
+\parbox{0.9\textwidth}{
+\textit{Note:}
+$x_{\mathrm{pcs}}[n]$ and $x_{\mathrm{pca}}[n]$ are the periodic
+conjugate-symmetric and periodic conjugate-antisymmetric parts of $x[n]$,
+respectively. Likewise, $X_{\mathrm{pcs}}[k]$ and $X_{\mathrm{pca}}[k]$ are
+the periodic conjugate-symmetric and periodic conjugate-antisymmetric parts
+of $X[k]$, respectively.
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Symmetry properties of the DFT of a real sequence (Mitra Table~5.2).}
+\label{tab:dft-real-symmetry}
+
+\begin{tabular}{cc}
+\toprule
+\textbf{Length-$N$ Sequence} & \textbf{$N$-point DFT} \\
+\midrule
+$x[n]$ & $X[k]=\operatorname{Re}\{X[k]\}+j\operatorname{Im}\{X[k]\}$ \\
+\midrule
+$x_{\mathrm{pe}}[n]$ & $\operatorname{Re}\{X[k]\}$ \\
+$x_{\mathrm{po}}[n]$ & $j\operatorname{Im}\{X[k]\}$ \\
+\midrule
+\multirow{5}{*}{Symmetry relations}
+& $X[k]=X^{*}[\HandoutMod{-k}{N}]$ \\[0.6em]
+& $\operatorname{Re}X[k]=\operatorname{Re}X[\HandoutMod{-k}{N}]$ \\[0.6em]
+& $\operatorname{Im}X[k]=-\operatorname{Im}X[\HandoutMod{-k}{N}]$ \\[0.6em]
+& $\lvert X[k]\rvert=\lvert X[\HandoutMod{-k}{N}]\rvert$ \\[0.6em]
+& $\arg X[k]=-\arg X[\HandoutMod{-k}{N}]$ \\
+\bottomrule
+\end{tabular}
+
+\medskip
+
+\parbox{0.9\textwidth}{
+\textit{Note:}
+$x_{\mathrm{pe}}[n]$ and $x_{\mathrm{po}}[n]$ are the periodic even and
+periodic odd parts of $x[n]$, respectively.
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{General properties of the DFT (Mitra Table~5.3).}
+\label{tab:dft-theorems}
+
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.24\linewidth}@{}>{\raggedright\arraybackslash}p{0.34\linewidth}@{}>{\raggedright\arraybackslash}p{0.40\linewidth}@{}}
+\toprule
+\textbf{Type of Property} & \textbf{Length-$N$ Sequence} & \textbf{$N$-point DFT} \\
+\midrule
+& $g[n]$ & $G[k]$ \\
+& $h[n]$ & $H[k]$ \\
+\midrule
+Linearity &
+$\alpha g[n]+\beta h[n]$ &
+$\alpha G[k]+\beta H[k]$ \\[0.6em]
+Circular time-shifting &
+$g[\HandoutMod{n-n_0}{N}]$ &
+$W_N^{kn_0}\,G[k]$ \\[0.6em]
+Circular frequency-shifting &
+$W_N^{-k_0 n}\,g[n]$ &
+$G[\HandoutMod{k-k_0}{N}]$ \\[0.6em]
+Duality &
+$G[n]$ &
+$N\,g[\HandoutMod{-k}{N}]$ \\[0.6em]
+$N$-point circular convolution &
+$\displaystyle\sum_{m=0}^{N-1} g[m]\,h[\HandoutMod{n-m}{N}]$ &
+$G[k]\,H[k]$ \\[1.2em]
+Modulation &
+$g[n]\,h[n]$ &
+$\displaystyle\frac{1}{N}\sum_{m=0}^{N-1} G[m]\,H[\HandoutMod{k-m}{N}]$ \\[1.2em]
+Parseval's relation &
+\multicolumn{2}{l}{$\displaystyle\sum_{n=0}^{N-1} |x[n]|^2=\frac{1}{N}\sum_{k=0}^{N-1} |X[k]|^2$} \\
+\bottomrule
+\end{tabular}
+\end{table}
