@@ -98,18 +98,18 @@
 \RequirePackage{titlesec}
 \RequirePackage{xcolor}
 
-% Muted, print-friendly palette
-\definecolor{ee483ink}{RGB}{25,25,25}
-\definecolor{ee483rule}{RGB}{120,120,120}
-\definecolor{defbg}{RGB}{250,250,250}
-\definecolor{exbg}{RGB}{252,252,252}
-\definecolor{exframe}{RGB}{55,130,55}
-\definecolor{factbg}{RGB}{248,250,248}
-\definecolor{notebg}{RGB}{252,252,252}
-\definecolor{ee483highlight}{RGB}{210,242,210}
-\definecolor{ee483highlightyellow}{RGB}{255, 249, 196}
-\definecolor{ee483footnote}{RGB}{95, 55, 140}
-\definecolor{ee483link}{RGB}{40, 90, 145}
+% Print-friendly palette derived only from xcolor's built-in colors.
+\colorlet{ee483ink}{black}
+\colorlet{ee483rule}{gray}
+\colorlet{defbg}{black!2}
+\colorlet{exbg}{black!1}
+\colorlet{exframe}{green!60!black}
+\colorlet{factbg}{green!2}
+\colorlet{notebg}{black!1}
+\colorlet{ee483highlight}{green!20}
+\colorlet{ee483highlightyellow}{yellow!30}
+\colorlet{ee483footnote}{violet}
+\colorlet{ee483link}{blue}
 \colorlet{ee483blue}{ee483ink}  % backward compatibility for figures
 
 \RequirePackage{pdfpages}

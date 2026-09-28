@@ -10,15 +10,16 @@
 \begin{defbox}[title={Def}]
 The DFT is a mapping of a length-$N$ sequence $x[n]$, $0\le n\le N-1$, into a length-$N$ Fourier representation $X[k]$, $k=0,\dots,N-1$, according to
 \begin{equation*}
-X[k] = \sum_{n=0}^{N-1} x[n]\,e^{-j\frac{2\pi kn}{N}}.
+X[k] = \sum_{n=0}^{N-1} x[n]\,e^{-j\frac{2\pi kn}{N}}. \MitraTag{5.7}
 \end{equation*}
 \end{defbox}
 
-\noindent It is a \textbf{sampled version of the DTFT} for a finite-length sequence:
+\noindent It is a \textbf{sampled version of the DTFT} for a finite-length sequence:\footnotemark{}
 \begin{equation*}
 X[k] = X(e^{j\omega})\Big|_{\omega=\frac{2\pi k}{N}}.
 \end{equation*}
-$\Rightarrow$ \HandoutHighlightYellow{discrete in both time and frequency}.
+\footnotetext{See the DTFT definition in Lecture~5 (September 8): $X(e^{j\omega})=\sum_{n=-\infty}^{\infty}x[n]\,e^{-j\omega n}$ (Mitra 3.10).}
+$\Rightarrow$ discrete in both time and frequency.
 
 \begin{defbox}[title={Inverse DFT}]
 \begin{equation*}
@@ -29,40 +30,94 @@ x[n] = \frac{1}{N}\sum_{k=0}^{N-1} X[k]\,e^{+j\frac{2\pi kn}{N}}, \qquad n=0,\do
 \HandoutMarkSubsection{2}{Twiddle-Factor Notation}
 
 With $W_N = e^{-j\frac{2\pi}{N}}$,
-\begin{align*}
-X[k] &= \sum_{n=0}^{N-1} x[n]\,W_N^{kn}, \qquad 0\le k\le N-1, \\
-x[n] &= \frac{1}{N}\sum_{k=0}^{N-1} X[k]\,W_N^{-kn}, \qquad 0\le n\le N-1.
-\end{align*}
-
-\paragraph{Verification of the inverse formula.}
-\begin{align*}
-X[\ell] &= \sum_{n=0}^{N-1} x[n]\,W_N^{\ell n}
-= \sum_{n=0}^{N-1}\left[\frac{1}{N}\sum_{k=0}^{N-1} X[k]\,W_N^{-kn}\right] W_N^{\ell n} \\
-&= \sum_{k=0}^{N-1} X[k]\,\underbrace{\left[\frac{1}{N}\sum_{n=0}^{N-1} W_N^{-(k-\ell)n}\right]}_{\HandoutUnderbraceLabel{(\ast)}}.
-\end{align*}
-Summing the geometric series,
-\begin{align*}
-(\ast) &= \frac{1}{N}\,\frac{1-W_N^{-(k-\ell)N}}{1-W_N^{-(k-\ell)}}
-= \frac{1}{N}\,\frac{1-e^{j2\pi(k-\ell)}}{1-e^{j\frac{2\pi(k-\ell)}{N}}} \\
-&= \frac{1}{N}\,\frac{e^{j\pi(k-\ell)}\left(e^{-j\pi(k-\ell)}-e^{j\pi(k-\ell)}\right)}{e^{j\frac{\pi(k-\ell)}{N}}\left(e^{-j\frac{\pi(k-\ell)}{N}}-e^{j\frac{\pi(k-\ell)}{N}}\right)} \\
-&= \frac{1}{N}\,\frac{\sin\!\big(\pi[k-\ell]\big)\,e^{j\pi(k-\ell)}}{\sin\!\big(\frac{\pi}{N}[k-\ell]\big)\,e^{j\frac{\pi(k-\ell)}{N}}}
-\end{align*}
-\noindent\HandoutMarkLeft{3}Hence
 \begin{equation*}
-(\ast) = \begin{cases} 1, & k-\ell = rN,\ r \text{ integer}, \\ 0, & \text{else} \end{cases}
-\;=\; \delta\big[\HandoutMod{k-\ell}{N}\big].
+\text{Rewrite the DFT:}\quad
+X[k] = \sum_{n=0}^{N-1} x[n]\,W_N^{kn}, \qquad 0\le k\le N-1. \MitraTag{11.60}
+\end{equation*}
+\begin{equation*}
+\text{Rewrite the Inverse DFT:}\quad
+x[n] = \frac{1}{N}\sum_{k=0}^{N-1} X[k]\,W_N^{-kn}, \qquad 0\le n\le N-1.
 \end{equation*}
 
-\begin{notebox}[title=\HandoutNoteAddendumTitle]
-The geometric-series formula is only valid when $W_N^{-(k-\ell)}\ne 1$, i.e., $k-\ell\ne rN$; in that case $\sin(\pi[k-\ell])=0$ while $\sin(\frac{\pi}{N}[k-\ell])\ne 0$, so $(\ast)=0$.
-When $k-\ell = rN$, every term of the sum equals $W_N^{-rNn}=1$, so $(\ast) = \frac{1}{N}\cdot N = 1$ directly (this is also the $0/0$ limit of the Dirichlet-kernel expression).
-\end{notebox}
+\paragraph{Verification of the inverse formula (check that the IDFT is indeed the inverse of the DFT).}
+\begin{align*}
+X[\ell] &= \sum_{n=0}^{N-1} x[n]\,W_N^{\ell n} \\
+&= \HandoutHighlightMath{$\displaystyle\sum_{n=0}^{N-1}$}\left[\frac{1}{N}\HandoutHighlightYellow{$\displaystyle\sum_{k=0}^{N-1}$} X[k]\,W_N^{-kn}\right] W_N^{\ell n} \\
+&\color{black!50}= \HandoutHighlightMath{$\color{black!50}\displaystyle\sum_{n=0}^{N-1}$}\HandoutHighlightYellow{$\color{black!50}\displaystyle\sum_{k=0}^{N-1}$} \frac{1}{N}\,X[k]\,W_N^{-kn}\,W_N^{\ell n}
+\qquad \text{(move all factors into $\textstyle\sum_k$)} \\
+&\color{black!50}= \HandoutHighlightYellow{$\color{black!50}\displaystyle\sum_{k=0}^{N-1}$}\HandoutHighlightMath{$\color{black!50}\displaystyle\sum_{n=0}^{N-1}$} \frac{1}{N}\,X[k]\,W_N^{-kn}\,W_N^{\ell n}
+\qquad \text{(swap the sums)} \\
+&= \HandoutHighlightYellow{$\displaystyle\sum_{k=0}^{N-1}$} X[k]\,\underbrace{\left[\textcolor{red}{\symbf{\frac{1}{N}}}\HandoutHighlightMath{$\displaystyle\sum_{n=0}^{N-1}$} W_N^{-(k-\ell)n}\right]}_{\HandoutUnderbraceLabel{\textcolor{red}{(\ast)}}}.
+\end{align*}
+
+\begin{handouttikz}[x=0.62cm, y=0.62cm, font=\small,
+  cell/.style={fill=black!55, circle, inner sep=0pt, minimum size=3.2pt},
+  sumdot/.style={draw, circle, fill=white, inner sep=0pt, minimum size=9pt, font=\tiny}]
+  \colorlet{nsum}{green!20}
+  \colorlet{ksum}{yellow!30}
+  % ---------- left: before the swap ----------
+  \foreach \r in {0,...,3} {
+    \fill[ksum, draw=ksum!60!orange, rounded corners=2pt] (0.08,-\r-0.12) rectangle (3.92,-\r-0.88);
+    \foreach \c in {0,...,3} {\node[cell] at (\c+0.5,-\r-0.5) {};}
+    \draw[->, ksum!40!orange] (4.0,-\r-0.5) -- (4.55,-\r-0.5);
+    \node[sumdot] (L\r) at (4.85,-\r-0.5) {$\Sigma$};
+  }
+  \fill[nsum, draw=nsum!60!black, rounded corners=3pt, fill opacity=0.9] (4.45,-0.1) rectangle (5.25,-3.9);
+  \foreach \r in {0,...,3} {\node[sumdot] at (4.85,-\r-0.5) {$\Sigma$};}
+  \draw[red!70!black, thick] (1.5,-2.5) circle (0.22);
+  \draw[->, nsum!50!black, thick] (4.85,-3.95) -- (4.85,-4.55) node[below, font=\small, text=black] {$X[\ell]$};
+  \node[anchor=south] at (2,0.05) {$k \rightarrow$};
+  \node[anchor=east] at (-0.05,-2) {$n \downarrow$};
+  \node[anchor=south, font=\small\bfseries] at (2.6,0.75) {Before the swap};
+  \node[align=center, font=\footnotesize] at (2.5,-6.15)
+    {inner \colorbox{ksum}{$\sum_k$}: each \textbf{row}\\ then outer \colorbox{nsum}{$\sum_n$}};
+  % ---------- middle ----------
+  \node[font=\Large] at (6.6,-2) {$=$};
+  \node[font=\scriptsize, align=center] at (6.6,-2.9) {same $N^2$\\terms};
+  % ---------- right: after the swap ----------
+  \begin{scope}[xshift=8.0cm]
+    \foreach \c in {0,...,3} {
+      \fill[nsum, draw=nsum!60!black, rounded corners=2pt] (\c+0.12,-0.08) rectangle (\c+0.88,-3.92);
+      \foreach \r in {0,...,3} {\node[cell] at (\c+0.5,-\r-0.5) {};}
+      \draw[->, nsum!50!black] (\c+0.5,-4.0) -- (\c+0.5,-4.55);
+    }
+    \fill[ksum, draw=ksum!60!orange, rounded corners=3pt] (0.1,-4.45) rectangle (3.9,-5.25);
+    \foreach \c in {0,...,3} {\node[sumdot] at (\c+0.5,-4.85) {$\Sigma$};}
+    \draw[red!70!black, thick] (1.5,-2.5) circle (0.22);
+    \draw[->, ksum!40!orange, thick] (3.95,-4.85) -- (4.55,-4.85) node[right, font=\small, text=black] {$X[\ell]$};
+    \node[anchor=south] at (2,0.05) {$k \rightarrow$};
+    \node[anchor=east] at (-0.05,-2) {$n \downarrow$};
+    \node[anchor=south, font=\small\bfseries] at (2,0.75) {After the swap};
+    \node[align=center, font=\footnotesize] at (2,-6.15)
+      {inner \colorbox{nsum}{$\sum_n$}: each \textbf{column} $=\textcolor{red}{(\ast)}$\\ then outer \colorbox{ksum}{$\sum_k$}};
+  \end{scope}
+\end{handouttikz}
+{\centering\scriptsize Each dot is one term $a[n,k]=\frac{1}{N}X[k]\,W_N^{-kn}\,W_N^{\ell n}$ (drawn for $N=4$; illustration, not in orig lecture note). The red ring is the same term $a[2,1]$ in both grids: it moves from ``row~2'' to ``column~1'' but is not changed.\par}
+\medskip
+
+Summing the geometric series (recall $W_N = e^{-j\frac{2\pi}{N}}$, so $W_N^{-(k-\ell)} = e^{j\frac{2\pi(k-\ell)}{N}}$),
+\begin{align*}
+\textcolor{red}{(\ast)} &= \frac{1}{N}\,\frac{1-W_N^{-(k-\ell)N}}{1-W_N^{-(k-\ell)}}
+= \frac{1}{N}\,\frac{1-e^{j2\pi(k-\ell)}}{1-e^{j\frac{2\pi(k-\ell)}{N}}} \\
+&= \frac{1}{N}\,\frac{e^{j\pi(k-\ell)}\,\textcolor{violet}{\left(e^{-j\pi(k-\ell)}-e^{j\pi(k-\ell)}\right)}}{e^{j\frac{\pi(k-\ell)}{N}}\,\textcolor{violet}{\left(e^{-j\frac{\pi(k-\ell)}{N}}-e^{j\frac{\pi(k-\ell)}{N}}\right)}} \\
+&= \frac{1}{N}\,\frac{\textcolor{violet}{\sin\!\big(\pi[k-\ell]\big)}\,e^{j\pi(k-\ell)}}{\textcolor{violet}{\sin\!\big(\frac{\pi}{N}[k-\ell]\big)}\,e^{j\frac{\pi(k-\ell)}{N}}}\qquad\footnotemark{}
+\end{align*}
+\footnotetext{The \textcolor{violet}{$\sin/\sin$} factor is the \emph{Dirichlet kernel} $D_N(\omega)=\dfrac{\sin\!\left(\omega\frac{N}{2}\right)}{\sin\!\left(\frac{\omega}{2}\right)}$ (Lecture~5, September~8, \S~2), at $\symbf{\omega=\dfrac{2\pi(k-\ell)}{N}}$.}
+\HandoutMarkBeforeAlign{3}%
+\begin{align*}
+&= \begin{cases} 1, & k \equiv \ell \pmod{N}, \\ 0, & \text{else} \end{cases}\qquad\footnotemark{} \\
+\intertext{%
+  \footnotesize In this verification, $k,\ell\in\{0,\ldots,N-1\}$, so $k\equiv\ell\pmod{N}\iff k=\ell$.%
+}\\
+&= \delta\big[\HandoutMod{k-\ell}{N}\big].
+\end{align*}
+\footnotetext{The geometric-series formula is only valid when $W_N^{-(k-\ell)}\ne 1$, i.e., $\symbf{k \not\equiv \ell \pmod{N}}$; then $\sin(\pi[k-\ell])=0$ while $\sin(\frac{\pi}{N}[k-\ell])\ne 0$, so $\textcolor{red}{(\ast)}=0$. When $k \equiv \ell \pmod{N}$, $W_N^{-(k-\ell)}=1$, so every term $W_N^{-(k-\ell)n}=1$ and $\textcolor{red}{(\ast)}=\frac{1}{N}\cdot N=1$ directly (also the $0/0$ limit of the Dirichlet-kernel expression).}
 
 \begin{defbox}[title={Modulo Operation $\HandoutMod{n}{N}$}]
 $k = \HandoutMod{n}{N}$ if $k\in\{0,\dots,N-1\}$ and there exists an integer $\ell$ such that $n = k + \ell N$.
 \end{defbox}
 
-\begin{examplebox}[title={Example ($N=3$)}]
+\begin{examplebox}[title={Example $\HandoutMod{n}{3}$ {\normalfont\small\textit{(see Mitra~2.3.1)}}}]
 \begin{center}
 \renewcommand{\arraystretch}{1.2}
 \begin{tabular}{c|ccccccccc}
@@ -80,18 +135,30 @@ X[\ell] = \sum_{k=0}^{N-1} X[k]\,\delta\big[\HandoutMod{k-\ell}{N}\big] = X[\ell
 
 \begin{examplebox}[title={Example}, handout mark=4]
 $g[n] = \cos\!\left(\dfrac{2\pi rn}{N}\right)$, $\;0\le n\le N-1$, with $r$ an integer, $0\le r\le N-1$.
-\begin{equation*}
-g[n] = \tfrac{1}{2}\left(W_N^{-rn} + W_N^{rn}\right)
-\end{equation*}
+\noindent We can write $g[n]$ as
 \begin{align*}
-\Rightarrow\ G[k] &= \frac{1}{2}\left(\sum_{n=0}^{N-1} W_N^{-(r-k)n} + \sum_{n=0}^{N-1} W_N^{-(-r-k)n}\right) \\
-&= \frac{1}{2}\Big(N\,\delta\big[\HandoutMod{r-k}{N}\big] + N\,\delta\big[\HandoutMod{-r-k}{N}\big]\Big).
+g[n] &= \tfrac{1}{2}\left(e^{j\frac{2\pi rn}{N}} + e^{-j\frac{2\pi rn}{N}}\right)
+\qquad\text{(Euler)} \\
+&= \tfrac{1}{2}\left(W_N^{-rn} + W_N^{rn}\right)
+\qquad\text{(recall $W_N=e^{-j\frac{2\pi}{N}}$)}.
+\end{align*}
+\begin{align*}
+G[k] &= \sum_{n=0}^{N-1} g[n]\,W_N^{kn}
+= \sum_{n=0}^{N-1} \tfrac{1}{2}\left(W_N^{-rn} + W_N^{rn}\right) W_N^{kn} \\
+&= \frac{1}{2}\left(\sum_{n=0}^{N-1} W_N^{-rn} W_N^{kn} + \sum_{n=0}^{N-1} W_N^{rn} W_N^{kn}\right) \\
+&= \frac{1}{2}\left(\sum_{n=0}^{N-1} W_N^{-(r-k)n} + \sum_{n=0}^{N-1} W_N^{-(-r-k)n}\right) \\
+&= \frac{1}{2}\Big(\textcolor{red}{\symbf{N}}\,\delta\big[\HandoutMod{r-k}{N}\big] + \textcolor{red}{\symbf{N}}\,\delta\big[\HandoutMod{-r-k}{N}\big]\Big).
 \end{align*}
 For $0\le k\le N-1$:
 \begin{equation*}
 G[k] = \begin{cases} \dfrac{N}{2}, & k = r,\ \ k = N-r, \\[4pt] 0, & \text{else}, \end{cases}
-\qquad \text{(unless $r=0$ or $r=N/2$)}
+\qquad \text{(unless $r=0$ or $r=N/2$)}\footnotemark{}
 \end{equation*}
+\footnotetext{Reading the two $\delta$'s for $k\in\{0,\ldots,N-1\}$:
+\begin{itemize}[nosep,topsep=2pt,leftmargin=1.4em]
+  \item $k=r$: $\HandoutMod{r-k}{N}=0$ in the first term.
+  \item $k=N-r$: $\HandoutMod{-r-k}{N}=0$ in the second term, i.e.\ $k\equiv -r\pmod{N}$ (the representative in $\{0,\ldots,N-1\}$ is $N-r$).
+\end{itemize}}
 using $\HandoutMod{-r-k}{N} = \HandoutMod{N-r-k}{N}$. When $r=0$ or $r=N/2$, the two impulses coincide and $G[r] = N$.
 \end{examplebox}
 
@@ -108,29 +175,34 @@ x[mN + n] &= x[n], \qquad n=0,\dots,N-1,\ \ m \text{ an integer},
 when the DFT / IDFT formulas are evaluated outside $0,\dots,N-1$.
 \end{factbox}
 Because
-\begin{equation*}
-W_N^N = e^{-j\frac{2\pi}{N}N} = e^{-j2\pi} = 1
-\quad\Rightarrow\quad
-W_N^{\ell N+k} = (1)^{\ell}\,W_N^{k} = W_N^{k}.
-\end{equation*}
+\begin{align*}
+W_N^N &= e^{-j\frac{2\pi}{N}N} = e^{-j2\pi} = 1 \\
+&\Rightarrow\quad W_N^{\ell N+k} = (1)^{\ell}\,W_N^{k} = W_N^{k}.
+\end{align*}
+\noindent So adding $\ell N$ to a frequency index (or $mN$ to a time index) does not change any twiddle factor in the DFT/IDFT sums.
+We therefore extend $X[k]$ and $x[n]$ periodically with period $N$ when those formulas are used for integer indices outside $\{0,\dots,N-1\}$ (as stated in the Property box).
 
 \subsection{Circular Shift}
 
 Consider $x[n]$, $0\le n\le N-1$. The ordinary shift $x_1[n] = x[n-n_0]$ is \textbf{no longer defined} over $0\le n\le N-1$.
 \begin{equation*}
-\Rightarrow\ \text{circular shifts:}\qquad x_1[n] = x\big[\HandoutMod{n-n_0}{N}\big].
+\Rightarrow\ \text{circular shifts:}\qquad x_1[n] = x\big[\HandoutMod{n-n_0}{N}\big]. \MitraTag{2.25}
 \end{equation*}
 
 \begin{examplebox}[title={Example (Right Circular Shift)}, handout mark=6]
 Let $0<n_0\le N-1$:
 \begin{equation*}
-x_1[n] = x\big[\HandoutMod{n-n_0}{N}\big] = \begin{cases} x[n-n_0], & n_0\le n\le N-1, \\ x[N+n-n_0], & 0\le n\le n_0-1. \end{cases}
+x_1[n] = x\big[\HandoutMod{n-n_0}{N}\big] = \begin{cases} \textcolor{blue}{x[n-n_0]}, & n_0\le n\le N-1, \\ \textcolor{orange}{x[N+n-n_0]}, & 0\le n\le n_0-1. \end{cases} \MitraTag{2.26}
 \end{equation*}
 
 \begin{handouttikz}[x=0.62cm, y=0.36cm]
   \foreach \n/\v in {0/1, 1/2, 2/3, 3/4} {
-    \draw[thick] (\n,0) -- (\n,\v); \fill (\n,\v) circle (2pt);
-    \node[above, font=\scriptsize] at (\n,\v) {$\v$};
+    \draw[thick] (\n,0) -- (\n,\v);
+    \ifnum\v=4 \fill[orange] (\n,\v) circle (2pt);
+      \node[above, font=\scriptsize, text=orange] at (\n,\v) {$\v$};
+    \else \fill[blue] (\n,\v) circle (2pt);
+      \node[above, font=\scriptsize, text=blue] at (\n,\v) {$\v$};
+    \fi
     \node[below, font=\scriptsize] at (\n,0) {$\n$};
   }
   \draw[->] (-0.6,0) -- (4.0,0) node[right] {$n$};
@@ -138,8 +210,12 @@ x_1[n] = x\big[\HandoutMod{n-n_0}{N}\big] = \begin{cases} x[n-n_0], & n_0\le n\l
   \draw[->, thick] (4.9,2) -- (6.3,2) node[midway, above, font=\small] {$n_0=1$};
   \begin{scope}[xshift=4.4cm]
     \foreach \n/\v in {0/4, 1/1, 2/2, 3/3} {
-      \draw[thick] (\n,0) -- (\n,\v); \fill (\n,\v) circle (2pt);
-      \node[above, font=\scriptsize] at (\n,\v) {$\v$};
+      \draw[thick] (\n,0) -- (\n,\v);
+      \ifnum\v=4 \fill[orange] (\n,\v) circle (2pt);
+        \node[above, font=\scriptsize, text=orange] at (\n,\v) {$\v$};
+      \else \fill[blue] (\n,\v) circle (2pt);
+        \node[above, font=\scriptsize, text=blue] at (\n,\v) {$\v$};
+      \fi
       \node[below, font=\scriptsize] at (\n,0) {$\n$};
     }
     \draw[->] (-0.6,0) -- (4.0,0) node[right] {$n$};
@@ -148,13 +224,47 @@ x_1[n] = x\big[\HandoutMod{n-n_0}{N}\big] = \begin{cases} x[n-n_0], & n_0\le n\l
 \end{handouttikz}
 
 \begin{equation*}
-x[n] = \{\underset{\uparrow}{1},2,3,4\}, \qquad
-x\big[\HandoutMod{n-1}{4}\big] = \{\underset{\uparrow}{4},1,2,3\},
+x[n] = \{\underset{\uparrow}{\textcolor{blue}{1}},\textcolor{blue}{2},\textcolor{blue}{3},\textcolor{orange}{4}\}, \qquad
+x\big[\HandoutMod{n-1}{4}\big] = \{\underset{\uparrow}{\textcolor{orange}{4}},\textcolor{blue}{1},\textcolor{blue}{2},\textcolor{blue}{3}\},
 \end{equation*}
 \begin{equation*}
-x\big[\HandoutMod{n-2}{4}\big] = \{\underset{\uparrow}{3},4,1,2\}
+x\big[\HandoutMod{n-2}{4}\big] = \{\underset{\uparrow}{\textcolor{orange}{3}},\textcolor{orange}{4},\textcolor{blue}{1},\textcolor{blue}{2}\}
 = x\big[\HandoutMod{n+2}{4}\big].
 \end{equation*}
+
+\begin{handouttikz}[x=0.62cm, y=0.36cm]
+  \foreach \n/\v in {0/1, 1/2, 2/3, 3/4} {
+    \ifnum\v<3
+      \draw[thick, blue] (\n,0) -- (\n,\v);
+      \fill[blue] (\n,\v) circle (2pt);
+      \node[above, font=\scriptsize, text=blue] at (\n,\v) {$\v$};
+    \else
+      \draw[thick, orange] (\n,0) -- (\n,\v);
+      \fill[orange] (\n,\v) circle (2pt);
+      \node[above, font=\scriptsize, text=orange] at (\n,\v) {$\v$};
+    \fi
+    \node[below, font=\scriptsize] at (\n,0) {$\n$};
+  }
+  \draw[->] (-0.6,0) -- (4.0,0) node[right] {$n$};
+  \node[font=\small] at (1.5,-2.1) {$x[n]$};
+  \draw[->, thick] (4.9,2) -- (6.3,2) node[midway, above, font=\small] {$n_0=2$};
+  \begin{scope}[xshift=4.4cm]
+    \foreach \n/\v in {0/3, 1/4, 2/1, 3/2} {
+      \ifnum\v<3
+        \draw[thick, blue] (\n,0) -- (\n,\v);
+        \fill[blue] (\n,\v) circle (2pt);
+        \node[above, font=\scriptsize, text=blue] at (\n,\v) {$\v$};
+      \else
+        \draw[thick, orange] (\n,0) -- (\n,\v);
+        \fill[orange] (\n,\v) circle (2pt);
+        \node[above, font=\scriptsize, text=orange] at (\n,\v) {$\v$};
+      \fi
+      \node[below, font=\scriptsize] at (\n,0) {$\n$};
+    }
+    \draw[->] (-0.6,0) -- (4.0,0) node[right] {$n$};
+    \node[font=\small] at (1.5,-2.1) {$x\big[\HandoutMod{n-2}{4}\big]$};
+  \end{scope}
+\end{handouttikz}
 \end{examplebox}
 
 \begin{factbox}[title={Property (Circular Time-Shifting)}]
@@ -243,13 +353,20 @@ With a fast algorithm (FFT) for the DFT, this is how long convolutions are compu
 
 \subsection{Parseval's Theorem}
 
-\begin{factbox}[title={Property}]
-\begin{equation*}
-\sum_{n=0}^{N-1} x^*[n]\,y[n] = \frac{1}{N}\sum_{k=0}^{N-1} X^*[k]\,Y[k]
-\quad\Rightarrow\quad
-\sum_{n=0}^{N-1} |x[n]|^2 = \frac{1}{N}\sum_{k=0}^{N-1} |X[k]|^2.
-\end{equation*}
+\begin{factbox}[title={\HandoutTitleWithFnmark{Property}}]
+\begin{align*}
+\sum_{n=0}^{N-1} x^*[n]\,y[n] &= \frac{1}{N}\sum_{k=0}^{N-1} X^*[k]\,Y[k], \\
+&\Rightarrow\quad \sum_{n=0}^{N-1} |x[n]|^2 = \frac{1}{N}\sum_{k=0}^{N-1} |X[k]|^2. \MitraTag{5.6}
+\end{align*}
 \end{factbox}
+\footnotetext{Notation vs.\ Mitra:
+\begin{itemize}[nosep,topsep=2pt,leftmargin=1.4em]
+  \item Sec.~5.1 is for a general orthogonal transform with basis $\psi[k,n]$. Its coefficients are written $\mathcal{X}[k]$ (calligraphic). $X[k]$ is used only for the DFT, from Sec.~5.2 on.
+  \item Sec.~5.1 has only one sequence. Mitra (5.6) is the energy form $\sum_n|x[n]|^2=\frac{1}{N}\sum_k|\mathcal{X}[k]|^2$.
+  \item Its derivation puts the conjugate on the second factor: $\sum_n x[n]\,x^*[n]=\frac{1}{N}\sum_k \mathcal{X}[k]\,\mathcal{X}^*[k]$.
+  \item The two-sequence line above is Mitra (5.115) in Sec.~5.7: $\sum_n g[n]\,h^*[n]=\frac{1}{N}\sum_k G[k]\,H^*[k]$.
+  \item This lecture writes $x,y$ instead of $g,h$ and puts the conjugate on the first factor. Both sides are then the complex conjugates of Mitra's, so the equation still holds.
+\end{itemize}}
 
 \subsection{Symmetry}
 
