@@ -1,6 +1,6 @@
 # EE 483 Lecture Notes
 
-Typeset notes for [EE 483: Introduction to Digital Signal Processing](https://catalogue.usc.edu/preview_course_nopop.php?catoid=21&coid=330713) at USC (Fall 2026).
+Verbatim lecture notes for EE 483.
 
 | | |
 |---|---|
