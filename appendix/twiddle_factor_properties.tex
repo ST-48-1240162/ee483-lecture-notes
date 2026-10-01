@@ -1,0 +1,20 @@
+% Properties of the twiddle factor W_N (addendum; included in clean and full builds).
+With $W_N = e^{-j\frac{2\pi}{N}}$:\footnotemark
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{tabular}{@{}>{\raggedright}p{0.19\linewidth} >{\raggedright}p{0.35\linewidth} >{\raggedright\arraybackslash}p{0.34\linewidth}@{}}
+\toprule
+\textbf{Property} & \textbf{Identity} & \textbf{Use in the FFT} \\
+\midrule
+Unity & $W_N^0 = W_N^{N} = W_N^{nN} = 1$ & simplifies boundary terms \\
+Periodicity & $W_N^{k+N} = W_N^{k}$, i.e., $W_N^{a} = W_N^{\HandoutMod{a}{N}}$ & reduce exponents mod $N$, e.g.\ $W_4^9 = W_4^1$ \\
+Half-period symmetry & $W_N^{k+N/2} = -W_N^{k}$ \ ($W_N^{N/2}=-1$) & the minus sign in the butterfly $X[k+\tfrac N2] = Y[k] - W_N^k Z[k]$ \\
+Order reduction & $W_N^{nk} = W_{N/n}^{k}$ ($n \mid N$); \ $W_N^2 = W_{N/2}$ & $W_N^{2pk} = W_{N/2}^{pk}$ turns each half into an $\tfrac N2$-point DFT \\
+Exponent addition & $W_N^{a}\,W_N^{b} = W_N^{a+b}$ & $W_N^{(2p+1)k} = W_N^{2pk}\,W_N^{k}$ \\
+Conjugate symmetry & $W_N^{-k} = \big(W_N^{k}\big)^{*} = W_N^{N-k}$ & inverse DFT; DFT of real signals \\
+Quarter period & $W_N^{N/4} = -j$ & multiplying by $-j$ is free (radix-4) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\footnotetext{Collected from J.~G.~Proakis and D.~G.~Manolakis, \textit{Digital Signal Processing}, FFT chapter; A.~V.~Oppenheim and R.~W.~Schafer, \textit{Discrete-Time Signal Processing}, Sec.~9.3; and B.~Ramesh Reddy, ``DSP Unit III Material,'' LBRCE, p.~3. \href{https://www.lbrce.ac.in/ece/ece_materials/Digital\%20Signal\%20Processing/DSP\%20UNIT\%20III\%20Material.pdf}{[PDF]}}

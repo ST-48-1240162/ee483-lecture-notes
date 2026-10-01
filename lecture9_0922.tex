@@ -1,5 +1,8 @@
 \documentclass[handout_subfiles_root.tex]{subfiles}
 \usepackage[rm2]{lecturenote}
+% Highlight the even-index term 2p in the DIT derivation.
+\newcommand{\HandoutTwoP}{\textcolor{orange}{2p}}
+\newcommand{\HandoutP}{\textcolor{orange}{p}}
 
 \begin{document}
 \HandoutTitle{9}{The Fast Fourier Transform (FFT)}{September 22, 2026}
@@ -78,34 +81,35 @@ and each half can be split again, $\big(\tfrac{N}{2}\big)^2 \to \big(\tfrac{N}{4
 
 \begin{itemize}
   \item In 1994, the FFT was called ``the most important numerical algorithm of our lifetime.''\footnotemark{}
-  \item Cooley and Tukey published their FFT paper in 1965. But many similar FFT algorithms exist from earlier authors --- a ``\textbf{rediscovery}.''
+  \item Cooley and Tukey published their FFT paper in 1965.\footnotemark{} But many similar FFT algorithms exist from earlier authors --- a ``\textbf{rediscovery}.''
   \item The earliest known example is by \textbf{Gauss} in 1805.\footnotemark{}
-\end{itemize}
-\addtocounter{footnote}{-1}%
-\footnotetext{G.~Strang, ``Wavelets,'' \textit{American Scientist}, vol.~82, 1994.}%
-\stepcounter{footnote}%
-\footnotetext{M.~T.~Heideman, D.~H.~Johnson, and C.~S.~Burrus, ``Gauss and the history of the fast Fourier transform,'' \textit{IEEE ASSP Magazine}, 1984.}
-
-\begin{notebox}[title={Motivating applications}]
-\begin{itemize}
-  \item \textbf{Gauss:} interpolate the trajectories of asteroids.
+  \item \textbf{Gauss:} interpolating asteroid orbits (Pallas, Juno) from a few observations with a trigonometric series, i.e., computing a DFT.
   \item \textbf{Tukey:} detecting Soviet nuclear tests using seismometers.
 \end{itemize}
-\end{notebox}
+\addtocounter{footnote}{-2}%
+\footnotetext{G.~Strang, ``Wavelets,'' \textit{American Scientist}, vol.~82, no.~3, pp.~250--255, 1994. \href{https://math.mit.edu/~gs/papers/amsci.pdf}{[PDF]}}%
+\stepcounter{footnote}%
+\footnotetext{J.~W.~Cooley and J.~W.~Tukey, ``An algorithm for the machine calculation of complex Fourier series,'' \textit{Mathematics of Computation}, vol.~19, no.~90, pp.~297--301, 1965. \href{https://www.ams.org/journals/mcom/1965-19-090/S0025-5718-1965-0178586-1/S0025-5718-1965-0178586-1.pdf}{[PDF]}}%
+\stepcounter{footnote}%
+\footnotetext{M.~T.~Heideman, D.~H.~Johnson, and C.~S.~Burrus, ``Gauss and the history of the fast Fourier transform,'' \textit{IEEE ASSP Magazine}, vol.~1, no.~4, pp.~14--21, Oct.~1984, \href{https://doi.org/10.1109/MASSP.1984.1162257}{doi:10.1109/MASSP.1984.1162257}; extended version in \textit{Archive for History of Exact Sciences}, vol.~34, no.~3, pp.~265--277, 1985. \href{https://faculty.washington.edu/seattle/physics541/\%202010-Fourier-transforms/history-3.pdf}{[PDF]}}
 
 \HandoutMarkSection{3}{Decimation-in-Time FFT (Radix-2)}
 
-Split the DFT sum into even ($n=2p$) and odd ($n=2p+1$) indices:
+\noindent\textit{Useful twiddle-factor identities are collected in Appendix~\ref{app:twiddle}.}\par\medskip
+
+\noindent\textbf{Decimation:} uniformly remove something in time-domain.
+
+\noindent Split the DFT sum into even ($n=\HandoutTwoP$) and odd ($n=\HandoutTwoP+1$) indices:\footnote{Why $W_N^{\HandoutTwoP k}$ can be replaced by $W_{N/2}^{\HandoutP k}$: the factor~$2$ in the exponent can be moved into the denominator, $W_N^{\HandoutTwoP k} = e^{-j\frac{2\pi}{N}\HandoutTwoP k} = e^{-j\frac{2\pi}{N/2}\HandoutP k} = W_{N/2}^{\HandoutP k}$, i.e., squaring the $N$-point twiddle factor gives the $\tfrac{N}{2}$-point one ($W_N^2 = W_{N/2}$). Likewise $W_N^{(\HandoutTwoP+1)k} = W_N^{\HandoutTwoP k}\,W_N^{k} = W_{N/2}^{\HandoutP k}\,W_N^{k}$. So the even and odd halves are each an ordinary $\tfrac{N}{2}$-point DFT, of $y[\HandoutP]=x[\HandoutTwoP]$ and $z[\HandoutP]=x[\HandoutTwoP+1]$.}
 \begin{align*}
-X[k] &= \sum_{p=0}^{\frac{N}{2}-1}\Big(x[2p]\,W_N^{2pk} + x[2p+1]\,W_N^{(2p+1)k}\Big) \\
-&= \sum_{p=0}^{\frac{N}{2}-1} y[p]\,W_{N/2}^{pk}
- + \left[\sum_{p=0}^{\frac{N}{2}-1} z[p]\,W_{N/2}^{pk}\right] W_N^{k} \\
-&= \HandoutHighlightYellow{$Y[k] + Z[k]\,W_N^{k}$}, \qquad 0\le k\le \tfrac{N}{2}-1,
+X[k] &= \sum_{\HandoutP=0}^{\frac{N}{2}-1}\Big(x[\HandoutTwoP]\,W_N^{\HandoutTwoP k} + x[\HandoutTwoP+1]\,W_N^{(\HandoutTwoP+1)k}\Big) \\
+&= \sum_{\HandoutP=0}^{\frac{N}{2}-1} y[\HandoutP]\,W_{N/2}^{\HandoutP k}
+ + \left[\sum_{\HandoutP=0}^{\frac{N}{2}-1} z[\HandoutP]\,W_{N/2}^{\HandoutP k}\right] W_N^{k} \\
+&= Y[k] + Z[k]\,W_N^{k}, \qquad 0\le k\le \tfrac{N}{2}-1,
 \end{align*}
-using $W_N^{2pk} = e^{-j\frac{2\pi}{N}2pk} = e^{-j\frac{2\pi}{N/2}pk} = W_{N/2}^{pk}$. For the upper half of the outputs,
+For the upper half of the outputs,
 \begin{align*}
-X\!\left[k+\tfrac{N}{2}\right] &= \sum_{p=0}^{\frac{N}{2}-1} y[p]\,W_{N/2}^{\left(k+\frac{N}{2}\right)p}
- + \left[\sum_{p=0}^{\frac{N}{2}-1} z[p]\,W_{N/2}^{\left(k+\frac{N}{2}\right)p}\right] W_N^{k+\frac{N}{2}} \\
+X\!\left[k+\tfrac{N}{2}\right] &= \sum_{\HandoutP=0}^{\frac{N}{2}-1} y[\HandoutP]\,W_{N/2}^{\left(k+\frac{N}{2}\right)\HandoutP}
+ + \left[\sum_{\HandoutP=0}^{\frac{N}{2}-1} z[\HandoutP]\,W_{N/2}^{\left(k+\frac{N}{2}\right)\HandoutP}\right] W_N^{k+\frac{N}{2}} \\
 &= Y[k] + Z[k]\,W_N^{k}\,W_N^{N/2},
 \end{align*}
 because
@@ -341,12 +345,33 @@ The \texttt{fftshift} command in MATLAB will place the \textbf{zero frequency at
   \item Monson H. Hayes, \textit{Schaum's Outline of Digital Signal Processing}, 2nd ed., Ch.\ 7
 \end{itemize}
 
-\HandoutAppendixListStart
-  \HandoutAppendixListItem{app:scan9}{A.\ Handwritten Lecture Note Scan (September 22, 2026)}
-\HandoutAppendixListEnd
+% Appendix A (twiddle-factor table) is in both builds; B (scan) is full build only.
+% Letter numbering is kept local (no \appendix) so the collected edition is unaffected.
+\clearpage
+\begingroup
+\renewcommand{\thesection}{\Alph{section}}%
+\renewcommand{\theHsection}{lec9appendix.\Alph{section}}%
+\setcounter{section}{0}%
+\section*{Appendix}
+\begin{itemize}[leftmargin=1.5em, itemsep=3pt]
+  \item \hyperref[app:twiddle]{A.\ Properties of Twiddle Factor (addendum to orig lecture note)}
+\ifhandoutclean\else
+  \item \hyperref[app:scan9]{B.\ Handwritten Lecture Note Scan (September 22, 2026)}
+\fi
+\end{itemize}
+\vspace{0.75em}
 
-\HandoutAppendixSection{app:scan9}{Handwritten Lecture Note Scan}
+\section{Properties of Twiddle Factor}
+\label{app:twiddle}
+\input{appendix/twiddle_factor_properties.tex}
+
+\ifhandoutclean\else
+\clearpage
+\section{Handwritten Lecture Note Scan}
+\label{app:scan9}
 % Scan file also contains unrelated pages (another course) after p.~9; include EE 483 pages only.
 \HandoutIncludeHandoutScan[pages=1-9]{lecture9_0922.pdf}
+\fi
+\endgroup
 
 \end{document}
