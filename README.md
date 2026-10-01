@@ -24,7 +24,7 @@ PDFs in [`pdf/`](pdf/) are clean builds (notes only, no textbook pages or handwr
 | [7](pdf/lecture07_linear_phase_filters.pdf) | Sep 15 | Linear Phase Filters | Mitra 5.2; Hayes 6 | ✅ |
 | [8](pdf/lecture08_discrete_fourier_transform.pdf) | Sep 17 | Discrete Fourier Transform (DFT) | Mitra 5.4, 5.5, 5.7, 11.3 to 11.5; Hayes 6 to 7 | ✅ |
 | — | — | [Collected edition (lectures 1–5, 7–8)](pdf/ee483_lectures_clean.pdf) | — | ✅ |
-| 9 | Sep 22 | The Fast Fourier Transform (FFT) | Mitra 11.3 to 11.5; Hayes 7 | 🚧 |
+| [9](pdf/lecture09_fast_fourier_transform.pdf) | Sep 22 | The Fast Fourier Transform (FFT) | Mitra 11.3 to 11.5; Hayes 7 | ✅ |
 | 10 | Sep 24 | DFT Matrix, DCT, and Transforms as Representations | Mitra 3.8, 5; Hayes 3 | 🚧 |
 | 11 | Sep 29 | Sampling Theory | Mitra 2.5, 3.8, 3.9; Hayes 3 | 🚧 |
 
