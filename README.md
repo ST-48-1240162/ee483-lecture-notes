@@ -26,6 +26,7 @@ PDFs in [`pdf/`](pdf/) are clean builds (notes only, no textbook pages or handwr
 | — | — | [Collected edition (lectures 1–5, 7–8)](pdf/ee483_lectures_clean.pdf) | — | ✅ |
 | 9 | Sep 22 | The Fast Fourier Transform (FFT) | Mitra 11.3 to 11.5; Hayes 7 | 🚧 |
 | 10 | Sep 24 | DFT Matrix, DCT, and Transforms as Representations | Mitra 3.8, 5; Hayes 3 | 🚧 |
+| 11 | Sep 29 | Sampling Theory | Mitra 2.5, 3.8, 3.9; Hayes 3 | 🚧 |
 
 ## Build
 
@@ -37,6 +38,7 @@ make notes              # *_clean.pdf (gitignored) + copy → pdf/lecture*.pdf (
 make notes-compilation  # pdf/ee483_lectures_clean.pdf (collected clean edition)
 make lecture9           # full + clean + pdf/lecture09_fast_fourier_transform.pdf
 make lecture10          # full + clean + pdf/lecture10_dft_matrix_dct.pdf
+make lecture11          # full + clean + pdf/lecture11_sampling_theory.pdf
 make lecture7           # full lecture7_0915.pdf (local; scans/appendix) + clean + pdf/ publish
 make all                # every lecture: full + clean + pdf/ publish
 ```

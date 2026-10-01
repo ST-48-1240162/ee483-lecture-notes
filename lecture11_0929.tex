@@ -1,0 +1,336 @@
+\documentclass[handout_subfiles_root.tex]{subfiles}
+\usepackage[rm2]{lecturenote}
+\usetikzlibrary{decorations.pathreplacing}
+
+\begin{document}
+\HandoutTitle{11}{Sampling Theory}{September 29, 2026}
+\maketitle
+
+\HandoutMarkSection{1}{Sampling Theory: \texorpdfstring{$x(t)\longleftrightarrow x[n]$}{x(t) <-> x[n]}}
+
+\noindent Consider the analog signal
+\begin{equation*}
+x(t) \longleftrightarrow X(j\Omega).
+\end{equation*}
+Sample uniformly at an interval $T$:
+\begin{equation*}
+x[n] = x(t)\big|_{t=nT}, \qquad n \text{ integer},
+\qquad\qquad
+x[n] \longleftrightarrow X(e^{j\omega}).
+\end{equation*}
+
+\begin{factbox}[title={Question}]
+What is the relationship between $X(j\Omega)$ and $X(e^{j\omega})$?
+\end{factbox}
+
+\noindent\textbf{Recall:}
+\begin{equation*}
+x(t) = \frac{1}{2\pi}\int_{-\infty}^{\infty} X(j\Omega)\,e^{j\Omega t}\,d\Omega
+\end{equation*}
+\begin{align*}
+\Rightarrow\quad x[n] &= \frac{1}{2\pi}\int_{-\infty}^{\infty} X(j\Omega)\,e^{j\Omega nT}\,d\Omega \\
+&= \frac{1}{2\pi}\sum_{k=-\infty}^{\infty}\int_{-\pi/T}^{\pi/T} X\!\left(j\Big(\Omega+\frac{2\pi k}{T}\Big)\right) e^{j\left(\Omega+\frac{2\pi k}{T}\right)nT}\,d\Omega \\
+&= \frac{1}{2\pi}\sum_{k=-\infty}^{\infty}\int_{-\pi/T}^{\pi/T} X\!\left(j\Big(\Omega+\frac{2\pi k}{T}\Big)\right) e^{j\Omega nT}\,d\Omega.
+\end{align*}
+
+\begin{notebox}[title=\HandoutNoteAddendumTitle]
+The second line splits the real line into intervals of length $\tfrac{2\pi}{T}$ centered at $\tfrac{2\pi k}{T}$. The third line uses $e^{j\frac{2\pi k}{T}nT} = e^{j2\pi kn} = 1$ for integers $k,n$.
+\end{notebox}
+
+\noindent Change of variables:
+\begin{equation*}
+\omega = \Omega T \;\Longleftrightarrow\; \Omega = \frac{\omega}{T},
+\qquad
+\Omega = \pm\frac{\pi}{T} \;\Rightarrow\; \omega = \pm\pi,
+\qquad
+d\omega = T\,d\Omega.
+\end{equation*}
+
+\HandoutMarkSubsection{2}{The Sampled Spectrum}
+
+\begin{align*}
+x[n] &= \frac{1}{2\pi T}\sum_{k=-\infty}^{\infty}\int_{-\pi}^{\pi} X\!\left(j\frac{\omega}{T}+j\frac{2\pi k}{T}\right) e^{j\omega n}\,d\omega \\
+&= \frac{1}{2\pi}\int_{-\pi}^{\pi} \underbrace{\left[\frac{1}{T}\sum_{k=-\infty}^{\infty} X\!\left(j\frac{\omega}{T}+j\frac{2\pi k}{T}\right)\right]}_{\HandoutUnderbraceLabel{X(e^{j\omega})}} e^{j\omega n}\,d\omega
+\end{align*}
+\vspace{0.3em}
+
+\begin{factbox}[title={Sampled spectrum}]
+\begin{equation*}
+X(e^{j\omega}) = \frac{1}{T}\sum_{k=-\infty}^{\infty} X(j\Omega)\Big|_{\Omega=\frac{\omega}{T}+\frac{2\pi k}{T}}
+\end{equation*}
+\end{factbox}
+
+\noindent Example: a triangular $X(j\Omega)$ of height $1$ supported on $[-\Omega_0,\Omega_0]$. The $k=0$ term is $\tfrac{1}{T}X\!\big(j\tfrac{\omega}{T}\big)$, a triangle of height $\tfrac1T$ on $[-\Omega_0T,\Omega_0T]$:
+
+\begin{handouttikz}[x=0.9cm, y=0.9cm, font=\small]
+  \begin{scope}
+    \draw[->, ee483rule] (-3,0) -- (3,0) node[right, ee483ink] {$\Omega$};
+    \draw[thick] (-1.2,0) -- (0,1.4) -- (1.2,0);
+    \node[left] at (-2.4,1.2) {$X(j\Omega)$};
+    \node[above] at (0,1.4) {$1$};
+    \foreach \x/\l in {-1.2/{-\Omega_0}, 0/{0}, 1.2/{\Omega_0}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+  \end{scope}
+  \begin{scope}[xshift=7cm]
+    \draw[->, ee483rule] (-3,0) -- (3,0) node[right, ee483ink] {$\omega$};
+    \draw[thick] (-1.6,0) -- (0,1.0) -- (1.6,0);
+    \node[left] at (-2.2,1.2) {$k=0$:\ $\tfrac1T X\!\big(j\tfrac{\omega}{T}\big)$};
+    \node[above] at (0,1.0) {$\tfrac1T$};
+    \foreach \x/\l in {-1.6/{-\Omega_0T}, 0/{0}, 1.6/{\Omega_0T}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+  \end{scope}
+\end{handouttikz}
+
+\HandoutMarkParagraph{3}{The \texorpdfstring{$k=-1$}{k=-1} term and the sum over \texorpdfstring{$k$}{k}.}
+\begin{equation*}
+k=-1 \;\Rightarrow\; \frac{1}{T}X\!\left(j\frac{\omega}{T}-j\frac{2\pi}{T}\right)
+= \frac{1}{T}X\!\left(j\Big(\Omega-\frac{2\pi}{T}\Big)\right)\bigg|_{\Omega=\frac{\omega}{T}},
+\end{equation*}
+i.e., the triangle moves to $\Omega=\tfrac{2\pi}{T}$ (support $\big[\tfrac{2\pi}{T}-\Omega_0,\tfrac{2\pi}{T}+\Omega_0\big]$), which is $\omega=2\pi$ (support $[2\pi-\Omega_0T,\,2\pi+\Omega_0T]$). Each $k$ contributes one copy centered at $\omega=-2\pi k$:
+
+\begin{handouttikz}[x=0.62cm, y=0.8cm, font=\small]
+  \foreach \row/\w in {0/0.75, -2.4/1.45} {
+    \draw[->, ee483rule] (-11.2,\row) -- (11.2,\row) node[right, ee483ink] {$\omega$};
+    \foreach \c in {-8,-4,0,4,8} {\draw[thick] (\c-2*\w,\row) -- (\c,\row+1.2) -- (\c+2*\w,\row);}
+    \foreach \c/\l in {-8/{-4\pi}, -4/{-2\pi}, 0/{0}, 4/{2\pi}, 8/{4\pi}} {\draw (\c,\row+0.08) -- (\c,\row-0.08) node[below] {$\l$};}
+  }
+  \foreach \c/\k in {-8/{+2}, -4/{+1}, 0/{0}, 4/{-1}, 8/{-2}} {\node[above] at (\c,1.25) {$k=\k$};}
+  \node[right] at (0.2,-1.1) {$\tfrac1T$};
+\end{handouttikz}
+{\centering\scriptsize Top: copies do not overlap. Bottom: wider $X(j\Omega)$ (or larger $T$), so neighboring copies overlap.\par}
+
+\HandoutMarkSection{4}{Summary: CTFT, Sampling, and DTFT}
+
+\begin{handouttikz}[x=1cm, y=1cm, font=\small]
+  \node (xt) at (0,0) {$x(t)$};
+  \node (Xj) at (3.2,0) {$X(j\Omega)$};
+  \node (xn) at (0,-1.8) {$x[n] = x(t)\big|_{t=nT}$};
+  \node (Xe) at (4.6,-1.3) {$X(e^{j\omega})$};
+  \draw[<->, thick] (xt) -- node[above] {CTFT} (Xj);
+  \draw[->, thick] (xt) -- node[right] {sampling} (xn);
+  \draw[<->, thick] (xn.north east) ++(0,-0.15) -- node[above] {DTFT} (Xe.west);
+\end{handouttikz}
+
+\begin{equation*}
+X(e^{j\omega}) = \underbrace{\frac{1}{T}}_{\HandoutUnderbraceLabel{\text{rescaling}}}\ \underbrace{\sum_{k=-\infty}^{\infty}}_{\HandoutUnderbraceLabel{\text{periodization}}} X(j\Omega)\Big|_{\underbrace{\scriptstyle\Omega=\frac{\omega}{T}+\frac{2\pi k}{T}}_{\HandoutUnderbraceLabel{\text{stretching of the axis}}}}
+\end{equation*}
+\vspace{0.3em}
+
+\noindent Two cases of interest:
+\begin{itemize}
+  \item $X(j\Omega) = 0$ whenever $|\Omega| \ge \frac{\pi}{T}$ \quad (bandlimited signal with bandwidth $B \le \frac{2\pi}{T}$).
+  \item $X(j\Omega) \ne 0$ for some $\Omega \ge \frac{\pi}{T}$ or $\Omega \le -\frac{\pi}{T}$.
+\end{itemize}
+
+\begin{handouttikz}[x=0.9cm, y=0.9cm, font=\small]
+  \begin{scope}
+    \draw[->, ee483rule] (-3,0) -- (3,0) node[right, ee483ink] {$\Omega$};
+    \draw[thick] (-1.2,0) -- (0,1.3) -- (1.2,0);
+    \node[above] at (0,1.3) {$1$};
+    \foreach \x/\l in {-1.2/{-\frac{\pi}{T}}, 0/{0}, 1.2/{\frac{\pi}{T}}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+    \draw[decorate, decoration={brace, mirror, amplitude=4pt}] (-1.2,-0.75) -- node[below=4pt] {$B$} (1.2,-0.75);
+    \node at (0,-1.9) {bandlimited};
+  \end{scope}
+  \begin{scope}[xshift=7cm]
+    \draw[->, ee483rule] (-3,0) -- (3,0) node[right, ee483ink] {$\Omega$};
+    \draw[thick] (-2.4,0) -- (0,1.3) -- (2.4,0);
+    \foreach \x/\l in {-1.2/{-\frac{\pi}{T}}, 0/{0}, 1.2/{\frac{\pi}{T}}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+    \node at (0,-1.9) {not bandlimited to $\frac{\pi}{T}$};
+  \end{scope}
+\end{handouttikz}
+
+\HandoutMarkSubsection{5}{The Bandlimited Case}
+
+\noindent Consider
+\begin{equation*}
+\frac{1}{T}\sum_{k=-\infty}^{\infty} X(j\Omega)\Big|_{\Omega=\tilde\Omega+\frac{2\pi k}{T}}.
+\end{equation*}
+
+\begin{handouttikz}[x=0.62cm, y=0.8cm, font=\small]
+  \foreach \row/\s/\v in {0/{\tilde\Omega}/T, -2.6/{\omega}/1} {
+    \draw[->, ee483rule] (-10.5,\row) -- (10.5,\row) node[right, ee483ink] {$\s$};
+    \foreach \c in {-6,0,6} {\draw[thick] (\c-3,\row) -- (\c,\row+1.3) -- (\c+3,\row);}
+    \draw[thick] (-10.2,\row+0.4) -- (-9,\row); \draw[thick] (9,\row) -- (10.2,\row+0.4);
+  }
+  \foreach \c/\l in {-9/{-\frac{3\pi}{T}}, -6/{-\frac{2\pi}{T}}, -3/{-\frac{\pi}{T}}, 0/{0}, 3/{\frac{\pi}{T}}, 6/{\frac{2\pi}{T}}, 9/{\frac{3\pi}{T}}} {\draw (\c,0.08) -- (\c,-0.08) node[below] {$\l$};}
+  \foreach \c/\l in {-9/{-3\pi}, -6/{-2\pi}, -3/{-\pi}, 0/{0}, 3/{\pi}, 6/{2\pi}, 9/{3\pi}} {\draw (\c,-2.52) -- (\c,-2.68) node[below] {$\l$};}
+  \node[above] at (0,1.3) {$\tfrac1T$};
+  \node[above] at (-6,1.3) {$k=+1$}; \node[above] at (6,1.3) {$k=-1$}; \node[above right] at (0.2,1.0) {$k=0$};
+  \node[left] at (-10.5,-1.6) {$\omega=\tilde\Omega T$};
+  \draw[decorate, decoration={brace, mirror, amplitude=4pt}] (-3,-3.5) -- (3,-3.5);
+\end{handouttikz}
+
+\noindent On $-\pi\le\omega\le\pi$, the \textbf{shape of the original CTFT $X(j\Omega)$ is preserved} (and $x(t)$ can be perfectly recovered from $x[n]$ if we follow appropriate steps).
+
+\Needspace{16\baselineskip}
+\HandoutMarkSubsection{6}{The Other Case (Aliasing) and the Sampling Theorem}
+
+\begin{handouttikz}[x=0.62cm, y=0.8cm, font=\small]
+  % shifted copies: each wider than 2pi/T, so neighbors overlap
+  \begin{scope}
+    \clip (-10.5,-0.2) rectangle (10.5,1.7);
+    \foreach \c in {-16,-8,0,8,16} {\draw[thick, ee483rule] (\c-5.5,0) -- (\c,1.4) -- (\c+5.5,0);}
+  \end{scope}
+  \draw[->, ee483rule] (-10.5,0) -- (10.5,0) node[right, ee483ink] {$\tilde\Omega$};
+  \foreach \c/\l in {-8/{-\frac{2\pi}{T}}, -4/{-\frac{\pi}{T}}, 0/{0}, 4/{\frac{\pi}{T}}, 8/{\frac{2\pi}{T}}} {\draw (\c,0.08) -- (\c,-0.08) node[below] {$\l$};}
+  % the resulting sum
+  \begin{scope}[yshift=-2.8cm]
+    \begin{scope}
+      \clip (-10.5,-0.2) rectangle (10.5,2.2);
+      \draw[thick] plot[domain=-10.5:10.5, samples=211]
+        (\x, {1.4*(max(0,1-abs(\x+16)/5.5)+max(0,1-abs(\x+8)/5.5)+max(0,1-abs(\x)/5.5)+max(0,1-abs(\x-8)/5.5)+max(0,1-abs(\x-16)/5.5))});
+    \end{scope}
+    \draw[->, ee483rule] (-10.5,0) -- (10.5,0) node[right, ee483ink] {$\tilde\Omega$};
+    \foreach \c/\l in {-8/{-\frac{2\pi}{T}}, -4/{-\frac{\pi}{T}}, 0/{0}, 4/{\frac{\pi}{T}}, 8/{\frac{2\pi}{T}}} {\draw (\c,0.08) -- (\c,-0.08) node[below] {$\l$};}
+  \end{scope}
+  \foreach \x in {-5.5,-2.5,2.5,5.5} {\draw[densely dashed, ee483rule] (\x,0) -- (\x,-2.25);}
+  % same axis in omega
+  \draw[->, ee483rule] (-10.5,-5.2) -- (10.5,-5.2) node[right, ee483ink] {$\omega$};
+  \foreach \c/\l in {-8/{-2\pi}, -4/{-\pi}, 0/{0}, 4/{\pi}, 8/{2\pi}} {\draw (\c,-5.12) -- (\c,-5.28) node[below] {$\l$};}
+\end{handouttikz}
+{\centering\scriptsize Overlapping copies add up, so the sum no longer looks like one copy of $X(j\Omega)$.\par}
+
+\noindent The \textbf{CTFT shape is not preserved} (EE~592).
+
+\begin{defbox}[title={Sampling theorem}]
+A signal can be recovered from its samples provided that the signal satisfies
+\begin{equation*}
+X(j\Omega) = 0 \quad \text{for } \forall\,|\Omega| \ge \frac{\pi}{T},
+\end{equation*}
+where $T$ is the sampling interval.
+\begin{itemize}
+  \item Nyquist \qquad -- Shannon \qquad -- Whittaker \qquad -- Kotelnikov
+\end{itemize}
+\end{defbox}
+
+\HandoutMarkSection{7}{Sampling Rate and the Nyquist Criterion}
+
+\noindent Converting from $\Omega$ (radians/sec) to $f$ (Hz $=1/\text{sec}$):
+\begin{equation*}
+f = \frac{\Omega}{2\pi\ \text{radians}}.
+\end{equation*}
+Largest signal frequency:
+\begin{equation*}
+|f_{\max}| < \frac{(\pi/T)}{2\pi} = \frac{1}{2T}.
+\end{equation*}
+Let $f_s \triangleq \frac{1}{T}$ be the \textbf{sampling rate} (sampling frequency).
+
+\begin{factbox}[title={Nyquist criterion (Nyquist condition)}]
+For no aliasing,
+\begin{equation*}
+f_s > 2|f_{\max}|.
+\end{equation*}
+\begin{itemize}
+  \item Frequency $2|f_{\max}|$: \textbf{Nyquist rate}.
+  \item Frequency $f_s/2$: \textbf{Nyquist frequency}.
+\end{itemize}
+\end{factbox}
+
+\begin{handouttikz}[x=1cm, y=1cm, font=\small]
+  \node (in) at (0,0) {$x(t)$};
+  \node[draw, minimum width=1.4cm, minimum height=0.8cm, align=center] (ad) at (2.6,0) {ideal\\A/D};
+  \node[draw, minimum width=1.4cm, minimum height=0.8cm, align=center] (da) at (8,0) {ideal\\D/A};
+  \node (out) at (10.6,0) {$x(t)$};
+  \draw[->, thick] (in) -- (ad);
+  \draw[->, thick] (ad) -- node[above] {$x[n]=x(t)\big|_{t=nT}$} (da);
+  \draw[->, thick] (da) -- (out);
+  \draw[rounded corners, thick] (1.5,-1.3) rectangle (9.1,1.1);
+  \node[above left] at (9.1,1.1) {digital ``box''};
+  \node[above] at (1.2,1.1) {analog signal};
+  \node[align=center, font=\scriptsize] at (2.6,-1.0) {sampling at interval $T$};
+\end{handouttikz}
+
+\noindent This works if $x(t)$ is appropriately bandlimited.
+
+\HandoutMarkSubsection{8}{Discrete-Time Processing of Analog Signals}
+
+\begin{handouttikz}[x=1cm, y=1cm, font=\small]
+  \node (in) at (0,0) {$x(t)$};
+  \node[draw, minimum height=0.8cm, align=center] (ad) at (2.1,0) {ideal\\A/D};
+  \node[draw, minimum height=0.8cm, align=center] (dt) at (5.4,0) {discrete-time\\processing};
+  \node[draw, minimum height=0.8cm, align=center] (da) at (8.7,0) {ideal\\D/A};
+  \node (out) at (10.7,0) {$y(t)$};
+  \draw[->, thick] (in) -- (ad);
+  \draw[->, thick] (ad) -- node[above] {$x[n]$} (dt);
+  \draw[->, thick] (dt) -- (da);
+  \draw[->, thick] (da) -- (out);
+  \draw[rounded corners, thick] (1.3,-0.9) rectangle (9.5,0.9);
+\end{handouttikz}
+
+\noindent Equivalent to analog processing (but is much easier).
+
+\noindent\textbf{What if $x(t)$ is not bandlimited?}
+
+\begin{handouttikz}[x=1cm, y=1cm, font=\small]
+  \node (in) at (0,0) {$x(t)$};
+  \node[draw, minimum height=0.8cm] (h) at (2.2,0) {$H(j\Omega)$};
+  \node[draw, minimum height=0.8cm, align=center] (p) at (7.9,0) {processing\\from before};
+  \node (out) at (10.4,0) {$\tilde x(t)$};
+  \draw[->, thick] (in) -- (h);
+  \draw[->, thick] (h) -- node[above] {$\tilde x(t)$} (p);
+  \draw[->, thick] (p) -- (out);
+  \node[below, align=center] at (2.2,-0.5) {ideal LPF\\(analog antialiasing filter)};
+  \node[below, align=center] at (5.3,-0.1) {$\tilde x(t)$ is truly\\bandlimited};
+\end{handouttikz}
+
+\begin{examplebox}[title={Example}]
+\begin{align*}
+g_1(t) &= \cos(6\pi t) &&\longleftrightarrow\quad G_1(j\Omega) = \pi\big[\delta(\Omega-6\pi)+\delta(\Omega+6\pi)\big], \\
+g_2(t) &= \cos(14\pi t) &&\longleftrightarrow\quad G_2(j\Omega) = \pi\big[\delta(\Omega-14\pi)+\delta(\Omega+14\pi)\big], \\
+g_3(t) &= \cos(26\pi t) &&\longleftrightarrow\quad G_3(j\Omega) = \pi\big[\delta(\Omega-26\pi)+\delta(\Omega+26\pi)\big].
+\end{align*}
+These are $3$\,Hz, $7$\,Hz, and $13$\,Hz signals. Sample at interval $T=0.1$\,sec:
+\begin{equation*}
+\text{sampling freq} = \frac{1}{T} = 10\text{ Hz} = 20\pi \text{ rad/sec}.
+\end{equation*}
+
+\HandoutMarkLeft{9}\noindent Signal content above $5$\,Hz will be aliased.
+
+\begin{center}
+\begin{tikzpicture}[x=0.36cm, y=0.7cm, font=\small]
+  % G1
+  \draw[->, ee483rule] (-11,0) -- (11,0) node[right, ee483ink] {$\Omega$};
+  \foreach \x in {-6,6} {\draw[->, thick] (\x,0) -- (\x,1.2);}
+  \foreach \x/\l in {-10/{-10\pi}, -6/{-6\pi}, 0/{0}, 6/{6\pi}, 10/{10\pi}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+  \node[left] at (-11,0.9) {$G_1(j\Omega)$};
+  \draw[->, ee483rule] (-11,-2.4) -- (11,-2.4) node[right, ee483ink] {$\omega$};
+  \foreach \x in {-6,6} {\draw[->, thick] (\x,-2.4) -- (\x,-1.2);}
+  \foreach \x/\l in {-10/{-\pi}, -6/{-0.6\pi}, 0/{0}, 6/{0.6\pi}, 10/{\pi}} {\draw (\x,-2.32) -- (\x,-2.48) node[below] {$\l$};}
+\end{tikzpicture}
+
+\vspace{0.6em}
+\begin{tikzpicture}[x=0.3cm, y=0.7cm, font=\small]
+  % G2
+  \draw[->, ee483rule] (-16,0) -- (16,0) node[right, ee483ink] {$\Omega$};
+  \foreach \x in {-14,14} {\draw[->, thick] (\x,0) -- (\x,1.2);}
+  \foreach \x/\l in {-14/{-14\pi}, -10/{-10\pi}, 0/{0}, 10/{10\pi}, 14/{14\pi}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+  \node[left] at (-16,0.9) {$G_2(j\Omega)$};
+  \draw[->, ee483rule] (-16,-2.6) -- (16,-2.6) node[right, ee483ink] {$\omega$};
+  \foreach \x in {-14,-6,6,14} {\draw[->, thick] (\x,-2.6) -- (\x,-1.4);}
+  \foreach \x/\l in {-14/{-1.4\pi}, -10/{-\pi}, -6/{-0.6\pi}, 0/{0}, 6/{0.6\pi}, 10/{\pi}, 14/{1.4\pi}} {\draw (\x,-2.52) -- (\x,-2.68) node[below] {$\l$};}
+  \draw[->, thin, ee483link] (14,-1.3) to[bend right=25] (-6,-1.3);
+  \draw[->, thin, ee483link] (-14,-1.3) to[bend left=25] (6,-1.3);
+\end{tikzpicture}
+\end{center}
+
+\noindent For $G_3(j\Omega)$: $\Omega = \pm 26\pi \;\Rightarrow\; \omega = \pm 2.6\pi \;\Rightarrow\; \pm 0.6\pi$.
+
+\noindent\textbf{We can't tell the difference between any of these signals!} \quad $g_1[n] = g_2[n] = g_3[n]$.
+\end{examplebox}
+
+\begin{notebox}[title=\HandoutNoteAddendumTitle]
+Directly in time: $g_2[n] = \cos(1.4\pi n) = \cos(1.4\pi n - 2\pi n) = \cos(-0.6\pi n) = \cos(0.6\pi n) = g_1[n]$, and likewise $g_3[n] = \cos(2.6\pi n) = \cos(2.6\pi n - 2\pi n) = \cos(0.6\pi n)$. Only $g_1$ ($3$\,Hz $<5$\,Hz) satisfies the Nyquist criterion, so $3$\,Hz is the frequency an ideal D/A would reconstruct for all three.
+\end{notebox}
+
+\section*{Readings}
+\begin{itemize}
+  \item Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Secs.\ 2.5, 3.8, 3.9
+  \item Monson H. Hayes, \textit{Schaum's Outline of Digital Signal Processing}, 2nd ed., Ch.\ 3
+\end{itemize}
+
+\HandoutAppendixListStart
+  \HandoutAppendixListItem{app:scan11}{A.\ Handwritten Lecture Note Scan (September 29, 2026)}
+\HandoutAppendixListEnd
+
+\HandoutAppendixSection{app:scan11}{Handwritten Lecture Note Scan}
+\HandoutIncludeHandoutScan{lecture11_0929.pdf}
+
+\end{document}
