@@ -127,7 +127,7 @@ The DTFT is $2\pi$-periodic: $X(e^{j(\omega+2\pi k)}) = X(e^{j\omega})$ for all 
 \begin{align*}
 X\!\left(e^{j(\omega_0+2\pi k)}\right) &= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j(\omega_0+2\pi k)n} \\
 &= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega_0 n}\,\underbrace{e^{-j2\pi k n}}_{\HandoutUnderbraceLabel{e^{-j2\pi kn}=1}} \\
-&= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega_0 n} = X(e^{j\omega_0}), \quad \text{for all values of $k$.} \quad \blacksquare
+&= \sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega_0 n} = X(e^{j\omega_0}), \quad \text{for all values of $k$.} && \HandoutQEDalign
 \end{align*}
 
 \begin{notebox}[title=\HandoutNoteAddendumTitle]
@@ -168,7 +168,7 @@ x[n] &= \frac{1}{2\pi}\int_{-\pi}^{\pi}\left(\sum_{\ell=-\infty}^{\infty} x[\ell
 &= \sum_{\ell=-\infty}^{\infty} x[\ell]\int_{-\pi}^{\pi}\frac{1}{2\pi}\,e^{j\omega(n-\ell)}\,d\omega \\
 &= \sum_{\ell=-\infty}^{\infty} x[\ell]\,\frac{\sin\big(\pi(n-\ell)\big)}{\pi(n-\ell)}
 = \sum_{\ell=-\infty}^{\infty} x[\ell]\,\delta[n-\ell] \\
-&= x[n]. \quad \blacksquare
+&= x[n]. && \HandoutQEDalign
 \end{align*}
 
 \HandoutMarkSubsection{6}{\HandoutTitleWithFnmark{Convergence}}

@@ -14,3 +14,7 @@ lecture[0-9]*.pdf
 
 # Local scan assets (not redistributable)
 scans/
+
+# Copyrighted portraits (used only in local full builds)
+figures/James_Cooley.jpg
+figures/John_Tukey.jpg

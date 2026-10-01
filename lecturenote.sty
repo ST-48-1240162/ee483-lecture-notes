@@ -102,9 +102,9 @@
 \colorlet{ee483ink}{black}
 \colorlet{ee483rule}{gray}
 \colorlet{defbg}{black!2}
-\colorlet{exbg}{black!1}
+\colorlet{exbg}{green!2}
 \colorlet{exframe}{green!60!black}
-\colorlet{factbg}{green!2}
+\colorlet{factbg}{black!2}
 \colorlet{notebg}{black!1}
 \colorlet{ee483highlight}{green!20}
 \colorlet{ee483highlightyellow}{yellow!30}
@@ -399,6 +399,16 @@
   \Needspace{2\baselineskip}%
   \paragraph{\HandoutMarkMargin{#1}#2}%
 }
+
+% End-of-proof marker (Halmos QED / tombstone).
+% align/align*: end the last line with \HandoutQEDalign (&&\HandoutQED).
+% equation*: \HandoutQEDhfill before \end{equation*}.
+% prose: \HandoutQEDhfill at end of the paragraph.
+\newcommand{\HandoutQED}{\blacksquare}
+\newcommand{\HandoutQEDalign}{\HandoutQED}
+\newcommand{\HandoutQEDhfill}{\hfill$\HandoutQED$}  % text-mode paragraphs
+\newcommand{\HandoutQEDhfillMath}{\hfill\HandoutQED}  % inside equation*/align
+\newcommand{\MitraTagWithQED}[1]{\tag*{{\small\textit{(Mitra~#1)}\ }\ensuremath{\blacksquare}}}
 
 % Mitra textbook equation reference (4th ed.).
 \makeatletter

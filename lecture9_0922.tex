@@ -8,17 +8,43 @@
 \HandoutMarkSection{1}{\HandoutTitleWithFnmark{Fast Fourier Transform (Cooley--Tukey)}}
 \footnotetext{cf.\ Mitra Secs.~11.3--11.5.}
 
+
+% Portraits are copyrighted: full (local) build only; the image files are gitignored.
+\newif\ifHandoutShowFFTPortraits
+\ifdefined\HandoutCleanBuild\else\IfFileExists{figures/James_Cooley.jpg}{\HandoutShowFFTPortraitstrue}{}\fi
+\ifHandoutShowFFTPortraits
+\noindent\begin{minipage}[c]{0.66\linewidth}
 \noindent\textbf{Notice:} the DFT (Lecture~8) is
 \begin{equation*}
 X[k] = \sum_{n=0}^{N-1} x[n]\,W_N^{nk}, \qquad 0\le k\le N-1.
 \end{equation*}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.3\linewidth}\centering
+\begin{minipage}[t]{0.48\linewidth}\centering
+\includegraphics[width=\linewidth,height=2.4cm,keepaspectratio]{James_Cooley.jpg}\\[-0.1em]
+{\scriptsize\itshape J.~W.~Cooley}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}\centering
+\includegraphics[width=\linewidth,height=2.4cm,keepaspectratio]{John_Tukey.jpg}\\[-0.1em]
+{\scriptsize\itshape J.~W.~Tukey}
+\end{minipage}
+\end{minipage}
+\par\medskip
+\else
+\noindent\textbf{Notice:} the DFT (Lecture~8) is
+\begin{equation*}
+X[k] = \sum_{n=0}^{N-1} x[n]\,W_N^{nk}, \qquad 0\le k\le N-1.
+\end{equation*}
+\fi
 
 \begin{factbox}[title={Direct DFT cost}]
 \begin{itemize}
   \item For each $k$: $N$ multiplies, $N-1$ additions.
-  \item $\Rightarrow$ total: \HandoutHighlightYellow{$N^2$ multiplies, $N^2-N$ additions}.
+  \item $\Rightarrow$ total: $N^2$ multiplies, $N^2-N$ additions.
 \end{itemize}
 \end{factbox}
+
+\noindent\textbf{Solution from radix-2 FFT:}
 
 \noindent Suppose $x[n]$, $0\le n\le N-1$, where $N=2^M$ (\textbf{radix-2 FFT}). Let
 \begin{align*}
@@ -146,7 +172,7 @@ If $N=2^M$ $\Rightarrow$ we can recurse:
 2\cdot\left(2\cdot\big(\text{cost of $\tfrac{N}{4}$-pt FFT}\big) + \begin{cases} \frac{N}{2} & \text{mult} \\ \frac{N}{2} & \text{add} \end{cases}\right) + \begin{cases} N & \text{mult} \\ N & \text{add} \end{cases}
 \end{equation*}
 \begin{equation*}
-\Rightarrow\ M=\log_2 N \ \text{stages} \ \Rightarrow\ \HandoutHighlightYellow{$N\log_2 N$ multiplies / additions}.
+\Rightarrow\ M=\log_2 N \ \text{stages} \ \Rightarrow\ N\log_2 N\ \text{multiplies / additions}.
 \end{equation*}
 
 \begin{notebox}[title=\HandoutNoteAddendumTitle]
@@ -221,7 +247,7 @@ $N$ multiplications per $y[n]$ $\Rightarrow$ $2N^2-2N$ multiplications.\footnote
   \item 1 length-$(2N-1)$ inverse FFT: $\;(2N-1)\log_2(2N-1)$ mult.
 \end{itemize}
 \begin{equation*}
-\Rightarrow\ \HandoutHighlightYellow{$3\,(2N-1)\log_2(2N-1) + (2N-1)$ mult}\quad\text{vs.}\quad \mathcal{O}(N^2)\ \text{directly}.
+\Rightarrow\ 3\,(2N-1)\log_2(2N-1) + (2N-1)\ \text{mult}\quad\text{vs.}\quad \mathcal{O}(N^2)\ \text{directly}.
 \end{equation*}
 \noindent\textit{In practice one pads to the next power of two $\ge 2N-1$ so that the radix-2 FFT applies.}
 

@@ -61,7 +61,7 @@ y[n]\,x[n] &\ \longleftrightarrow\ \frac{1}{2\pi}\int_{-\pi}^{\pi} Y\!\left(e^{j
 \begin{align*}
 \sum_{n=-\infty}^{\infty}\left(\sum_{k=-\infty}^{\infty} y[k]\,x[n-k]\right)e^{-j\omega n}
 &= \sum_{k=-\infty}^{\infty} y[k]\left(\sum_{n=-\infty}^{\infty} x[n-k]\,e^{-j\omega n}\right) \\
-&= \underbrace{\left(\sum_{k=-\infty}^{\infty} y[k]\,e^{-j\omega k}\right)}_{\HandoutUnderbraceLabel{Y(e^{j\omega})}} X(e^{j\omega}). \quad \blacksquare
+&= \underbrace{\left(\sum_{k=-\infty}^{\infty} y[k]\,e^{-j\omega k}\right)}_{\HandoutUnderbraceLabel{Y(e^{j\omega})}} X(e^{j\omega}). && \HandoutQEDalign
 \end{align*}
 The inner sum in the first line is the DTFT of $x[n-k]$, which by the time-shift property is $e^{-j\omega k}X(e^{j\omega})$.
 
@@ -83,7 +83,7 @@ The inner sum in the first line is the DTFT of $x[n-k]$, which by the time-shift
 &= \sum_{n=-\infty}^{\infty}\left(\frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\,e^{j\omega n}\,d\omega\right) y^*[n] \\
 &= \frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\left(\sum_{n=-\infty}^{\infty} y^*[n]\,e^{j\omega n}\right) d\omega \\
 &= \frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\,
-  \underbrace{\left(\sum_{n=-\infty}^{\infty} y[n]\,e^{-j\omega n}\right)^{\!*}}_{\HandoutUnderbraceLabel{Y^*(e^{j\omega})}} d\omega. \quad \blacksquare
+  \underbrace{\left(\sum_{n=-\infty}^{\infty} y[n]\,e^{-j\omega n}\right)^{\!*}}_{\HandoutUnderbraceLabel{Y^*(e^{j\omega})}} d\omega. && \HandoutQEDalign
 \end{align*}
 
 \begin{examplebox}[title={Example}, handout mark=4]

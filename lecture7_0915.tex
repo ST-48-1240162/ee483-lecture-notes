@@ -230,7 +230,7 @@ Renaming $\HandoutPinkEmph{k\to n}$ and using $h[N-1-n]=h[n]$:
 \HandoutHighlightYellow{$H(e^{j\omega})$} &= e^{-j\omega M}\Bigg[h[M] + \sum_{n=0}^{M-1}\Biggl( \symbf{h}\symbf{[}\symbf{n}\symbf{]}\,e^{-j\omega(n-M)} \notag\\
 &\hspace{9.4em} + \boxed{\underbrace{h[N-1-n]}_{\HandoutUnderbraceLabel{\symbf{h}\symbf{[}\symbf{n}\symbf{]}}}\,e^{+j\omega\HandoutPinkSup{(n-M)}}}\Biggr)\Bigg] \\
 &= \underbrace{e^{-j\omega M}}_{\HandoutUnderbraceLabel{\text{linear phase}}}\,
-\left[\underbrace{\mkern5mu h[M] + \HandoutEulerMarkLinkMath\,\mathbf{2}\sum_{n=0}^{M-1} h[n]\,\mathop{\mathbf{cos}\!}\big(\omega[n-M]\big)\mkern5mu}_{\HandoutUnderbraceLabel{\text{real function}}}\right]. \quad \blacksquare \MitraTag{7.53}
+\left[\underbrace{\mkern5mu h[M] + \HandoutEulerMarkLinkMath\,\mathbf{2}\sum_{n=0}^{M-1} h[n]\,\mathop{\mathbf{cos}\!}\big(\omega[n-M]\big)\mkern5mu}_{\HandoutUnderbraceLabel{\text{real function}}}\right].\MitraEq{7.53} && \HandoutQEDalign
 \end{align*}
 
 \begin{notebox}[title=\HandoutEulerAddendumNoteTitle]
@@ -291,7 +291,7 @@ while their real parts add:
 \noindent At the center tap, $h[M] = -h[N-1-M] = -h[M]$, hence $h[M]=0$. Then
 \begin{equation*}
 H(e^{j\omega}) = 2\,e^{-j\left(\frac{\pi}{2}+\omega M\right)}\sum_{n=0}^{M-1} h[n]\sin\!\big(\omega[n-M]\big)
-\qquad \left(\text{Recall: }\,\HandoutPiHalfMarkLinkMath\ e^{\pm j\frac{\pi}{2}} = \pm j\right). \MitraTag{7.57}
+\qquad \left(\text{Recall: }\,\HandoutPiHalfMarkLinkMath\ e^{\pm j\frac{\pi}{2}} = \pm j\right). \MitraTagWithQED{7.57}
 \end{equation*}
 
 \begin{notebox}[title=\HandoutPiHalfAddendumNoteTitle]
@@ -348,8 +348,7 @@ Renaming $\HandoutPinkEmph{k\to n}$ and using $h[N-1-n]=-h[n]$:
 \sum_{n=0}^{M-1} h[n]\Bigl(e^{-j\omega\left(n-M+\frac{1}{2}\right)}
 -e^{+j\omega\left(n-M+\frac{1}{2}\right)}\Bigr) \\
 &= \underbrace{2\,e^{-j\left(\frac{\pi}{2}+\omega\left(M-\frac{1}{2}\right)\right)}}_{\HandoutUnderbraceLabel{\text{linear phase}}}\,
-\underbrace{\sum_{n=0}^{M-1} h[n]\sin\!\big(\omega[n-M+\tfrac{1}{2}]\big)}_{\HandoutUnderbraceLabel{\text{real function}}}.
-\quad \blacksquare \MitraTag{7.58}
+\underbrace{\sum_{n=0}^{M-1} h[n]\sin\!\big(\omega[n-M+\tfrac{1}{2}]\big)}_{\HandoutUnderbraceLabel{\text{real function}}}. \MitraEq{7.58} && \HandoutQEDalign
 \end{align*}
 \noindent The group delay is $\tfrac{N-1}{2}=M-\tfrac{1}{2}$ samples (a half-integer), as in the Type~1--4 table below; compare with §2.1.2 (Type~3), where odd $N$ gives delay $M$ and $\sin\big(\omega[n-M]\big)$ instead of $\sin\big(\omega[n-M+\tfrac{1}{2}]\big)$.
 
@@ -371,7 +370,7 @@ Renaming $\HandoutPinkEmph{k\to n}$ and using $h[N-1-n]=h[n]$:
 \HandoutHighlightYellow{$H(e^{j\omega})$} &= e^{-j\omega\left(M-\frac{1}{2}\right)}\Bigg[\sum_{n=0}^{M-1}\Biggl( \symbf{h}\symbf{[}\symbf{n}\symbf{]}\,e^{-j\omega\left(n-M+\frac{1}{2}\right)} \notag\\
 &\hspace{9.4em} + \boxed{\underbrace{h[N-1-n]}_{\HandoutUnderbraceLabel{\symbf{h}\symbf{[}\symbf{n}\symbf{]}}}\,e^{+j\omega\left(n-M+\frac{1}{2}\right)}}\Biggr)\Bigg] \\
 &= \underbrace{e^{-j\omega\left(M-\frac{1}{2}\right)}}_{\HandoutUnderbraceLabel{\text{linear phase}}}\,
-\left[\underbrace{\mkern5mu \HandoutEulerMarkLinkMath\,\mathbf{2}\sum_{n=0}^{M-1} h[n]\,\mathop{\mathbf{cos}\!}\big(\omega[n-M+\tfrac{1}{2}]\big)\mkern5mu}_{\HandoutUnderbraceLabel{\text{real function}}}\right]. \quad \blacksquare \MitraTag{7.56}
+\left[\underbrace{\mkern5mu \HandoutEulerMarkLinkMath\,\mathbf{2}\sum_{n=0}^{M-1} h[n]\,\mathop{\mathbf{cos}\!}\big(\omega[n-M+\tfrac{1}{2}]\big)\mkern5mu}_{\HandoutUnderbraceLabel{\text{real function}}}\right].\MitraEq{7.56} && \HandoutQEDalign
 \end{align*}
 \noindent The group delay is $\tfrac{N-1}{2}=M-\tfrac{1}{2}$ samples. At $\omega=\pi$, each $\cos\big(\omega[n-M+\tfrac{1}{2}]\big)$ is zero, so $H(e^{j\pi})=0$ (Type~2 cannot be a strict highpass); compare §2.1.1 (Type~1, \HandoutMitraTagText{7.53}), where length-$N$ is odd and $\cos\big(\omega[n-M]\big)$.
 

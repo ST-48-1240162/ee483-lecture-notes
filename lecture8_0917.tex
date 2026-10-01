@@ -130,7 +130,7 @@ $\HandoutMod{n}{3}$ & $1$ & $2$ & $0$ & $1$ & $2$ & $0$ & $1$ & $2$ & $0$
 
 \noindent Therefore
 \begin{equation*}
-X[\ell] = \sum_{k=0}^{N-1} X[k]\,\delta\big[\HandoutMod{k-\ell}{N}\big] = X[\ell] \quad \text{for } \ell\in\{0,\dots,N-1\}. \quad \blacksquare
+X[\ell] = \sum_{k=0}^{N-1} X[k]\,\delta\big[\HandoutMod{k-\ell}{N}\big] = X[\ell] \quad \text{for } \ell\in\{0,\dots,N-1\}. \HandoutQEDhfillMath
 \end{equation*}
 
 \begin{examplebox}[title={Example}, handout mark=4]
@@ -285,23 +285,24 @@ Let $m = n+N-n_0$ ($n = m-N+n_0$) in the first sum and $p = n-n_0$ ($n=p+n_0$) i
 &= \sum_{n=0}^{N-1} g[n]\,W_N^{k(n+n_0)} \qquad \left(W_N^{-kN}=1\right) \\
 &= W_N^{kn_0}\left[\sum_{n=0}^{N-1} g[n]\,W_N^{kn}\right]
 = W_N^{kn_0}\,G[k]
-= e^{-j\frac{2\pi kn_0}{N}}\,G[k]. \quad \blacksquare
+= e^{-j\frac{2\pi kn_0}{N}}\,G[k]. && \HandoutQEDalign
 \end{align*}
 
 \HandoutMarkSubsection{8}{Convolution}
 
-\noindent Linear convolution and the DTFT:
+\subsubsection{Linear convolution and the DTFT}
 \begin{equation*}
 x[n]\circledast h[n] \ \overset{\text{DTFT}}{\longleftrightarrow}\ X(e^{j\omega})\,H(e^{j\omega}).
 \end{equation*}
 If $x[n]$ has length $N_1$ and $h[n]$ has length $N_2$, then $y[n] = x[n]\circledast h[n]$ has length $N_1+N_2-1$: it is possibly nonzero for $0\le n\le N_1+N_2-2$ and is zero otherwise.
 
-\begin{defbox}[title={Circular Convolution (two length-$N$ sequences)}]
+\subsubsection{Circular Convolution (two length-$N$ sequences)}
+\begin{defbox}[title={Def}]
 \begin{equation*}
-y_c[n] = \sum_{m=0}^{N-1} x[m]\,h\big[\HandoutMod{n-m}{N}\big], \qquad 0\le n\le N-1,
+y_c[n] = \sum_{m=0}^{N-1} x[m]\,h\big[\HandoutMod{n-m}{N}\big], \qquad 0\le n\le N-1, \MitraTag{5.51}
 \end{equation*}
 \begin{equation*}
-y_c[n] = x[n] \HandoutCircConv h[n] = h[n] \HandoutCircConv x[n].
+y_c[n] = x[n] \HandoutCircConv h[n] = h[n] \HandoutCircConv x[n]. \MitraTag{5.52}
 \end{equation*}
 \end{defbox}
 
@@ -311,10 +312,14 @@ If $y_c[n] = x[n] \HandoutCircConv h[n]$, then $Y_c[k] = X[k]\,H[k]$.
 
 \HandoutMarkParagraph{9}{Proof.}
 \begin{align*}
-Y_c[k] &= \sum_{n=0}^{N-1}\left[\sum_{m=0}^{N-1} x\big[\HandoutMod{n-m}{N}\big]\,h[m]\right] W_N^{kn}
-= \sum_{m=0}^{N-1} h[m]\left[\sum_{n=0}^{N-1} x\big[\HandoutMod{n-m}{N}\big]\,W_N^{kn}\right] \\
+Y_c[k] &= \HandoutHighlightMath{$\displaystyle\sum_{n=0}^{N-1}$}\left[\HandoutHighlightYellow{$\displaystyle\sum_{m=0}^{N-1}$} x\big[\HandoutMod{n-m}{N}\big]\,h[m]\right] W_N^{kn} \\
+&\color{black!50}= \HandoutHighlightMath{$\color{black!50}\displaystyle\sum_{n=0}^{N-1}$}\HandoutHighlightYellow{$\color{black!50}\displaystyle\sum_{m=0}^{N-1}$} x\big[\HandoutMod{n-m}{N}\big]\,h[m]\, W_N^{kn}
+\qquad \text{(expand inner sum)} \\
+&\color{black!50}= \HandoutHighlightYellow{$\color{black!50}\displaystyle\sum_{m=0}^{N-1}$}\HandoutHighlightMath{$\color{black!50}\displaystyle\sum_{n=0}^{N-1}$} x\big[\HandoutMod{n-m}{N}\big]\,h[m]\, W_N^{kn}
+\qquad \text{(swap the sums)} \\
+&= \HandoutHighlightYellow{$\displaystyle\sum_{m=0}^{N-1}$} h[m]\left[\HandoutHighlightMath{$\displaystyle\sum_{n=0}^{N-1}$} x\big[\HandoutMod{n-m}{N}\big]\,W_N^{kn}\right] \\
 &= \left[\sum_{m=0}^{N-1} h[m]\,W_N^{km}\right] X[k] \qquad \text{(circular time-shift)} \\
-&= H[k]\,X[k]. \quad \checkmark
+&= H[k]\,X[k]. && \HandoutQEDalign
 \end{align*}
 
 \subsection{Linear Convolution via Circular Convolution}
