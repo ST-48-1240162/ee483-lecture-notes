@@ -1,8 +1,11 @@
 \documentclass[handout_subfiles_root.tex]{subfiles}
 \usepackage[rm2]{lecturenote}
+\usetikzlibrary{decorations.markings}
 % Highlight the even-index term 2p in the DIT derivation.
 \newcommand{\HandoutTwoP}{\textcolor{orange}{2p}}
 \newcommand{\HandoutP}{\textcolor{orange}{p}}
+\newcommand{\HandoutTwoQ}{\textcolor{orange}{2q}}
+\newcommand{\HandoutQ}{\textcolor{orange}{q}}
 
 \begin{document}
 \HandoutTitle{9}{The Fast Fourier Transform (FFT)}{September 22, 2026}
@@ -129,42 +132,46 @@ X\!\left[k+\tfrac{N}{2}\right] &= Y[k] - W_N^{k}\,Z[k],
 
 \HandoutMarkSubsection{4}{``Butterfly Diagram''}
 
-\begin{handouttikz}[x=1cm, y=0.62cm, font=\small]
-  % input labels and DFT blocks
-  \foreach \i/\lab in {0/{x[0]}, 1/{x[2]}, 3/{x[N-2]}} {\node[anchor=east] (xe\i) at (0,-\i) {$\lab$};}
-  \node at (-0.45,-2) {$\vdots$};
-  \foreach \i/\lab in {5/{x[1]}, 6/{x[3]}, 8/{x[N-1]}} {\node[anchor=east] (xo\i) at (0,-\i) {$\lab$};}
-  \node at (-0.45,-7) {$\vdots$};
-  \node[draw, minimum width=1.3cm, minimum height=2.3cm, align=center] (D1) at (1.1,-1.5) {$\frac{N}{2}$-pt\\DFT};
-  \node[draw, minimum width=1.3cm, minimum height=2.3cm, align=center] (D2) at (1.1,-6.5) {$\frac{N}{2}$-pt\\DFT};
-  \foreach \i in {0,1,3} {\draw[->] (0.05,-\i) -- (0.45,-\i);}
-  \foreach \i in {5,6,8} {\draw[->] (0.05,-\i) -- (0.45,-\i);}
-  % Y and Z outputs
-  \foreach \i/\lab in {0/{Y[0]}, 1/{Y[1]}, 3/{Y[\frac{N}{2}-1]}} {
-    \draw[->] (1.75,-\i) -- (2.1,-\i); \node[anchor=west, inner sep=1pt] at (2.1,-\i) {$\lab$};}
-  \foreach \i/\lab in {5/{Z[0]}, 6/{Z[1]}, 8/{Z[\frac{N}{2}-1]}} {
-    \draw[->] (1.75,-\i) -- (2.1,-\i); \node[anchor=west, inner sep=1pt] at (2.1,-\i) {$\lab$};}
-  \node at (2.5,-2) {$\vdots$}; \node at (2.5,-7) {$\vdots$};
-  % butterflies
-  \def\xa{4.9} \def\xb{7.7}
-  \foreach \k/\w in {0/0, 1/1, 3/{\frac{N}{2}-1}} {
-    \pgfmathtruncatemacro{\kk}{\k+5}
-    \draw[thick] (3.85,-\k) -- (\xa,-\k);
-    \draw[thick, ee483link] (3.85,-\kk) -- (\xa,-\kk)
-      node[midway, above, font=\scriptsize, inner sep=1.5pt] {$\times W_N^{\w}$};
-    \draw[thick, ee483ink] (\xa,-\k) -- (\xb,-\k);
-    \draw[thick, ee483ink] (\xa,-\k) -- (\xb,-\kk);
-    \draw[thick, ee483link] (\xa,-\kk) -- (\xb,-\k);
-    \draw[thick, ee483link] (\xa,-\kk) -- (\xb,-\kk);
-    \fill (\xa,-\k) circle (1.4pt); \fill (\xa,-\kk) circle (1.4pt);
-    \fill (\xb,-\k) circle (1.6pt); \fill (\xb,-\kk) circle (1.6pt);
-    \node[font=\scriptsize, red, anchor=south, inner sep=1pt] at (\xb-0.3,-\kk) {$-1$};
+\begin{handouttikz}[x=1cm, y=1cm, font=\small,
+    bf/.style={thick, postaction={decorate}, decoration={markings,
+      mark=at position 0.07 with {\arrow{Latex[length=4.5pt,width=3.5pt]}}}},
+    tw/.style={font=\scriptsize, inner sep=1pt, fill=white}]
+  % rows r = 0, 1, (row 2 = \vdots), 3 = N/2-1 in each half; lower (odd) half shifted down by a gap
+  \def\dy{0.78}\def\gap{0.5}\def\xa{3.3}\def\xb{9.0}
+  \foreach \r/\xe/\xo/\yk/\xt/\xbt/\wt/\wb in {
+      0/{x[0]}/{x[1]}/{0}/{X[0]}/{X[\frac{N}{2}]}/{0}/{N/2},
+      1/{x[2]}/{x[3]}/{1}/{X[1]}/{X[\frac{N}{2}+1]}/{1}/{N/2+1},
+      3/{x[N-2]}/{x[N-1]}/{\frac{N}{2}-1}/{X[\frac{N}{2}-1]}/{X[N-1]}/{N/2-1}/{N-1}} {
+    \pgfmathsetmacro{\yt}{-\r*\dy}
+    \pgfmathsetmacro{\yb}{-(\r+4)*\dy-\gap}
+    \coordinate (Y\r) at (\xa,\yt); \coordinate (Z\r) at (\xa,\yb);
+    \coordinate (Xt\r) at (\xb,\yt); \coordinate (Xb\r) at (\xb,\yb);
+    % inputs x[2r] -> upper DFT, x[2r+1] -> lower DFT
+    \draw[-{Latex[length=5pt,width=3.5pt]}] (-0.55,\yt) -- (0,\yt); \fill (-0.55,\yt) circle (1.6pt);
+    \node[anchor=east] at (-0.62,\yt) {$\xe$};
+    \draw[-{Latex[length=5pt,width=3.5pt]}] (-0.55,\yb) -- (0,\yb); \fill (-0.55,\yb) circle (1.6pt);
+    \node[anchor=east] at (-0.62,\yb) {$\xo$};
+    % half-length DFT outputs Y[k], Z[k]
+    \draw[thick] (1.5,\yt) -- node[above, inner sep=1.5pt] {$Y[\yk]$} (Y\r);
+    \draw[thick] (1.5,\yb) -- node[above, inner sep=1.5pt] {$Z[\yk]$} (Z\r);
+    % butterflies: black lines add into X[k], blue lines add into X[k+N/2]
+    \draw[bf, ee483ink]  (Y\r) -- (Xt\r);
+    \draw[bf, ee483link] (Y\r) -- (Xb\r);
+    \draw[bf, ee483ink]  (Z\r) -- (Xt\r) node[tw, pos=0.9, text=ee483ink] {$W_N^{\wt}$};
+    \draw[bf, ee483link] (Z\r) -- (Xb\r) node[tw, pos=0.9, text=ee483link] {$-W_N^{\wt}$};
+    \foreach \p in {Y\r,Z\r,Xt\r,Xb\r} {\fill (\p) circle (1.6pt);}
+    % outputs
+    \node[anchor=west] at (\xb+0.08,\yt) {$\xt$};
+    \node[anchor=west] at (\xb+0.08,\yb) {$\xbt$};
   }
-  \foreach \i/\lab in {0/{X[0]}, 1/{X[1]}, 3/{X[\frac{N}{2}-1]}, 5/{X[\frac{N}{2}]}, 6/{X[\frac{N}{2}+1]}, 8/{X[N-1]}} {
-    \draw[->] (\xb,-\i) -- (\xb+0.45,-\i); \node[anchor=west] at (\xb+0.45,-\i) {$\lab$};}
-  \node at (\xb+0.9,-2) {$\vdots$}; \node at (\xb+0.9,-7) {$\vdots$};
+  % \vdots for the omitted rows
+  \foreach \y in {-2*\dy, -6*\dy-\gap} {
+    \node at (-0.95,\y) {$\vdots$}; \node at (2.3,\y) {$\vdots$}; \node at (\xb+0.5,\y) {$\vdots$};}
+  \node[draw, thick, minimum width=1.5cm, minimum height={4*0.78cm}, align=center] at (0.75,{-1.5*\dy}) {$\frac{N}{2}$-pt\\DFT};
+  \node[draw, thick, minimum width=1.5cm, minimum height={4*0.78cm}, align=center] at (0.75,{-5.5*\dy-\gap}) {$\frac{N}{2}$-pt\\DFT};
 \end{handouttikz}
-{\centering\scriptsize Each $Y[k]$ goes to both $X[k]$ and $X[k+\frac{N}{2}]$; $W_N^kZ[k]$ is added to $X[k]$ and subtracted (\textcolor{red}{$-1$}) from $X[k+\frac{N}{2}]$.\par}
+{\centering\scriptsize Lines of the same color add into one output; a twiddle factor on a line multiplies the value it carries:\\
+black: $X[k]=Y[k]+W_N^{k}Z[k]$; \ \textcolor{ee483link}{blue}: $X[k+\frac{N}{2}]=Y[k]-W_N^{k}Z[k]$ \ (the twiddle on this line is $W_N^{k+\frac{N}{2}}=-W_N^{k}$, since $W_N^{N/2}=-1$).\par}
 
 \subsection{Cost of an $N$-point FFT}
 
@@ -172,9 +179,10 @@ X\!\left[k+\tfrac{N}{2}\right] &= Y[k] - W_N^{k}\,Z[k],
 \text{Cost of an $N$-point FFT} = 2\cdot\big(\text{cost of $\tfrac{N}{2}$-pt FFT}\big) + \begin{cases} N & \text{multiplies} \\ N & \text{additions} \end{cases}
 \end{equation*}
 If $N=2^M$ $\Rightarrow$ we can recurse:
-\begin{equation*}
-2\cdot\left(2\cdot\big(\text{cost of $\tfrac{N}{4}$-pt FFT}\big) + \begin{cases} \frac{N}{2} & \text{mult} \\ \frac{N}{2} & \text{add} \end{cases}\right) + \begin{cases} N & \text{mult} \\ N & \text{add} \end{cases}
-\end{equation*}
+\begin{align*}
+&\text{Cost of an $N$-point FFT} \\
+&= 2\cdot\left(2\cdot\big(\text{cost of $\tfrac{N}{4}$-pt FFT}\big) + \begin{cases} \frac{N}{2} & \text{mult} \\ \frac{N}{2} & \text{add} \end{cases}\right) + \begin{cases} N & \text{mult} \\ N & \text{add} \end{cases}
+\end{align*}
 \begin{equation*}
 \Rightarrow\ M=\log_2 N \ \text{stages} \ \Rightarrow\ N\log_2 N\ \text{multiplies / additions}.
 \end{equation*}
@@ -184,16 +192,10 @@ In the butterfly, the product $W_N^k Z[k]$ is computed \emph{once} and then adde
 \end{notebox}
 
 \HandoutMarkLeft{5}%
-\begin{handouttikz}[x=0.55cm, y=0.055cm, font=\small]
-  \draw[->] (0,0) -- (11.2,0) node[right] {$N$};
-  \draw[->] (0,0) -- (0,68) node[above] {\footnotesize cost};
-  \draw[thick, domain=0:8.1, samples=60] plot (\x, {\x*\x});
-  \draw[thick, ee483link, domain=1:10.5, samples=60] plot (\x, {\x*ln(\x)/ln(2)});
-  \draw[thick, ee483rule, domain=0:10.5] plot (\x, {\x});
-  \node[anchor=south] at (8.1,65.6) {$N^2$};
-  \node[anchor=west, ee483link] at (10.5,35.6) {$N\log_2 N$};
-  \node[anchor=west, ee483rule] at (10.5,10.5) {$N$};
-\end{handouttikz}
+\begin{center}
+  \includegraphics{fft_cost.pdf}% generated by figures/plot_fft_cost.m
+\end{center}
+{\centering\scriptsize Operation counts $N^2$ (direct DFT) and $N\log_2 N$ (radix-2 FFT), with $N$ for reference; dots mark $N=2^M$.\par}
 
 \section{Decimation-in-Frequency FFT}
 
@@ -202,15 +204,15 @@ Now split the \emph{time} range into its two halves:
 X[k] &= \sum_{n=0}^{N-1} x[n]\,W_N^{nk}
 = \sum_{m=0}^{\frac{N}{2}-1} x[m]\,W_N^{mk} + \sum_{m=0}^{\frac{N}{2}-1} x\!\left[m+\tfrac{N}{2}\right] W_N^{\left(m+\frac{N}{2}\right)k}.
 \end{align*}
-\textbf{For $k$ even}, $k=2q$:
+\textbf{For $k$ even}, $k=\HandoutTwoQ$:
 \begin{align*}
-X[2q] &= \sum_{m=0}^{\frac{N}{2}-1}\Big(x[m] + x\!\left[m+\tfrac{N}{2}\right]\underbrace{W_N^{\frac{N}{2}\cdot 2q}}_{\HandoutUnderbraceLabel{=1}}\Big)\,W_N^{2mq} \\
-&= \sum_{m=0}^{\frac{N}{2}-1}\Big(x[m] + x\!\left[m+\tfrac{N}{2}\right]\Big)\,W_{N/2}^{mq}.
+X[\HandoutTwoQ] &= \sum_{m=0}^{\frac{N}{2}-1}\Big(x[m] + x\!\left[m+\tfrac{N}{2}\right]\underbrace{W_N^{\frac{N}{2}\cdot \HandoutTwoQ}}_{\HandoutUnderbraceLabel{=1}}\Big)\,W_N^{\HandoutTwoQ m} \\
+&= \sum_{m=0}^{\frac{N}{2}-1}\Big(x[m] + x\!\left[m+\tfrac{N}{2}\right]\Big)\,W_{N/2}^{m\HandoutQ}.
 \end{align*}
-\textbf{For $k$ odd}, $k=2q+1$:
+\textbf{For $k$ odd}, $k=\HandoutTwoQ+1$:
 \begin{align*}
-X[2q+1] &= \sum_{m=0}^{\frac{N}{2}-1}\Big[x[m] + x\!\left[m+\tfrac{N}{2}\right]\underbrace{W_N^{\frac{N}{2}(2q+1)}}_{\HandoutUnderbraceLabel{=-1}}\Big]\,W_N^{(2q+1)m} \\
-&= \sum_{m=0}^{\frac{N}{2}-1}\Big[x[m] - x\!\left[m+\tfrac{N}{2}\right]\Big]\,W_{N/2}^{mq}\,W_N^{m}.
+X[\HandoutTwoQ+1] &= \sum_{m=0}^{\frac{N}{2}-1}\Big[x[m] + x\!\left[m+\tfrac{N}{2}\right]\underbrace{W_N^{\frac{N}{2}(\HandoutTwoQ+1)}}_{\HandoutUnderbraceLabel{=-1}}\Big]\,W_N^{(\HandoutTwoQ+1)m} \\
+&= \sum_{m=0}^{\frac{N}{2}-1}\Big[x[m] - x\!\left[m+\tfrac{N}{2}\right]\Big]\,W_{N/2}^{m\HandoutQ}\,W_N^{m}.
 \end{align*}
 
 \begin{factbox}[title={DIF in words}]
