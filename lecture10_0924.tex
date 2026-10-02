@@ -1,5 +1,13 @@
 \documentclass[handout_subfiles_root.tex]{subfiles}
 \usepackage[rm2]{lecturenote}
+\usepackage{colortbl}
+% Time index n and transform index k, colored in the unitary-transform box.
+\newcommand{\HandoutN}{\textcolor{orange}{n}}
+\newcommand{\HandoutK}{\textcolor{ee483link}{k}}
+% Fully shaded matrix cells, used to track entries through conjugation and transposition.
+% Square cells: fixed width 2.8em, and a strut of the same total height (1.8em above, 1.0em below the baseline).
+\newcommand{\HandoutCell}[2]{\cellcolor{#1}\rule[-1.0em]{0pt}{2.8em}{#2}}
+\newenvironment{shadedbmatrix}{\left[\renewcommand{\arraystretch}{1}\setlength{\arraycolsep}{0pt}\begin{array}{w{c}{2.8em}w{c}{2.8em}}}{\end{array}\right]}
 
 \begin{document}
 \HandoutTitle{10}{DFT Matrix, DCT, and Transforms as Representations}{September 24, 2026}
@@ -29,12 +37,46 @@ W_N^0 & W_N^{N-1} & W_N^{2(N-1)} & \cdots & W_N^{(N-1)^2}
 \begin{factbox}[title={Claim}]
 $\mathbf{D}_N$ and $\mathbf{D}_N^{-1}$ are related:
 \begin{equation*}
-\mathbf{D}_N^{-1} = \frac{1}{N}\,\mathbf{D}_N^{H}
-\qquad\Rightarrow\qquad
-\tfrac{1}{\sqrt N}\mathbf{D}_N \text{ is a \textbf{unitary} matrix (after scaling).}
+\mathbf{D}_N^{-1} = \underbrace{\frac{1}{N}\,\mathbf{D}_N^{H}}_{\HandoutUnderbraceLabel{\text{a \textbf{unitary} matrix (after scaling)}}}
 \end{equation*}
+$\mathbf{D}_N^H$ is the Hermitian transpose of $\mathbf{D}_N$ (conjugate and transpose: $\mathbf{D}_N^H = (\mathbf{D}_N^{*})^{\mathsf T}$).
 A unitary matrix $\mathbf{U}$ satisfies $\mathbf{U}^{-1} = \mathbf{U}^H$.
 \end{factbox}
+
+\begin{notebox}[title={\texorpdfstring{Hermitian transpose and Hermitian matrices\hfill\normalfont\small\textit{(addendum to orig lecture note)}}{Hermitian transpose and Hermitian matrices (addendum)}}]
+\textbf{Hermitian transpose (conjugate transpose).} The Hermitian transpose of an $m\times n$ complex matrix $\mathbf{A}$ is the $n\times m$ matrix $\mathbf{A}^H$ obtained by transposing $\mathbf{A}$ and taking the complex conjugate of every entry (in either order):
+\begin{equation*}
+\mathbf{A}^H = (\mathbf{A}^{*})^{\mathsf T} = (\mathbf{A}^{\mathsf T})^{*}, \qquad [\mathbf{A}^H]_{ij} = a_{ji}^{*}.
+\end{equation*}
+Here $\mathbf{A}^{*}$ is the entrywise conjugate (some math texts write $\mathbf{A}^{*}$ for $\mathbf{A}^H$ itself).
+For example,
+\begin{equation*}
+\mathbf{A}=
+\begin{shadedbmatrix}
+\HandoutCell{gray!18}{1} & \HandoutCell{orange!30}{j}\\
+\HandoutCell{ee483link!18}{2} & \HandoutCell{violet!18}{3-j}
+\end{shadedbmatrix}.
+\end{equation*}
+Then,
+\begin{equation*}
+\mathbf{A}^*=
+\begin{shadedbmatrix}
+\HandoutCell{gray!18}{1} & \HandoutCell{orange!30}{-j}\\
+\HandoutCell{ee483link!18}{2} & \HandoutCell{violet!18}{3+j}
+\end{shadedbmatrix},
+\qquad
+\mathbf{A}^H=(\mathbf{A}^*)^{\mathsf T}=
+\begin{shadedbmatrix}
+\HandoutCell{gray!18}{1} & \HandoutCell{ee483link!18}{2}\\
+\HandoutCell{orange!30}{-j} & \HandoutCell{violet!18}{3+j}
+\end{shadedbmatrix}.
+\end{equation*}
+For real $\mathbf{A}$ this is just the transpose. Useful rules: $(\mathbf{A}^H)^H = \mathbf{A}$, \ $(\mathbf{A}\mathbf{B})^H = \mathbf{B}^H\mathbf{A}^H$, \ and $\vec{x}^H\vec{x} = \sum_n |x[n]|^2 = \|\vec{x}\|^2$.
+
+\medskip
+\textbf{Hermitian matrix.} $\mathbf{A}$ is \emph{Hermitian} if $\mathbf{A}^H = \mathbf{A}$ (the complex analogue of a symmetric matrix), e.g.\ $\begin{bmatrix} 2 & 1-j \\ 1+j & 3 \end{bmatrix}$. Its diagonal is real and its eigenvalues are real.
+
+\end{notebox}
 
 \begin{notebox}[title=\HandoutNoteAddendumTitle]
 The claim is the inverse DFT of Lecture~8 in matrix language: $[\mathbf{D}_N^H]_{nk} = W_N^{-kn}$, and
@@ -45,7 +87,7 @@ The claim is the inverse DFT of Lecture~8 in matrix language: $[\mathbf{D}_N^H]_
 \end{notebox}
 
 \begin{factbox}[title={Property (energy preservation)}]
-For unitary $\mathbf{U}$ and $\vec{X}\triangleq\mathbf{U}\vec{x}$,
+For unitary $\mathbf{U}$ ($\mathbf{U}^{-1} = \mathbf{U}^{H}$) and $\vec{X}\triangleq\mathbf{U}\vec{x}$,
 \begin{align*}
 \sum_{n=0}^{N-1}|x[n]|^2 = \vec{x}^H\vec{x}
 &= \vec{x}^H\,\mathbf{U}^{-1}\mathbf{U}\,\vec{x}
@@ -53,8 +95,21 @@ For unitary $\mathbf{U}$ and $\vec{X}\triangleq\mathbf{U}\vec{x}$,
  = (\mathbf{U}\vec{x})^H\,\mathbf{U}\vec{x} \\
 &= \vec{X}^H\vec{X} = \sum_{k=0}^{N-1}|X[k]|^2.
 \end{align*}
+A unitary transform does not change the energy of the signal.
 \end{factbox}
-\noindent With $\mathbf{U}=\frac{1}{\sqrt N}\mathbf{D}_N$ this is exactly Parseval's theorem for the DFT, $\sum|x[n]|^2 = \frac{1}{N}\sum|X[k]|^2$ (Lecture~8).
+\noindent With $\mathbf{U}=\frac{1}{\sqrt N}\mathbf{D}_N$ this is exactly Parseval's theorem for the DFT,\footnote{Lecture~8, Sec.~2.5 ``Parseval's Theorem.''}
+\begin{equation*}
+\sum_{n=0}^{N-1}|x[n]|^2 = \frac{1}{N}\sum_{k=0}^{N-1}|X[k]|^2. \MitraTag{5.6}
+\end{equation*}
+
+\begin{notebox}[title={\texorpdfstring{Mitra's view\hfill\normalfont\small\textit{(addendum to orig lecture note)}}{Mitra's view (addendum)}}]
+\begin{itemize}
+  \item ``An important consequence of the orthogonality of the basis sequence is the energy preservation property of the transform that allows one to compute the energy $\sum_{n=0}^{N-1}|x[n]|^2$ of the time-domain sequence $x[n]$ in the transform domain.'' \ (Sec.~5.1)\footnotemark
+  \item ``In some applications, it is also desirable to use transforms that decorrelate the transform coefficients $\mathcal{X}[k]$, $0\le k\le N-1$. Energy compaction is another attractive property that is taken advantage of in signal compression applications. In transforms with good energy compaction properties, most of the signal energy is concentrated in a subset of the transform coefficients, allowing the remaining coefficients with very low energy to be set to zero values. This process leads to an efficient approximation of the time-domain signal in the transform domain and is the basis of many signal compression methods.'' \ (Sec.~5.1)
+  \item ``Equation (5.114) can be used to compute the total energy of a finite-length sequence in the frequency domain.'' \ (Sec.~5.7)
+\end{itemize}
+\end{notebox}
+\footnotetext{S.~K.~Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Sec.~5.1 and Sec.~5.7, ``Parseval's Theorem.'' $\mathcal{X}[k]$ is Mitra's notation for the coefficients of a general orthogonal transform.}
 
 \HandoutMarkSubsection{2}{Unitary Transforms}
 
@@ -65,16 +120,17 @@ For unitary $\mathbf{U}$ and $\vec{X}\triangleq\mathbf{U}\vec{x}$,
 \begin{factbox}[title={Inverse of a unitary transform}]
 If
 \begin{equation*}
-\mathcal{T}\{x[n]\}[k] = \sum_{n=0}^{N-1} c[n,k]\,x[n]
+\mathcal{T}\{x[\HandoutN]\}[\HandoutK] = \sum_{\HandoutN=0}^{N-1} c[\HandoutN,\HandoutK]\,x[\HandoutN]
 \end{equation*}
 and $\mathcal{T}\{\cdot\}$ is unitary, then
 \begin{equation*}
-\mathcal{T}^{-1}\{X[k]\}[n] = \sum_{k=0}^{N-1} c^*[n,k]\,X[k].
+\mathcal{T}^{-1}\{X[\HandoutK]\}[\HandoutN] = \sum_{\HandoutK=0}^{N-1} c^*[\HandoutN,\HandoutK]\,X[\HandoutK].
 \end{equation*}
 \end{factbox}
 \noindent For the DFT, $c[n,k] = W_N^{nk}$ and $c^*[n,k]=W_N^{-nk}$ (we still need the factor $\tfrac{1}{N}$, since $\mathbf{D}_N$ itself is unitary only after scaling by $\tfrac{1}{\sqrt N}$).
 
-\section{Discrete Cosine Transform (DCT)}
+\section[Discrete Cosine Transform (DCT)]{Discrete Cosine Transform (DCT)\textsuperscript{\textcolor{red}{*}}}
+{\renewcommand{\thefootnote}{\textcolor{red}{*}}\footnotetext{Sec.~2 and everything after it in this lecture are not covered on the exam (ref: lecture video, 09/24, from 26:40).}}
 
 \begin{defbox}[title={DCT (one version)\footnotemark}]
 \begin{equation*}
