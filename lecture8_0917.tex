@@ -302,9 +302,10 @@ If $x[n]$ has length $N_1$ and $h[n]$ has length $N_2$, then $y[n] = x[n]\circle
 y_c[n] = \sum_{m=0}^{N-1} x[m]\,h\big[\HandoutMod{n-m}{N}\big], \qquad 0\le n\le N-1, \MitraTag{5.51}
 \end{equation*}
 \begin{equation*}
-y_c[n] = x[n] \HandoutCircConv h[n] = h[n] \HandoutCircConv x[n]. \MitraTag{5.52}
+y_c[n] = x[n] \HandoutCircConv h[n] = h[n] \HandoutCircConv x[n].\footnotemark \MitraTag{5.52}
 \end{equation*}
 \end{defbox}
+\footnotetext{The proof of Commutativity of Circular Convolution was asked in Problem Set~5, Problem~2.}
 
 \begin{factbox}[title={Convolution Theorem}]
 If $y_c[n] = x[n] \HandoutCircConv h[n]$, then $Y_c[k] = X[k]\,H[k]$.
@@ -372,7 +373,7 @@ With a fast algorithm (FFT) for the DFT, this is how long convolutions are compu
   \item The two-sequence line above is Mitra (5.115) in Sec.~5.7: $\sum_n g[n]\,h^*[n]=\frac{1}{N}\sum_k G[k]\,H^*[k]$.
   \item This lecture writes $x,y$ instead of $g,h$ and puts the conjugate on the first factor. Both sides are then the complex conjugates of Mitra's, so the equation still holds.
 \end{itemize}}
-\noindent The proof was asked in Problem Set~5, Problem~1.
+\noindent The proof of Parseval's Theorem for the DFT was asked in Problem Set~5, Problem~1.
 
 \subsection{Symmetry}
 
