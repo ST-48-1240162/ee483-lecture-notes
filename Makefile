@@ -16,9 +16,10 @@ PUBLISHED_NOTES := \
 	pdf/lecture08_discrete_fourier_transform.pdf \
 	pdf/lecture09_fast_fourier_transform.pdf \
 	pdf/lecture10_dft_matrix_dct.pdf \
-	pdf/lecture11_sampling_theory.pdf
+	pdf/lecture11_sampling_theory.pdf \
+	pdf/lecture12_signal_reconstruction.pdf
 
-.PHONY: all notes notes-compilation compilation publish-notes clean lecture1 lecture2 lecture3 lecture4 lecture5 lecture6 lecture7 lecture8 lecture9 lecture10 lecture11
+.PHONY: all notes notes-compilation compilation publish-notes clean lecture1 lecture2 lecture3 lecture4 lecture5 lecture6 lecture7 lecture8 lecture9 lecture10 lecture11 lecture12
 
 all: $(PDFS)
 
@@ -47,6 +48,7 @@ lecture8: lecture8_0917.pdf lecture8_0917_clean.pdf pdf/lecture08_discrete_fouri
 lecture9: lecture9_0922.pdf lecture9_0922_clean.pdf pdf/lecture09_fast_fourier_transform.pdf
 lecture10: lecture10_0924.pdf lecture10_0924_clean.pdf pdf/lecture10_dft_matrix_dct.pdf
 lecture11: lecture11_0929.pdf lecture11_0929_clean.pdf pdf/lecture11_sampling_theory.pdf
+lecture12: lecture12_1001.pdf lecture12_1001_clean.pdf pdf/lecture12_signal_reconstruction.pdf
 
 publish-notes: $(PUBLISHED_NOTES)
 
@@ -71,6 +73,8 @@ pdf/lecture09_fast_fourier_transform.pdf: lecture9_0922_clean.pdf | pdf
 pdf/lecture10_dft_matrix_dct.pdf: lecture10_0924_clean.pdf | pdf
 	cp -f $< $@
 pdf/lecture11_sampling_theory.pdf: lecture11_0929_clean.pdf | pdf
+	cp -f $< $@
+pdf/lecture12_signal_reconstruction.pdf: lecture12_1001_clean.pdf | pdf
 	cp -f $< $@
 
 # Full: lecture notes + textbook excerpt + handwritten lecture note scan

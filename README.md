@@ -25,10 +25,11 @@ PDFs in [`pdf/`](pdf/) are clean builds (notes only, no textbook pages or handwr
 | 6 | Sep 10 | DTFT and Fourier Series | Mitra 3.6, 3.7, 4.6.4, 4.8, 4.9; Hayes 2.7, 5.3 | 🚧 |
 | [7](pdf/lecture07_linear_phase_filters.pdf) | Sep 15 | Linear Phase Filters | Mitra 5.2; Hayes 6 | ✅ |
 | [8](pdf/lecture08_discrete_fourier_transform.pdf) | Sep 17 | Discrete Fourier Transform (DFT) | Mitra 5.4, 5.5, 5.7, 11.3 to 11.5; Hayes 6 to 7 | ✅ |
-| — | — | [Collected edition (lectures 1–5, 7–8)](pdf/ee483_lectures_clean.pdf) | — | ✅ |
 | [9](pdf/lecture09_fast_fourier_transform.pdf) | Sep 22 | The Fast Fourier Transform (FFT) | Mitra 11.3 to 11.5; Hayes 7 | ✅ |
 | [10](pdf/lecture10_dft_matrix_dct.pdf) | Sep 24 | DFT Matrix, DCT, and Transforms as Representations | Mitra 3.8, 5; Hayes 3 | ✅ |
 | 11 | Sep 29 | Sampling Theory | Mitra 2.5, 3.8, 3.9; Hayes 3 | 🚧 |
+| 12 | Oct 1 | Signal Reconstruction, Zero-Order Hold, and Oversampling | Mitra 3.8, 3.10; Hayes 3.5 | 🚧 |
+| — | — | [Collected edition (lectures 1–5, 7–8)](pdf/ee483_lectures_clean.pdf) | — | ✅ |
 
 ## Build
 
@@ -38,10 +39,11 @@ Requires XeLaTeX (`fontspec`, `unicode-math`, `subfiles`, `tcolorbox`, …), TeX
 make clean
 make notes              # *_clean.pdf (gitignored) + copy → pdf/lecture*.pdf (same as CI)
 make notes-compilation  # pdf/ee483_lectures_clean.pdf (collected clean edition)
+make lecture7           # full lecture7_0915.pdf (local; scans/appendix) + clean + pdf/ publish
 make lecture9           # full + clean + pdf/lecture09_fast_fourier_transform.pdf
 make lecture10          # full + clean + pdf/lecture10_dft_matrix_dct.pdf
 make lecture11          # full + clean + pdf/lecture11_sampling_theory.pdf
-make lecture7           # full lecture7_0915.pdf (local; scans/appendix) + clean + pdf/ publish
+make lecture12          # full + clean + pdf/lecture12_signal_reconstruction.pdf
 make all                # every lecture: full + clean + pdf/ publish
 ```
 

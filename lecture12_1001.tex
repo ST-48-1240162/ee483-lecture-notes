@@ -1,0 +1,280 @@
+\documentclass[handout_subfiles_root.tex]{subfiles}
+\usepackage[rm2]{lecturenote}
+
+\begin{document}
+\HandoutTitle{12}{Signal Reconstruction, Zero-Order Hold, and Oversampling}{October 1, 2026}
+\maketitle
+
+\HandoutMarkSection{1}{Aliasing and Signal Reconstruction}
+
+\noindent\textbf{Aliasing:} high frequencies can look like low frequencies.
+
+\subsection{Signal Reconstruction (for Bandlimited Signals)}
+
+\noindent Let $X(j\Omega)=0$ for $\forall\,|\Omega|\ge\frac{\pi}{T}$. Then
+\begin{equation*}
+x(t) = \frac{1}{2\pi}\int_{-\pi/T}^{\pi/T} X(j\Omega)\,e^{j\Omega t}\,d\Omega.
+\end{equation*}
+Let $\omega=\Omega T \Leftrightarrow \Omega=\frac{\omega}{T} \Rightarrow d\Omega=\frac{1}{T}\,d\omega$:
+\begin{equation*}
+x(t) = \frac{1}{2\pi T}\int_{-\pi}^{\pi} X\!\left(j\tfrac{\omega}{T}\right) e^{j\frac{\omega}{T}t}\,d\omega.
+\end{equation*}
+From Lecture~11,
+\begin{equation*}
+X(e^{j\omega}) = \frac{1}{T}\sum_{k=-\infty}^{\infty} X(j\Omega)\Big|_{\Omega=\frac{\omega}{T}+\frac{2\pi k}{T}} = \frac{1}{T}\,X\!\left(j\tfrac{\omega}{T}\right) \qquad \text{for } |\omega|\le\pi,
+\end{equation*}
+so
+\begin{align*}
+x(t) &= \frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega})\,e^{j\frac{\omega t}{T}}\,d\omega
+= \frac{1}{2\pi}\int_{-\pi}^{\pi}\left[\sum_{n=-\infty}^{\infty} x[n]\,e^{-j\omega n}\right] e^{j\frac{\omega t}{T}}\,d\omega \\
+&= \sum_{n=-\infty}^{\infty} x[n]\left[\frac{1}{2\pi}\int_{-\pi}^{\pi} e^{j\frac{\omega t}{T}-j\omega n}\,d\omega\right].
+\end{align*}
+
+\begin{factbox}[title={Reconstruction formula}]
+\begin{equation*}
+x(t) = \sum_{n=-\infty}^{\infty} x[n]\,\frac{\sin\!\big(\pi(\frac{t}{T}-n)\big)}{\pi(\frac{t}{T}-n)}.
+\end{equation*}
+\end{factbox}
+
+\begin{notebox}[title=\HandoutNoteAddendumTitle]
+With $a=\frac{t}{T}-n$, the bracket is
+$\frac{1}{2\pi}\int_{-\pi}^{\pi} e^{j\omega a}\,d\omega = \frac{e^{j\pi a}-e^{-j\pi a}}{2\pi j a} = \frac{\sin(\pi a)}{\pi a}$.
+In this course $\mathrm{sinc}(x)=\frac{\sin x}{x}$, so the kernel is $\mathrm{sinc}\big(\pi(\frac{t}{T}-n)\big)$: it equals $1$ at $t=nT$ and $0$ at every other sample time, so $x(nT)=x[n]$.
+\end{notebox}
+
+\HandoutMarkSubsection{2}{Sinc Interpolation: Discrete Time to Continuous Time}
+
+\begin{handouttikz}[x=0.62cm, y=1.3cm, font=\small]
+  \draw[->, ee483rule] (-1.2,0) -- (11.5,0) node[right, ee483ink] {$t$};
+  \foreach \n/\v in {1/0.55, 2/1.0, 3/0.75, 4/0.35, 5/0.15} {
+    \draw[densely dashed, ee483rule, domain=-1:11, samples=160, smooth]
+      plot (\x, {\v*sin(deg(pi*(\x/2-\n)))/(pi*(\x/2-\n)+1e-9)});
+    \draw[thick] (2*\n,0) -- (2*\n,\v); \fill (2*\n,\v) circle (1.8pt);
+  }
+  \draw[thick, ee483link, domain=-1:11, samples=200, smooth] plot (\x, {
+      0.55*sin(deg(pi*(\x/2-1)))/(pi*(\x/2-1)+1e-9)
+    + 1.0*sin(deg(pi*(\x/2-2)))/(pi*(\x/2-2)+1e-9)
+    + 0.75*sin(deg(pi*(\x/2-3)))/(pi*(\x/2-3)+1e-9)
+    + 0.35*sin(deg(pi*(\x/2-4)))/(pi*(\x/2-4)+1e-9)
+    + 0.15*sin(deg(pi*(\x/2-5)))/(pi*(\x/2-5)+1e-9)});
+  \node[ee483link, anchor=west] at (11.5,0.4) {$x(t)$};
+\end{handouttikz}
+
+\begin{handouttikz}[x=1cm, y=1cm, font=\small]
+  \node (in) at (0,0) {$x[n]$};
+  \node[draw, circle, inner sep=1pt] (m) at (1.6,0) {$\times$};
+  \node[draw, minimum height=0.8cm, align=center] (h) at (7.4,0) {$\mathrm{sinc}\!\big(\frac{\pi t}{T}\big)$};
+  \node (out) at (9.6,0) {$x(t)$};
+  \node (imp) at (1.6,-1.5) {$\displaystyle\sum_{k=-\infty}^{\infty}\delta(t-kT)$};
+  \draw[->, thick] (in) -- (m);
+  \draw[->, thick] (imp) -- (m);
+  \draw[->, thick] (m) -- node[above] {$\tilde x(t)=\sum_{k}x[k]\,\delta(t-kT)$} (h);
+  \draw[->, thick] (h) -- (out);
+  \node[below, font=\scriptsize] at (h.south) {analog LPF};
+  \draw[rounded corners, thick] (0.9,-2.2) rectangle (8.75,0.85);
+  \node[above left] at (8.75,0.85) {ideal D/A};
+\end{handouttikz}
+
+\noindent\textbf{What is the CTFT of $\tilde x(t)$?}
+\begin{align*}
+\tilde X(j\Omega) &= \int_{-\infty}^{\infty}\left[\sum_{k=-\infty}^{\infty} x[k]\,\delta(t-kT)\right] e^{-j\Omega t}\,dt \\
+&= \sum_{k=-\infty}^{\infty} x[k]\,e^{-j\Omega kT} = X(e^{j\omega})\Big|_{\omega=\Omega T}.
+\end{align*}
+
+\begin{handouttikz}[x=0.55cm, y=0.8cm, font=\small]
+  \foreach \row/\ax/\lab in {0/{\omega}/{X(e^{j\omega})}, -2.4/{\Omega}/{\tilde X(j\Omega)}} {
+    \draw[->, ee483rule] (-9.5,\row) -- (9.5,\row) node[right, ee483ink] {$\ax$};
+    \foreach \c in {-8,0,8} {\draw[thick] (\c-4,\row) -- (\c,\row+1.2) -- (\c+4,\row);}
+    \node[left] at (-9.5,\row+1.0) {$\lab$};
+    \node[above] at (0,\row+1.2) {$\tfrac1T$};
+  }
+  \foreach \x/\l in {-8/{-2\pi}, -4/{-\pi}, 0/{0}, 4/{\pi}, 8/{2\pi}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+  \foreach \x/\l in {-8/{-\frac{2\pi}{T}}, -4/{-\frac{\pi}{T}}, 0/{0}, 4/{\frac{\pi}{T}}, 8/{\frac{2\pi}{T}}} {\draw (\x,-2.32) -- (\x,-2.48) node[below] {$\l$};}
+\end{handouttikz}
+
+\HandoutMarkSection{3}{Zero-Order Hold (ZOH)}
+
+\noindent\textbf{Note:} $\mathrm{sinc}\big(\frac{\pi t}{T}\big)$ has CTFT $T$ on $|\Omega|<\frac{\pi}{T}$ (and $0$ outside), so the analog LPF passes the central copy of $\tilde X(j\Omega)$ scaled by $T$, which is $X(j\Omega)$:
+
+\begin{handouttikz}[x=0.8cm, y=0.8cm, font=\small]
+  \begin{scope}
+    \draw[->, ee483rule] (-3,0) -- (3,0) node[right, ee483ink] {$\Omega$};
+    \draw[thick] (-2.6,0) -- (-1.6,0) -- (-1.6,1.2) -- (1.6,1.2) -- (1.6,0) -- (2.6,0);
+    \node[above right] at (1.6,1.2) {$T$};
+    \foreach \x/\l in {-1.6/{-\frac{\pi}{T}}, 0/{0}, 1.6/{\frac{\pi}{T}}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+  \end{scope}
+  \begin{scope}[xshift=7.5cm]
+    \draw[->, ee483rule] (-3,0) -- (3,0) node[right, ee483ink] {$\Omega$};
+    \draw[thick] (-1.6,0) -- (0,1.2) -- (1.6,0);
+    \node[above] at (0,1.2) {$1$};
+    \node[left] at (-2.2,1.0) {$X(j\Omega)$};
+    \foreach \x/\l in {-1.6/{-\frac{\pi}{T}}, 0/{0}, 1.6/{\frac{\pi}{T}}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+  \end{scope}
+\end{handouttikz}
+
+\begin{defbox}[title={Zero-order hold (ZOH)}]
+Instead of outputting a stream of Dirac delta functions, output each sample value and hold it constant until the next sample comes:
+\begin{equation*}
+\hat x(t) = \sum_{n=-\infty}^{\infty} x[n]\,r(t-nT),
+\qquad
+r(t) = \begin{cases} \frac{1}{T}, & 0\le t\le T, \\ 0, & \text{else.} \end{cases}
+\end{equation*}
+\end{defbox}
+
+\begin{handouttikz}[x=0.6cm, y=0.55cm, font=\small]
+  \def\vals{{0,0,1.6,1.1,0.9,0.75,0,0}}
+  % samples x[n]
+  \draw[->, ee483rule] (-0.5,4.6) -- (10.5,4.6) node[right, ee483ink] {$n$};
+  \foreach \i in {0,...,7} {\pgfmathsetmacro{\v}{\vals[\i]}
+    \draw[thick] (1.2*\i+0.4,4.6) -- (1.2*\i+0.4,4.6+\v); \fill (1.2*\i+0.4,4.6+\v) circle (1.8pt);}
+  % ideal: Dirac deltas
+  \draw[->, ee483rule] (-0.5,2.3) -- (10.5,2.3) node[right, ee483ink] {$t$ \ (ideal)};
+  \foreach \i in {2,...,5} {\pgfmathsetmacro{\v}{\vals[\i]}
+    \draw[->, thick] (1.2*\i+0.4,2.3) -- (1.2*\i+0.4,2.3+\v);}
+  \draw[|-|] (2.8,1.95) -- node[below, font=\scriptsize] {$T$} (4.0,1.95);
+  % ZOH: staircase
+  \draw[->, ee483rule] (-0.5,0) -- (10.5,0) node[right, ee483ink] {$t$ \ (ZOH)};
+  \draw[thick] (2.8,0) -- (2.8,1.6) -- (4.0,1.6) -- (4.0,1.1) -- (5.2,1.1) -- (5.2,0.9) -- (6.4,0.9) -- (6.4,0.75) -- (7.6,0.75) -- (7.6,0);
+\end{handouttikz}
+
+\HandoutMarkSubsection{4}{Spectrum of the ZOH Output}
+
+\begin{align*}
+\hat X(j\Omega) &= \int_{-\infty}^{\infty}\sum_{n=-\infty}^{\infty} x[n]\,r(t-nT)\,e^{-j\Omega t}\,dt \\
+&= \sum_{n=-\infty}^{\infty} x[n]\underbrace{\int_{-\infty}^{\infty} r(t-nT)\,e^{-j\Omega(t-nT)}\,dt}_{\HandoutUnderbraceLabel{\frac{1}{T}\cdot T\,e^{-j\frac{\Omega T}{2}}\,\mathrm{sinc}\left(\frac{\Omega T}{2}\right)}}\; e^{-j\Omega nT} \\[0.4em]
+&= \left[\sum_{n=-\infty}^{\infty} x[n]\,e^{-j\Omega nT}\right] e^{-j\frac{\Omega T}{2}}\,\mathrm{sinc}\!\left(\frac{\Omega T}{2}\right) \\
+&= X(e^{j\omega})\Big|_{\omega=\Omega T}\cdot \mathrm{sinc}\!\left(\frac{\Omega T}{2}\right) e^{-j\frac{\Omega T}{2}}.
+\end{align*}
+
+\begin{handouttikz}[x=0.55cm, y=1.1cm, font=\small]
+  % u = Omega*T/pi; periodic triangle tri(u) = 1 - |u - 2 round(u/2)|
+  \draw[->, ee483rule] (-9.5,0) -- (9.5,0) node[right, ee483ink] {$\Omega$};
+  \draw[thick, domain=-9:9, samples=181] plot (\x, {1-abs(\x/4-2*round(\x/8))});
+  \draw[densely dashed, ee483link, domain=-9:9, samples=181, smooth] plot (\x, {abs(sin(deg(pi*\x/8))/(pi*\x/8+1e-9))});
+  \node[left] at (-9.5,1.0) {$\tilde X(j\Omega)$};
+  \node[ee483link, anchor=west] at (9.6,0.55) {$\big|\mathrm{sinc}\big(\frac{\Omega T}{2}\big)\big|$};
+  \foreach \x/\l in {-8/{-\frac{2\pi}{T}}, -4/{-\frac{\pi}{T}}, 0/{0}, 4/{\frac{\pi}{T}}, 8/{\frac{2\pi}{T}}} {\draw (\x,0.06) -- (\x,-0.06) node[below] {$\l$};}
+  \begin{scope}[yshift=-2.1cm]
+    \draw[->, ee483rule] (-9.5,0) -- (9.5,0) node[right, ee483ink] {$\Omega$};
+    \draw[thick, domain=-9:9, samples=361] plot (\x, {(1-abs(\x/4-2*round(\x/8)))*abs(sin(deg(pi*\x/8))/(pi*\x/8+1e-9))});
+    \node[left] at (-9.5,1.0) {$|\hat X(j\Omega)|$};
+    \foreach \x/\l in {-8/{-\frac{2\pi}{T}}, -4/{-\frac{\pi}{T}}, 0/{0}, 4/{\frac{\pi}{T}}, 8/{\frac{2\pi}{T}}} {\draw (\x,0.06) -- (\x,-0.06) node[below] {$\l$};}
+  \end{scope}
+\end{handouttikz}
+
+\HandoutMarkSubsection{5}{Compensating Analog LPF}
+
+\begin{handouttikz}[x=1cm, y=1cm, font=\small]
+  \node (in) at (0,0) {$x[n]$};
+  \node[draw, minimum height=0.7cm] (z) at (1.7,0) {ZOH};
+  \node[draw, minimum height=0.7cm, align=center] (l) at (4.6,0) {analog\\LPF};
+  \node (out) at (6.6,0) {$x(t)$};
+  \draw[->, thick] (in) -- (z);
+  \draw[->, thick] (z) -- node[above] {$\hat x(t)$} (l);
+  \draw[->, thick] (l) -- (out);
+\end{handouttikz}
+
+\begin{equation*}
+H(j\Omega) = \begin{cases} \dfrac{T\,e^{j\Omega T/2}}{\mathrm{sinc}(\Omega T/2)}, & |\Omega|\le\frac{\pi}{T}, \\[8pt] 0, & \text{else.} \end{cases}
+\end{equation*}
+$\Rightarrow$ \textbf{eliminated the need for Dirac delta functions!}
+
+\begin{handouttikz}[x=0.9cm, y=1.2cm, font=\small]
+  \draw[->, ee483rule] (-3.2,0) -- (3.4,0) node[right, ee483ink] {$\Omega$};
+  \draw[->, ee483rule] (0,0) -- (0,2.0);
+  \draw[thick] (-2.4,0) -- (-2.4,{pi/2}) -- plot[domain=-2.4:2.4, samples=121, smooth] (\x, {1/(sin(deg(pi*\x/4.8))/(pi*\x/4.8+1e-9))}) -- (2.4,0);
+  \node[left] at (-2.6,1.7) {$|H(j\Omega)|$};
+  \draw[densely dashed, ee483rule] (0,1) -- (-0.4,1) node[left, ee483ink] {$T$};
+  \draw[densely dashed, ee483rule] (2.4,{pi/2}) -- (2.9,{pi/2}) node[right, ee483ink] {$\frac{\pi T}{2}$};
+  \foreach \x/\l in {-2.4/{-\frac{\pi}{T}}, 0/{0}, 2.4/{\frac{\pi}{T}}} {\draw (\x,0.06) -- (\x,-0.06) node[below] {$\l$};}
+\end{handouttikz}
+
+\begin{itemize}
+  \item We still need non-causal, infinite analog filters.
+  \item \textbf{Practically:} we'll use a causal approximation (delay), and we'll also approximate the analog frequency response (inaccuracy).
+\end{itemize}
+
+\HandoutMarkSection{6}{Oversampling}
+
+\noindent\textbf{Note:} we can sample faster than the Nyquist rate (sampling faster $\Rightarrow$ smaller $T$).
+
+\begin{examplebox}[title={Example}]
+\noindent $X(j\Omega)=1$ for $|\Omega|\le 3000\pi$ and $0$ else, so the Nyquist rate is $3000$\,Hz.
+
+\begin{handouttikz}[x=0.5cm, y=0.8cm, font=\small]
+  \draw[->, ee483rule] (-6,0) -- (6,0) node[right, ee483ink] {$\Omega$};
+  \draw[thick] (-5.5,0) -- (-3,0) -- (-3,1) -- (3,1) -- (3,0) -- (5.5,0);
+  \node[above right] at (3,1) {$1$};
+  \node[left] at (-5.8,1) {$X(j\Omega)$};
+  \foreach \x/\l in {-3/{-3000\pi}, 0/{0}, 3/{3000\pi}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+\end{handouttikz}
+
+\noindent $T=\frac{1}{3000}$\,s (sampling at the Nyquist rate): $X(e^{j\omega}) = 3000$ for all $\omega$.
+
+\begin{handouttikz}[x=0.5cm, y=0.8cm, font=\small]
+  \draw[->, ee483rule] (-9,0) -- (9,0) node[right, ee483ink] {$\omega$};
+  \draw[thick] (-8.5,1) -- (8.5,1);
+  \foreach \x in {-4,4} {\draw[ee483rule] (\x,0) -- (\x,1);}
+  \node[above] at (0,1) {$3000$};
+  \node[left] at (-8.8,1) {$X(e^{j\omega})$};
+  \foreach \x/\l in {-4/{-\pi}, 0/{0}, 4/{\pi}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+\end{handouttikz}
+
+\noindent Let $T=\frac{1}{4000}$\,s $\Rightarrow$ sampling rate $4000$\,Hz:
+
+\begin{handouttikz}[x=0.7cm, y=0.8cm, font=\small]
+  % pi = 4 units; copies of height 4000 on |w| <= 3pi/4 around 2pi*m
+  \draw[->, ee483rule] (-6.5,0) -- (9.8,0) node[right, ee483ink] {$\omega$};
+  \draw[thick] (-6.2,1) -- (-5,1) -- (-5,0) -- (-3,0) -- (-3,1) -- (3,1) -- (3,0) -- (5,0) -- (5,1) -- (9.5,1);
+  \node[above] at (0,1) {$4000$};
+  \node[left] at (-6.5,1) {$X(e^{j\omega})$};
+  \foreach \x/\l in {-5/{-\frac{5\pi}{4}}, -3/{-\frac{3\pi}{4}}, 0/{0}, 3/{\frac{3\pi}{4}}, 5/{\frac{5\pi}{4}}, 8/{2\pi}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+  \foreach \x/\l in {-4/{-\pi}, 4/{\pi}} {\draw (\x,0.08) -- (\x,-0.08) node[above=2pt] {$\l$};}
+\end{handouttikz}
+
+\noindent Oversampling might be good: it relaxes our constraints on the analog LPF.
+\end{examplebox}
+
+\begin{examplebox}[title={Example (continued)}]
+\HandoutMarkLeft{7}\noindent The output of the ideal D/A before filtering:
+
+\begin{handouttikz}[x=0.75cm, y=0.8cm, font=\small]
+  \draw[->, ee483rule] (-7,0) -- (7.2,0) node[right, ee483ink] {$\Omega$};
+  \draw[thick] (-6.8,1) -- (-5,1) -- (-5,0) -- (-3,0) -- (-3,1) -- (3,1) -- (3,0) -- (5,0) -- (5,1) -- (6.8,1);
+  \node[above] at (0,1) {$4000$};
+  \node[left] at (-7,1) {$\tilde X(j\Omega)$};
+  \foreach \x/\l in {-5/{-5000\pi}, -3/{-3000\pi}, 0/{0}, 3/{3000\pi}, 5/{5000\pi}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+\end{handouttikz}
+
+\noindent The analog LPF must satisfy
+\begin{equation*}
+H(j\Omega) = \begin{cases} T, & |\Omega|\le 3000\pi, \\ 0, & |\Omega|\ge 5000\pi, \\ \text{don't care}, & \text{else.} \end{cases}
+\end{equation*}
+
+\begin{handouttikz}[x=0.75cm, y=0.8cm, font=\small]
+  \draw[->, ee483rule] (-7,0) -- (7,0) node[right, ee483ink] {$\Omega$};
+  \draw[thick] (-3,1) -- (3,1);
+  \draw[thick, densely dashed] (-5,0) -- (-3,1); \draw[thick, densely dashed] (3,1) -- (5,0);
+  \draw[thick] (-6.5,0) -- (-5,0); \draw[thick] (5,0) -- (6.5,0);
+  \node[above] at (0,1) {$T$};
+  \node[left] at (-7,1) {$H(j\Omega)$};
+  \foreach \x/\l in {-5/{-5000\pi}, -3/{-3000\pi}, 0/{0}, 3/{3000\pi}, 5/{5000\pi}} {\draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};}
+\end{handouttikz}
+
+\noindent Much easier than designing a sharp cutoff frequency!
+\end{examplebox}
+
+\section*{Readings}
+\begin{itemize}
+  \item Monson H. Hayes, \textit{Schaum's Outline of Digital Signal Processing}, 2nd ed.,\\ Ch.~3.5 (upsampling, downsampling, sample rate conversion)
+  \item Sanjit K. Mitra, \textit{Digital Signal Processing: A Computer-Based Approach}, 4th ed., Secs.~3.8, 3.10
+\end{itemize}
+
+\HandoutAppendixListStart
+  \HandoutAppendixListItem{app:scan12}{A.\ Handwritten Lecture Note Scan (October 1, 2026)}
+\HandoutAppendixListEnd
+
+\HandoutAppendixSection{app:scan12}{Handwritten Lecture Note Scan}
+\HandoutIncludeHandoutScan{lecture12_1001.pdf}
+
+\end{document}
